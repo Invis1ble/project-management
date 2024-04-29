@@ -1,8 +1,15 @@
 {
-    "name": "symfony/skeleton",
+    "name": "invis1ble/findbride-release-management",
+    "authors": [
+        {
+            "name": "Invis1ble",
+            "email": "invis1ble@users.noreply.github.com",
+            "role": "Developer"
+        }
+    ],
     "type": "project",
     "license": "MIT",
-    "description": "A minimal Symfony project recommended to create bare bones applications",
+    "description": "A release management tool for the website findbride.com",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
@@ -27,12 +34,12 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "ReleaseManagement\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "ReleaseManagement\\Tests\\": "tests/"
         }
     },
     "replace": {
