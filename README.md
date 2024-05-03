@@ -21,3 +21,7 @@ In the `.env` file set following variables:
 - JIRA_USERNAME
 - JIRA_PROJECT_KEY
 
+## Monitoring
+
+RabbiMQ Management http://localhost:15672/#/queues/%2F/messages
+
