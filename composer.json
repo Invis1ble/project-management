@@ -1,5 +1,5 @@
 {
-    "name": "invis1ble/findbride-release-management",
+    "name": "invis1ble/release-management",
     "authors": [
         {
             "name": "Invis1ble",
@@ -9,20 +9,36 @@
     ],
     "type": "project",
     "license": "MIT",
-    "description": "A release management tool for the website findbride.com",
+    "description": "A release management tool",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
         "php": ">=8.3.6",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "beberlei/assert": "^3.3",
+        "broadway/broadway-bundle": "*",
+        "broadway/broadway-saga": "*",
+        "broadway/saga-state-dbal": "^0.2.0",
+        "doctrine/dbal": "^3",
+        "doctrine/doctrine-bundle": "^2.12",
+        "doctrine/doctrine-migrations-bundle": "^3.3",
+        "doctrine/orm": "^3.1",
+        "guzzlehttp/guzzle": "^7.8",
+        "invis1ble/messenger-bundle": "^2.0",
         "runtime/frankenphp-symfony": "^0.2.0",
+        "symfony/amqp-messenger": "7.0.*",
         "symfony/console": "7.0.*",
         "symfony/dotenv": "7.0.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.0.*",
         "symfony/runtime": "7.0.*",
+        "symfony/uid": "7.0.*",
         "symfony/yaml": "7.0.*"
+    },
+    "require-dev": {
+        "symfony/stopwatch": "7.0.*",
+        "symfony/web-profiler-bundle": "7.0.*"
     },
     "config": {
         "allow-plugins": {
