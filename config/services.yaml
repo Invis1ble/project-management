@@ -4,21 +4,77 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    release_management.gitlab_project.backend: '%env(GITLAB_BACKEND_PROJECT_ID)%'
+    release_management.gitlab_project.frontend: '%env(GITLAB_FRONTEND_PROJECT_ID)%'
+    release_management.jira_project.main: '%env(JIRA_PROJECT_KEY)%'
+    saga.state.doctrine.dbal.table_name: 'saga_state'
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            bool $debug: '%kernel.debug%'
+            int $backendProjectId: '%release_management.gitlab_project.backend%'
+            int frontendProjectId: '%release_management.gitlab_project.frontend%'
+            ReleaseManagement\Shared\Domain\Model\SourceCodeRepositoryInterface $backendSourceCodeRepository: '@release_management.gitlab_backend_client'
+            ReleaseManagement\Shared\Domain\Model\SourceCodeRepositoryInterface $frontendSourceCodeRepository: '@release_management.gitlab_frontend_client'
+            ReleaseManagement\Shared\Domain\Model\ContinuousIntegrationClientInterface $frontendCiClient: '@release_management.gitlab_frontend_client'
+            ReleaseManagement\Shared\Domain\Model\ContinuousIntegrationClientInterface $backendCiClient: '@release_management.gitlab_backend_client'
+    
+    application_layer:
+        namespace: ReleaseManagement\
+        resource: '../src/*/Application/**/*{Handler,Saga}.php'
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+    ui_layer:
+        namespace: ReleaseManagement\
+        resource: '../src/*/Ui/**/*{Command}.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    infrastructure_layer:
+        namespace: ReleaseManagement\
+        resource: '../src/*/Infrastructure/**/*{Factory,Repository,Resolver}.php'
+    
+    ReleaseManagement\Release\Domain\Model\ReleaseFactoryInterface: '@ReleaseManagement\Release\Infrastructure\Domain\Model\ReleaseFactory'
+    ReleaseManagement\Release\Domain\Repository\ReleaseRepositoryInterface: '@ReleaseManagement\Release\Infrastructure\Domain\Repository\ReleaseRepository'
+    ReleaseManagement\Release\Domain\Model\TaskTrackerInterface: '@ReleaseManagement\Release\Infrastructure\Domain\Model\TaskTracker'
+
+    ReleaseManagement\Shared\Infrastructure\Domain\Model\GitlabHttpClientFactory:
+        arguments:
+            $gitlabUrl: '%env(GITLAB_URL)%'
+            $gitlabAccessToken: '%env(GITLAB_ACCESS_TOKEN)%'
+
+    release_management.gitlab_http_client:
+        class: GuzzleHttp\Client
+        factory: [ '@ReleaseManagement\Shared\Infrastructure\Domain\Model\GitlabHttpClientFactory', 'createGitlabClient']
+
+    ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTrackerClientFactory:
+        arguments:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $jiraUsername: '%env(JIRA_USERNAME)%'
+            $jiraAccessToken: '%env(JIRA_ACCESS_TOKEN)%'
+
+    release_management.task_tracker.http_client:
+        class: GuzzleHttp\Client
+        factory: [ '@ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTrackerClientFactory', 'createTaskTrackerClient' ]
+    
+    release_management.gitlab_backend_client:
+        class: ReleaseManagement\Shared\Infrastructure\Domain\Model\GitlabClient
+        arguments:
+            $httpClient: '@release_management.gitlab_http_client'
+            $projectId: '%release_management.gitlab_project.backend%'
+    
+    release_management.gitlab_frontend_client:
+        class: ReleaseManagement\Shared\Infrastructure\Domain\Model\GitlabClient
+        arguments:
+            $httpClient: '@release_management.gitlab_http_client'
+            $projectId: '%release_management.gitlab_project.frontend%'
+    
+    ReleaseManagement\Release\Infrastructure\Domain\Model\TaskTracker:
+        arguments:
+            $httpClient: '@release_management.task_tracker.http_client'
+            $projectKey: '%release_management.jira_project.main%'
+
+    GuzzleHttp\Psr7\HttpFactory: ~
+    Psr\Http\Message\UriFactoryInterface: '@GuzzleHttp\Psr7\HttpFactory'
+    Psr\Http\Message\RequestFactoryInterface: '@GuzzleHttp\Psr7\HttpFactory'
