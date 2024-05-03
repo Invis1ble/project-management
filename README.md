@@ -21,6 +21,12 @@ In the `.env` file set following variables:
 - JIRA_USERNAME
 - JIRA_PROJECT_KEY
 
+## Usage
+
+```sh
+docker compose exec -it php bin/console release:prepare
+```
+
 ## Monitoring
 
 RabbiMQ Management http://localhost:15672/#/queues/%2F/messages
