@@ -57,7 +57,9 @@ jobs:
         run: docker compose exec -T php bin/phpunit
       -
         name: Doctrine Schema Validator
-        run: docker compose exec -T php bin/console -e test doctrine:schema:validate
+        # @see https://github.com/doctrine/migrations/issues/1406
+#        run: docker compose exec -T php bin/console -e test doctrine:schema:validate
+        run: docker compose exec -T php bin/console -e test doctrine:schema:validate --skip-sync
   lint:
     name: Docker Lint
     runs-on: ubuntu-latest

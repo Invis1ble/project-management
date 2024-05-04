@@ -75,11 +75,6 @@ final class StatusType extends StringType
         throw ConversionException::conversionFailed($value, self::NAME);
     }
 
-    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
-    {
-        return parent::getSQLDeclaration(['length' => 32] + $column, $platform);
-    }
-
     public function getName(): string
     {
         return self::NAME;

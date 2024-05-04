@@ -10,8 +10,8 @@
 
         <id name="id" type="release_id" />
 
-        <field name="branchName" type="release_branch_name" />
-        <field name="status" type="release_status" />
+        <field name="branchName" type="release_branch_name" length="24" />
+        <field name="status" type="release_status" length="32" />
         <field name="createdAt" type="utc_datetime_microseconds_immutable" />
     </entity>
 </doctrine-mapping>
