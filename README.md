@@ -4,7 +4,9 @@ Release Management
 ![CI Status](https://github.com/Invis1ble/release-management/actions/workflows/ci.yml/badge.svg?event=push)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-## Getting Started
+
+Getting Started
+---------------
 
 1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
 2. Run `docker compose build --no-cache` to build fresh images
@@ -25,13 +27,22 @@ In the `.env` file set following variables:
 - JIRA_USERNAME
 - JIRA_PROJECT_KEY
 
-## Usage
+
+Usage
+-----
 
 ```sh
 docker compose exec -it php bin/console release:prepare
 ```
 
-## Monitoring
+
+Monitoring
+----------
 
 RabbiMQ Management http://localhost:15672/#/queues/%2F/messages
 
+
+License
+-------
+
+[The MIT License](./LICENSE)
