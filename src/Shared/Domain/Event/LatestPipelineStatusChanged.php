@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace ReleaseManagement\Shared\Domain\Event;
 
-use ReleaseManagement\Shared\Domain\Model\BranchName;
-use ReleaseManagement\Shared\Domain\Model\Pipeline\PipelineId;
-use ReleaseManagement\Shared\Domain\Model\Pipeline\Status;
-use ReleaseManagement\Shared\Domain\Model\ProjectId;
+use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
+use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
+use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
 final readonly class LatestPipelineStatusChanged extends AbstractPipelineEvent
 {
     public function __construct(
         PipelineId $pipelineId,
-        BranchName $branchName,
+        Name $branchName,
         public ?Status $previousStatus,
         Status $status,
         ProjectId $projectId,

@@ -14,9 +14,9 @@ doctrine:
         types:
             utc_datetime_microseconds_immutable: ReleaseManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\UtcDateTimeMicrosecondsImmutableType
 
-            release_id: ReleaseManagement\Release\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleaseIdType
-            release_branch_name: ReleaseManagement\Release\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleaseBranchNameType
-            release_status: ReleaseManagement\Release\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\StatusType
+            release_publication_id: ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleasePublicationIdType
+            release_branch_name: ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleaseBranchNameType
+            release_publication_status: ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\StatusType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -25,12 +25,12 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
-            Release\Entity:
+            ReleasePublication\Entity:
                 is_bundle: false
                 type: xml
-                dir: '%kernel.project_dir%/src/Release/Infrastructure/config/doctrine/Entity'
-                prefix: ReleaseManagement\Release\Infrastructure\Domain\Model\Entity
-                alias: Release\Entity
+                dir: '%kernel.project_dir%/src/ReleasePublication/Infrastructure/config/doctrine/Entity'
+                prefix: ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model\Entity
+                alias: ReleasePublication\Entity
         controller_resolver:
             auto_mapping: true
 

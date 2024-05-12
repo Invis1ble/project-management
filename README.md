@@ -20,12 +20,15 @@ Getting Started
 
 In the `.env` file set following variables:
 
-- GITLAB_URL
-- GITLAB_BACKEND_PROJECT_ID
-- GITLAB_FRONTEND_PROJECT_ID
-- JIRA_URL
-- JIRA_USERNAME
-- JIRA_PROJECT_KEY
+- `GITLAB_URL`
+- `GITLAB_BACKEND_PROJECT_ID`
+- `GITLAB_FRONTEND_PROJECT_ID`
+- `JIRA_URL`
+- `JIRA_USERNAME`
+- `JIRA_PROJECT_KEY`
+- `JIRA_SPRINT_FIELD_ID` - `customfield` id for Sprint section in Jira issues
+- `JIRA_SPRINT_BOARD_ID`
+- `JIRA_MERGE_REQUEST_FIELD_ID` - `customfield` id for Development section in Jira issues
 
 
 Usage

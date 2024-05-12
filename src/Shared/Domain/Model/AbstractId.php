@@ -38,7 +38,7 @@ abstract readonly class AbstractId implements IdInterface
 
     public function equals(IdInterface $id): bool
     {
-        return $this->value === $id->value() && $this::class === $id::class;
+        return (string) $this === (string) $id && $this::class === $id::class;
     }
 
     /**
