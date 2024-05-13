@@ -7,7 +7,7 @@ namespace ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 /**
  * @see https://docs.gitlab.com/ee/api/pipelines.html
  */
-enum Status: string
+enum Status: string implements \JsonSerializable
 {
     case Created = 'created';
 
@@ -47,5 +47,10 @@ enum Status: string
             [self::Success, self::Failed, self::Canceled, self::Skipped],
             true,
         );
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->value;
     }
 }

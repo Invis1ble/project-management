@@ -26,6 +26,11 @@ services:
         ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface:
             tags: ['release_management.development_collaboration.merge_request_manager']
 
+
+
+    Invis1ble\Messenger\Command\CommandBus:
+        arguments: ['@messenger.bus.command.async']
+
     
 
     application_layer:

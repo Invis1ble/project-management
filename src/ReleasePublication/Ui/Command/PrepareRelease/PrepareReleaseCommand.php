@@ -13,6 +13,8 @@ use ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\Release as Tas
 use ReleaseManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
 use ReleaseManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
 use ReleaseManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
+use ReleaseManagement\Shared\Domain\Event\LatestPipelineAwaitingTick;
+use ReleaseManagement\Shared\Domain\Event\LatestPipelineStatusChanged;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
@@ -70,7 +72,18 @@ final class PrepareReleaseCommand extends Command
         );
 
 
-//        dump($tasks);
+        dump($tasks);
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -308,5 +321,15 @@ final class PrepareReleaseCommand extends Command
     private function abort(): void
     {
         throw new \RuntimeException('Aborted');
+    }
+
+    public function handleLatestPipelineAwaitingTick(LatestPipelineAwaitingTick $e): void
+    {
+        $this->io->info("[$e->branchName @ $e->projectId] Latest pipeline $e->pipelineId tick");
+    }
+
+    public function handleLatestPipelineStatusChanged(LatestPipelineStatusChanged $e): void
+    {
+        $this->io->info("[$e->branchName @ $e->projectId] Latest pipeline $e->pipelineId status changed: $e->previousStatus -> $e->status");
     }
 }

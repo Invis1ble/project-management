@@ -34,6 +34,15 @@ In the `.env` file set following variables:
 Usage
 -----
 
+Run queue workers:
+```sh
+docker compose exec php bin/console messenger:consume command.async --queues=commands -vvv
+```
+
+```sh
+docker compose exec php bin/console messenger:consume event.async --queues=events -vvv
+```
+
 ```sh
 docker compose exec -it php bin/console release:prepare
 ```

@@ -72,32 +72,46 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
             $pipeline = json_decode($content, true);
 
-            if (new \DateTimeImmutable($pipeline['created_at']) > $createdAfter) {
-                $status = Status::from($pipeline['status']);
+            $pipelineId = PipelineId::from($pipeline['id']);
+            $status = Status::from($pipeline['status']);
 
+            if (new \DateTimeImmutable($pipeline['created_at']) > $createdAfter) {
                 if ($status !== $previousStatus) {
                     $this->eventBus->dispatch(new LatestPipelineStatusChanged(
-                        pipelineId: PipelineId::from($pipeline['id']),
+                        pipelineId: $pipelineId,
                         branchName: $branchName,
                         previousStatus: $previousStatus,
                         status: $status,
                         projectId: $this->projectId,
+                        maxAwaitingTime: $maxAwaitingTime,
                     ));
+
+                    $previousStatus = $status;
                 }
 
                 if ($status->finished() || !$status->inProgress()) {
                     return $pipeline;
                 }
-
-                $previousStatus = $status;
             }
 
-            $this->eventBus->dispatch(new LatestPipelineAwaitingTick($branchName));
+            $this->eventBus->dispatch(new LatestPipelineAwaitingTick(
+                pipelineId: $pipelineId,
+                branchName: $branchName,
+                status: $status,
+                projectId: $this->projectId,
+                maxAwaitingTime: $maxAwaitingTime,
+            ));
 
             sleep($tickIntervalInSeconds);
         } while (new \DateTimeImmutable() <= $untilTime);
 
-        $this->eventBus->dispatch(new LatestPipelineStuck($branchName, $maxAwaitingTime));
+        $this->eventBus->dispatch(new LatestPipelineStuck(
+            pipelineId: $pipelineId,
+            branchName: $branchName,
+            status: $status,
+            projectId: $this->projectId,
+            maxAwaitingTime: $maxAwaitingTime,
+        ));
 
         return $pipeline;
     }

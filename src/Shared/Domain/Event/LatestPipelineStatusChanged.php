@@ -17,12 +17,14 @@ final readonly class LatestPipelineStatusChanged extends AbstractPipelineEvent
         public ?Status $previousStatus,
         Status $status,
         ProjectId $projectId,
+        \DateInterval $maxAwaitingTime,
     ) {
         parent::__construct(
             $pipelineId,
             $branchName,
             $status,
             $projectId,
+            $maxAwaitingTime,
         );
     }
 }

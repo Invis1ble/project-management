@@ -11,17 +11,10 @@ framework:
             # async: '%env(MESSENGER_TRANSPORT_DSN)%'
             # failed: 'doctrine://default?queue_name=failed'
             # sync: 'sync://'
-            command.async:
-                dsn: "%env(MESSENGER_TRANSPORT_DSN)%"
-                retry_strategy:
-                    delay: 1000
-                    max_retries: 5
-                    multiplier: 2
-                    max_delay: 0
 
         routing:
             # Route your messages to the transports
-            Invis1ble\Messenger\Command\CommandInterface: command.async
+            Invis1ble\Messenger\Command\CommandInterface: async
 
 # when@test:
 #    framework:
