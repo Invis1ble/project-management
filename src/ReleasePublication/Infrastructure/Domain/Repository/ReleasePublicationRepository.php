@@ -7,10 +7,10 @@ namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\Repository;
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
 use ReleaseManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
+use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublication;
 use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use ReleaseManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
-use ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model\Entity\ReleasePublication;
 use ReleaseManagement\Shared\Domain\Repository\EventDispatchingRepository;
 
 final class ReleasePublicationRepository extends EventDispatchingRepository implements ReleasePublicationRepositoryInterface

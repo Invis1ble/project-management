@@ -8,20 +8,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\StringType;
 use ReleaseManagement\ReleasePublication\Domain\Model\Status\Dictionary;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusCreated;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendBranchCreated;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineCanceled;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineCreated;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineFailed;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineManual;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelinePending;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelinePreparing;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineRunning;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineScheduled;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineSkipped;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineStuck;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineWaitingForResource;
+use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFactory;
 use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
 
 final class StatusType extends StringType
@@ -40,22 +27,7 @@ final class StatusType extends StringType
         }
 
         try {
-            return match ($value) {
-                Dictionary::Created->value => new StatusCreated(),
-                Dictionary::FrontendBranchCreated->value => new StatusFrontendBranchCreated(),
-                Dictionary::FrontendPipelineCreated->value => new StatusFrontendPipelineCreated(),
-                Dictionary::FrontendPipelineWaitingForResource->value => new StatusFrontendPipelineWaitingForResource(),
-                Dictionary::FrontendPipelinePreparing->value => new StatusFrontendPipelinePreparing(),
-                Dictionary::FrontendPipelinePending->value => new StatusFrontendPipelinePending(),
-                Dictionary::FrontendPipelineRunning->value => new StatusFrontendPipelineRunning(),
-                Dictionary::FrontendPipelineSuccess->value => new StatusFrontendPipelineSuccess(),
-                Dictionary::FrontendPipelineFailed->value => new StatusFrontendPipelineFailed(),
-                Dictionary::FrontendPipelineCanceled->value => new StatusFrontendPipelineCanceled(),
-                Dictionary::FrontendPipelineSkipped->value => new StatusFrontendPipelineSkipped(),
-                Dictionary::FrontendPipelineManual->value => new StatusFrontendPipelineManual(),
-                Dictionary::FrontendPipelineScheduled->value => new StatusFrontendPipelineScheduled(),
-                Dictionary::FrontendPipelineStuck->value => new StatusFrontendPipelineStuck(),
-            };
+            return StatusFactory::createStatus(Dictionary::from($value));
         } catch (\Throwable $e) {
             throw ConversionException::conversionFailed($value, self::NAME, $e);
         }

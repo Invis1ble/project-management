@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
 
+use Invis1ble\Messenger\Event\EventBusInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use ReleaseManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
+use ReleaseManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
 use ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\Release;
 use ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Board;
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Project;
+use ReleaseManagement\Shared\Domain\Model\TaskTracker\Version;
 use ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
 
 final readonly class TaskTracker extends BasicTaskTracker implements TaskTrackerInterface
@@ -22,9 +26,11 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
     public function __construct(
         ClientInterface $httpClient,
         UriFactoryInterface $uriFactory,
+        StreamFactoryInterface $streamFactory,
         RequestFactoryInterface $requestFactory,
         IssueFactoryInterface $issueFactory,
         MergeRequestFactoryInterface $mergeRequestFactory,
+        private EventBusInterface $eventBus,
         Project\Key $projectKey,
         Board\BoardId $sprintBoardId,
         int $sprintFieldId,
@@ -34,6 +40,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         parent::__construct(
             $httpClient,
             $uriFactory,
+            $streamFactory,
             $requestFactory,
             $issueFactory,
             $mergeRequestFactory,
@@ -43,7 +50,112 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         );
     }
 
-    public function latestRelease(): ?Release
+    public function renameReleaseCandidate(Name $branchName): Version\Version
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
+                'query' => 'Release Candidate',
+                'orderBy' => 'name',
+                'status' => 'unreleased',
+                'maxResults' => 1,
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $releaseCandidate = json_decode($content, true)['values'][0];
+
+        $request = $this->requestFactory->createRequest(
+            'PUT',
+            $this->uriFactory->createUri("/rest/api/3/version/{$releaseCandidate['id']}"),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode([
+                'name' => (string) $branchName,
+            ])));
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $release = json_decode($content, true);
+
+        $version = new Version\Version(
+            Version\VersionId::fromString($release['id']),
+            Version\Name::fromString($release['name']),
+            isset($release['description']) ? Version\Description::fromString($release['description']) : null,
+            $release['archived'],
+            $release['released'],
+            isset($release['releaseDate']) ? new \DateTimeImmutable($release['releaseDate']) : null,
+        );
+
+        $this->eventBus->dispatch(new ReleaseCandidateRenamed(
+            id: $version->id,
+            name: $version->name,
+            previousName: Version\Name::fromString($releaseCandidate['name']),
+            description: $version->description,
+            archived: $version->archived,
+            released: $version->released,
+            releaseDate: $version->releaseDate,
+        ));
+
+        return $version;
+    }
+
+    public function createReleaseCandidate(): Version\Version
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $project = json_decode($content, true);
+
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri('/rest/api/3/version'),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode([
+                'projectId' => $project['id'],
+                'name' => 'Release Candidate',
+            ])));
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $releaseCandidate = json_decode($content, true);
+
+        $version = new Version\Version(
+            Version\VersionId::fromString($releaseCandidate['id']),
+            Version\Name::fromString($releaseCandidate['name']),
+            isset($releaseCandidate['description']) ? Version\Description::fromString($releaseCandidate['description']) : null,
+            $releaseCandidate['archived'],
+            $releaseCandidate['released'],
+            isset($releaseCandidate['releaseDate']) ? new \DateTimeImmutable($releaseCandidate['releaseDate']) : null,
+        );
+
+        $this->eventBus->dispatch(new ReleaseCandidateCreated(
+            id: $version->id,
+            name: $version->name,
+            description: $version->description,
+            archived: $version->archived,
+            released: $version->released,
+            releaseDate: $version->releaseDate,
+        ));
+
+        return $version;
+    }
+
+    public function latestRelease(): ?Version\Version
     {
         $request = $this->requestFactory->createRequest(
             'GET',
@@ -87,13 +199,13 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
 
         $release = $heap->top();
 
-        return new Release(
-            $release['id'],
-            $release['name'],
-            $release['description'] ?? null,
+        return new Version\Version(
+            Version\VersionId::fromString($release['id']),
+            Version\Name::fromString($release['name']),
+            isset($release['description']) ? Version\Description::fromString($release['description']) : null,
             $release['archived'],
             $release['released'],
-            $release['releaseDate'] ?? null,
+            isset($release['releaseDate']) ? new \DateTimeImmutable($release['releaseDate']) : null,
         );
     }
 

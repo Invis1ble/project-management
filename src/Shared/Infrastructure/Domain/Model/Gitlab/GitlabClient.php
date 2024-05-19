@@ -7,11 +7,15 @@ namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\Gitlab;
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
-use ReleaseManagement\Shared\Domain\Event\BranchCreated;
-use ReleaseManagement\Shared\Domain\Event\LatestPipelineAwaitingTick;
-use ReleaseManagement\Shared\Domain\Event\LatestPipelineStatusChanged;
-use ReleaseManagement\Shared\Domain\Event\LatestPipelineStuck;
+use ReleaseManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineAwaitingTick;
+use ReleaseManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStatusChanged;
+use ReleaseManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStuck;
+use ReleaseManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequestMerged;
+use ReleaseManagement\Shared\Domain\Event\SourceCodeRepository\BranchCreated;
+use ReleaseManagement\Shared\Domain\Event\SourceCodeRepository\CommitCreated;
+use ReleaseManagement\Shared\Domain\Exception\UnsupportedProjectException;
 use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
 use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
@@ -21,6 +25,14 @@ use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
 use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\File;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\Filename;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\AbstractAction;
+use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
 use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
 final readonly class GitlabClient implements SourceCodeRepositoryInterface, ContinuousIntegrationClientInterface, MergeRequestManagerInterface
@@ -29,6 +41,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         private ClientInterface $httpClient,
         private UriFactoryInterface $uriFactory,
         private RequestFactoryInterface $requestFactory,
+        private StreamFactoryInterface $streamFactory,
         private DetailsFactoryInterface $detailsFactory,
         private EventBusInterface $eventBus,
         private ProjectId $projectId,
@@ -38,8 +51,8 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
     public function awaitLatestPipeline(
         Name $branchName,
         \DateTimeImmutable $createdAfter,
-        \DateInterval $maxAwaitingTime = null,
-        \DateInterval $tickInterval = null,
+        ?\DateInterval $maxAwaitingTime = null,
+        ?\DateInterval $tickInterval = null,
     ): array {
         $startTime = new \DateTimeImmutable();
 
@@ -78,11 +91,11 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             if (new \DateTimeImmutable($pipeline['created_at']) > $createdAfter) {
                 if ($status !== $previousStatus) {
                     $this->eventBus->dispatch(new LatestPipelineStatusChanged(
-                        pipelineId: $pipelineId,
+                        projectId: $this->projectId,
                         branchName: $branchName,
+                        pipelineId: $pipelineId,
                         previousStatus: $previousStatus,
                         status: $status,
-                        projectId: $this->projectId,
                         maxAwaitingTime: $maxAwaitingTime,
                     ));
 
@@ -95,10 +108,10 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             }
 
             $this->eventBus->dispatch(new LatestPipelineAwaitingTick(
-                pipelineId: $pipelineId,
-                branchName: $branchName,
-                status: $status,
                 projectId: $this->projectId,
+                branchName: $branchName,
+                pipelineId: $pipelineId,
+                status: $status,
                 maxAwaitingTime: $maxAwaitingTime,
             ));
 
@@ -106,27 +119,128 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         } while (new \DateTimeImmutable() <= $untilTime);
 
         $this->eventBus->dispatch(new LatestPipelineStuck(
-            pipelineId: $pipelineId,
-            branchName: $branchName,
-            status: $status,
             projectId: $this->projectId,
+            branchName: $branchName,
+            pipelineId: $pipelineId,
+            status: $status,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 
         return $pipeline;
     }
 
-    public function createBranch(Name $name): void
+    public function createBranch(Name $name, Name $ref): void
     {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/branches" . http_build_query([
+                'branch' => (string) $name,
+                'ref' => (string) $ref,
+            ])),
+        );
+
+        $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
         $this->eventBus->dispatch(new BranchCreated(
-            branchName: $name,
             projectId: $this->projectId,
+            branchName: $name,
+            ref: $ref,
         ));
     }
 
-    public function retryLatestPipeline()
+    public function commit(
+        Name $branchName,
+        Message $message,
+        ActionList $actions,
+        ?Name $startBranchName = null,
+    ): void {
+        $data = [
+            'branch' => (string)$branchName,
+            'commit_message' => (string)$message,
+            'actions' => iterator_to_array($actions->map(fn (AbstractAction $action): array => $action->toArray())),
+        ];
+
+        if (null !== $startBranchName) {
+            $data['start_branch_name'] = (string) $startBranchName;
+        }
+
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/commits"),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode($data)));
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $this->eventBus->dispatch(new CommitCreated(
+            projectId: $this->projectId,
+            branchName: $branchName,
+            startBranchName: $startBranchName,
+            commitId: CommitId::fromString($data['id']),
+            message: Message::fromString($data['message']),
+            guiUrl: $this->uriFactory->createUri($data['web_url']),
+        ));
+    }
+
+    public function file(Name $branchName, FilePath $filePath): File
     {
-        // TODO: Implement retryLatestPipeline() method.
+        $encodedFilePath = urlencode((string) $filePath);
+
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/files/$encodedFilePath?" . http_build_query([
+                'ref' => (string) $branchName,
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return new File(
+            filename: Filename::fromString($data['file_name']),
+            filePath: FilePath::fromString($data['file_path']),
+            content: Content::fromBase64Encoded($data['content']),
+            ref: Name::fromString($data['ref']),
+            commitId: CommitId::fromString($data['commit_id']),
+            lastCommitId: CommitId::fromString($data['last_commit_id']),
+            executeFilemode: $data['execute_filemode'],
+        );
+    }
+
+    public function merge(ProjectId $projectId, MergeRequestId $mergeRequestId): Details
+    {
+        $this->assertSupportsProject($projectId);
+
+        $request = $this->requestFactory->createRequest(
+            'PUT',
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $mergeRequest = json_decode($content, true);
+
+        $details = $this->createDetails($mergeRequest);
+
+        $this->eventBus->dispatch(new MergeRequestMerged(
+            projectId: $projectId,
+            mergeRequestId: $mergeRequestId,
+            details: $details,
+        ));
+
+        return $details;
     }
 
     public function supports(ProjectId $projectId): bool
@@ -136,13 +250,11 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
     public function details(ProjectId $projectId, MergeRequestId $mergeRequestId): Details
     {
-        if (!$this->supports($projectId)) {
-            throw new \InvalidArgumentException("Unsupported project id: $projectId");
-        }
+        $this->assertSupportsProject($projectId);
 
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/merge_requests/$mergeRequestId"),
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -151,6 +263,18 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $mergeRequest = json_decode($content, true);
 
+        return $this->createDetails($mergeRequest);
+    }
+
+    private function assertSupportsProject(ProjectId $projectId): void
+    {
+        if (!$this->supports($projectId)) {
+            throw new UnsupportedProjectException($projectId);
+        }
+    }
+
+    private function createDetails(array $mergeRequest): Details
+    {
         return $this->detailsFactory->createDetails(
             status: $mergeRequest['detailed_merge_status'],
         );

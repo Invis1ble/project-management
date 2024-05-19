@@ -36,13 +36,11 @@ Usage
 
 Run queue workers:
 ```sh
-docker compose exec php bin/console messenger:consume command.async --queues=commands -vvv
+docker compose exec php bin/console messenger:consume async -vvv
 ```
 
-```sh
-docker compose exec php bin/console messenger:consume event.async --queues=events -vvv
-```
 
+Prepare release command:
 ```sh
 docker compose exec -it php bin/console release:prepare
 ```

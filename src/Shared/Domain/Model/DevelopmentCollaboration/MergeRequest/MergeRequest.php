@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
 use Psr\Http\Message\UriInterface;
+use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
 use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 
 final readonly class MergeRequest
@@ -22,6 +24,19 @@ final readonly class MergeRequest
         public UriInterface $guiUrl,
         public ?Details $details,
     ) {
+    }
+
+    public function merge(MergeRequestManagerInterface $mergeRequestManager): self
+    {
+        if ($this->merged()) {
+            return $this;
+        }
+
+        if (null === $this->details) {
+            throw new \RuntimeException("Merge request $this->id details not set");
+        }
+
+        return $this->details->merge($mergeRequestManager, $this);
     }
 
     public function open(): bool
@@ -62,5 +77,19 @@ final readonly class MergeRequest
             $this->guiUrl,
             $details,
         );
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id->value(),
+            'name' => (string) $this->name,
+            'project_id' => $this->projectId->value(),
+            'project_name' => (string) $this->projectName,
+            'source_branch_name' => (string) $this->sourceBranchName,
+            'target_branch_name' => (string) $this->targetBranchName,
+            'status' => $this->status->value,
+            'gui_url' => (string) $this->guiUrl,
+        ];
     }
 }

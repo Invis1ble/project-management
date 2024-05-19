@@ -19,11 +19,7 @@ interface ContinuousIntegrationClientInterface
     public function awaitLatestPipeline(
         Name $branchName,
         \DateTimeImmutable $createdAfter,
-        \DateInterval $maxAwaitingTime = null,
-        \DateInterval $tickInterval = null,
+        ?\DateInterval $maxAwaitingTime = null,
+        ?\DateInterval $tickInterval = null,
     ): array;
-
-    public function retryLatestPipeline(
-
-    );
 }

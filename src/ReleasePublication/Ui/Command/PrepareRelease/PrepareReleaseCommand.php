@@ -9,12 +9,9 @@ use Invis1ble\Messenger\Query\QueryBusInterface;
 use ReleaseManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
 use ReleaseManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
 use ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\Release as TaskTrackerRelease;
 use ReleaseManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
 use ReleaseManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
 use ReleaseManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
-use ReleaseManagement\Shared\Domain\Event\LatestPipelineAwaitingTick;
-use ReleaseManagement\Shared\Domain\Event\LatestPipelineStatusChanged;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
@@ -23,6 +20,7 @@ use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as Ba
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ReleaseManagement\Shared\Domain\Model\TaskTracker\Version\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -64,12 +62,33 @@ final class PrepareReleaseCommand extends Command
 
         $this->io->title('Preparing new release');
 
+
+
+
+
         $newReleaseBranchName = $this->newReleaseBranchName();
         $tasks = $this->readyToMergeTasks();
 
         $tasks = new IssueList(
             ...$tasks->map(fn (Issue $task): Issue => $this->taskWithMergeRequests($task)),
         );
+
+        $this->io->section('Summary');
+
+        $this->io->block('New release branch name', null, 'fg=green');
+        $this->io->block((string) $newReleaseBranchName);
+
+        $this->io->block('Tasks in Ready to Merge from the active sprint', null, 'fg=green');
+        $this->listIssues($tasks);
+
+        $this->io->block('Merge requests will be merged', null, 'fg=green');
+        $this->listMergeRequests($tasks->mergeRequestsToMerge());
+
+        $confirmed = $this->io->confirm('OK');
+
+        if (!$confirmed) {
+            $this->abort();
+        }
 
 
         dump($tasks);
@@ -104,7 +123,7 @@ final class PrepareReleaseCommand extends Command
     {
         $this->io->section('Fetching latest release');
 
-        /** @var TaskTrackerRelease $release */
+        /** @var Version $release */
         $release = $this->queryBus->ask(new GetLatestReleaseQuery());
 
         if (null === $release) {
@@ -115,7 +134,7 @@ final class PrepareReleaseCommand extends Command
             throw new \UnexpectedValueException("Latest release $release->name not yet released");
         }
 
-        $latestReleaseBranchName = Name::fromString($release->name);
+        $latestReleaseBranchName = Name::fromString((string) $release->name);
 
         $this->io->info("Latest release branch name: $latestReleaseBranchName");
 
@@ -210,7 +229,11 @@ final class PrepareReleaseCommand extends Command
                 break;
             }
 
-            $this->io->warning("Merge request is not mergeable. Merge status: {$mergeRequest->status->value}");
+            $this->io->warning([
+                "Merge request $mergeRequest->projectName!$mergeRequest->id is not mergeable.",
+                "Merge status: {$mergeRequest->status->value}",
+                $mergeRequest->guiUrl,
+            ]);
 
             $confirmed = $this->io->confirm(
                 question: "Check merge request $mergeRequest->guiUrl merge status again",
@@ -321,15 +344,5 @@ final class PrepareReleaseCommand extends Command
     private function abort(): void
     {
         throw new \RuntimeException('Aborted');
-    }
-
-    public function handleLatestPipelineAwaitingTick(LatestPipelineAwaitingTick $e): void
-    {
-        $this->io->info("[$e->branchName @ $e->projectId] Latest pipeline $e->pipelineId tick");
-    }
-
-    public function handleLatestPipelineStatusChanged(LatestPipelineStatusChanged $e): void
-    {
-        $this->io->info("[$e->branchName @ $e->projectId] Latest pipeline $e->pipelineId status changed: $e->previousStatus -> $e->status");
     }
 }

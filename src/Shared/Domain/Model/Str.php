@@ -37,17 +37,17 @@ readonly class Str implements \Stringable, \Serializable, \JsonSerializable
 
     public function __serialize(): array
     {
-        return [$this->value];
+        return [$this->serialize()];
     }
 
     public function __unserialize(array $data): void
     {
-        $this->value = $data[0];
+        $this->unserialize($data[0]);
     }
 
     public function jsonSerialize(): string
     {
-        return $this->value;
+        return $this->serialize();
     }
 
     protected function validate(string $value): void

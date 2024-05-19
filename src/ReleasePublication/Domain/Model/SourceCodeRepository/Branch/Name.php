@@ -42,12 +42,12 @@ final readonly class Name extends BasicName
         return new self("v-$this->majorVersion-$this->minorVersion-$patch");
     }
 
-    protected function validateName(string $name): void
+    protected function validate(string $value): void
     {
-        parent::validateName($name);
+        parent::validate($value);
 
-        if (!preg_match("/^v(?:-[0-9]+){3}$/", $name)) {
-            throw new \InvalidArgumentException("Invalid release branch name format: $name");
+        if (!preg_match("/^v(?:-[0-9]+){3}$/", $value)) {
+            throw new \InvalidArgumentException("Invalid release branch name format: $value");
         }
     }
 }

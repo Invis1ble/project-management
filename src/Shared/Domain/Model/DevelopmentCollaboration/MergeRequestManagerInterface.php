@@ -10,6 +10,8 @@ use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\
 
 interface MergeRequestManagerInterface
 {
+    public function merge(ProjectId $projectId, MergeRequestId $mergeRequestId): Details;
+
     public function supports(ProjectId $projectId): bool;
 
     public function details(ProjectId $projectId, MergeRequestId $mergeRequestId): Details;

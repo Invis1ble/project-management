@@ -4,7 +4,6 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    saga.state.doctrine.dbal.table_name: 'saga_state'
 
 services:
     # default configuration for services in *this* file
@@ -35,7 +34,7 @@ services:
 
     application_layer:
         namespace: ReleaseManagement\
-        resource: '../src/*/Application/**/*{Handler,Saga}.php'
+        resource: '../src/*/Application/**/*{Handler}.php'
 
     ui_layer:
         namespace: ReleaseManagement\
@@ -43,7 +42,7 @@ services:
 
     infrastructure_layer:
         namespace: ReleaseManagement\
-        resource: '../src/*/Infrastructure/**/*{Factory,Repository,Resolver}.php'
+        resource: '../src/*/Infrastructure/**/*{Bus,Handler,Factory,Repository,Resolver}.php'
     
     
     
@@ -114,7 +113,7 @@ services:
     ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
     
-    ReleaseManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequestManagerStack:
+    ReleaseManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerStack:
         arguments:
             - !tagged_iterator release_management.development_collaboration.merge_request_manager
 
@@ -138,4 +137,5 @@ services:
     ReleaseManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface: '@ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface: '@ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\GuiUrlFactory'
-    ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface: '@ReleaseManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequestManagerStack'
+    ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface: '@ReleaseManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerStack'
+    ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface: '@ReleaseManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactory'

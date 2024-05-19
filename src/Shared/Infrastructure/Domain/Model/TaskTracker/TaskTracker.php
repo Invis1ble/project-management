@@ -6,6 +6,7 @@ namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
@@ -21,6 +22,7 @@ readonly class TaskTracker implements TaskTrackerInterface
     public function __construct(
         protected ClientInterface $httpClient,
         protected UriFactoryInterface $uriFactory,
+        protected StreamFactoryInterface $streamFactory,
         protected RequestFactoryInterface $requestFactory,
         protected IssueFactoryInterface $issueFactory,
         protected MergeRequestFactoryInterface $mergeRequestFactory,

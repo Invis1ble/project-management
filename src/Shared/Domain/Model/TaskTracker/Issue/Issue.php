@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue;
 
+use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
 use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 use ReleaseManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
 
@@ -19,6 +21,19 @@ final readonly class Issue implements \Stringable
         public ?MergeRequestList $mergeRequests,
         public ?MergeRequestList $mergeRequestsToMerge,
     ) {
+    }
+
+    public function mergeMergeRequests(MergeRequestManagerInterface $mergeRequestManager): self
+    {
+        return new self(
+            $this->id,
+            $this->key,
+            $this->typeId,
+            $this->summary,
+            $this->sprints,
+            $this->mergeRequests,
+            $this->mergeRequestsToMerge?->mergeMergeRequests($mergeRequestManager),
+        );
     }
 
     public function canonicalBranchName(): Name

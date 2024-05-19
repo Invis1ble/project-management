@@ -9,7 +9,7 @@ use Symfony\Component\Uid\Uuid;
 
 abstract readonly class AbstractUuid implements IdInterface
 {
-    protected function __construct(private AbstractUid $uuid)
+    public function __construct(private AbstractUid $uuid)
     {
     }
 
@@ -35,7 +35,7 @@ abstract readonly class AbstractUuid implements IdInterface
 
     public function unserialize(string $data): void
     {
-        $this->uuid = Uuid::fromString($data[0]);
+        $this->uuid = Uuid::fromString($data);
     }
 
     public function __serialize(): array
