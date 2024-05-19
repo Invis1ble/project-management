@@ -13,6 +13,8 @@ FROM frankenphp_upstream AS frankenphp_base
 
 WORKDIR /app
 
+VOLUME /app/var/
+
 # persistent / runtime deps
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -68,8 +70,6 @@ CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod
-
-VOLUME /app/var/
 
 ENV APP_ENV=prod
 ENV FRANKENPHP_CONFIG="import worker.Caddyfile"
