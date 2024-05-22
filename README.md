@@ -1,4 +1,4 @@
-Release Management
+Project Management
 ===============================
 
 ![CI Status](https://github.com/Invis1ble/project-management/actions/workflows/ci.yml/badge.svg?event=push)
