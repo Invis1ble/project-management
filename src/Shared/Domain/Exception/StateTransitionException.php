@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Exception;
+namespace ProjectManagement\Shared\Domain\Exception;
 
 class StateTransitionException extends ConflictException
 {

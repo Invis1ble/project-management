@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Event\ContinuousIntegration;
+namespace ProjectManagement\Shared\Domain\Event\ContinuousIntegration;
 
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
 final readonly class LatestPipelineStatusChanged extends AbstractPipelineEvent
 {

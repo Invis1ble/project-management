@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint;
+namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint;
 
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
 
 final readonly class Sprint
 {

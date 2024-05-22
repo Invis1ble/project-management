@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
+namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
 
 enum Dictionary: string
 {

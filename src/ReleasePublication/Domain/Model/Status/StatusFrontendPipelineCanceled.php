@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Model\Status;
+namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
 
 final readonly class StatusFrontendPipelineCanceled extends StatusFrontendPipelineFinished
 {

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Model\Status;
+namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
 
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
 final readonly class StatusFrontendPipelineSuccess extends StatusFrontendPipelineFinished
 {

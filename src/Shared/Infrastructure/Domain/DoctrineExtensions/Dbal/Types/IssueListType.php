@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
+namespace ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\JsonType;
 use GuzzleHttp\Psr7\Uri;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\SprintList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint\Name;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint\State;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\SprintList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Name;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\State;
 
 final class IssueListType extends JsonType
 {

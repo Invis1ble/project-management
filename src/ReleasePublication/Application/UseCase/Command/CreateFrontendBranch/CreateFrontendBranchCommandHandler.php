@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Application\UseCase\Command\CreateFrontendBranch;
+namespace ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateFrontendBranch;
 
-use ReleaseManagement\ReleasePublication\Application\UseCase\Command\ReleasePublicationRepositoryAwareCommandHandler;
-use ReleaseManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use ProjectManagement\ReleasePublication\Application\UseCase\Command\ReleasePublicationRepositoryAwareCommandHandler;
+use ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
 final readonly class CreateFrontendBranchCommandHandler extends ReleasePublicationRepositoryAwareCommandHandler
 {

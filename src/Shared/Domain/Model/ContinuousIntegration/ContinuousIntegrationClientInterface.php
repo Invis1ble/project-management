@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\ContinuousIntegration;
+namespace ProjectManagement\Shared\Domain\Model\ContinuousIntegration;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
 interface ContinuousIntegrationClientInterface
 {

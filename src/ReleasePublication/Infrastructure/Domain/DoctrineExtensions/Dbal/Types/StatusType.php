@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
+namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\StringType;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\Dictionary;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusFactory;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
+use ProjectManagement\ReleasePublication\Domain\Model\Status\Dictionary;
+use ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFactory;
+use ProjectManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
 
 final class StatusType extends StringType
 {

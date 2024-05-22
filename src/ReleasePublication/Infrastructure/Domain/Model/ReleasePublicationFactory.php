@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model;
+namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Model;
 
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublication;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
 
 final readonly class ReleasePublicationFactory implements ReleasePublicationFactoryInterface
 {

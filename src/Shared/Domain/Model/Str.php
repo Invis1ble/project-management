@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model;
+namespace ProjectManagement\Shared\Domain\Model;
 
 readonly class Str implements \Stringable, \Serializable, \JsonSerializable
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Event\TaskTracker;
+namespace ProjectManagement\ReleasePublication\Domain\Event\TaskTracker;
 
-use ReleaseManagement\Shared\Domain\Event\TaskTracker\AbstractVersionEvent;
+use ProjectManagement\Shared\Domain\Event\TaskTracker\AbstractVersionEvent;
 
 final readonly class ReleaseCandidateCreated extends AbstractVersionEvent
 {

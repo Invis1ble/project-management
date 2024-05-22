@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Event\TaskTracker;
+namespace ProjectManagement\ReleasePublication\Domain\Event\TaskTracker;
 
-use ReleaseManagement\Shared\Domain\Event\TaskTracker\AbstractVersionEvent;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Version\Description;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Version\Name;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Version\VersionId;
+use ProjectManagement\Shared\Domain\Event\TaskTracker\AbstractVersionEvent;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Description;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Name;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionId;
 
 final readonly class ReleaseCandidateRenamed extends AbstractVersionEvent
 {

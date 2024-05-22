@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests;
+namespace ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests;
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
 
 final readonly class GetIssueMergeRequestsQueryHandler implements QueryHandlerInterface
 {

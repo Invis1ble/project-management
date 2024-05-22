@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
 use Psr\Http\Message\UriInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 
 final readonly class MergeRequest
 {

@@ -2,38 +2,38 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\Gitlab;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab;
 
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
-use ReleaseManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineAwaitingTick;
-use ReleaseManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStatusChanged;
-use ReleaseManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStuck;
-use ReleaseManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequestMerged;
-use ReleaseManagement\Shared\Domain\Event\SourceCodeRepository\BranchCreated;
-use ReleaseManagement\Shared\Domain\Event\SourceCodeRepository\CommitCreated;
-use ReleaseManagement\Shared\Domain\Exception\UnsupportedProjectException;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\File;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\Filename;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\AbstractAction;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineAwaitingTick;
+use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStatusChanged;
+use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStuck;
+use ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequestMerged;
+use ProjectManagement\Shared\Domain\Event\SourceCodeRepository\BranchCreated;
+use ProjectManagement\Shared\Domain\Event\SourceCodeRepository\CommitCreated;
+use ProjectManagement\Shared\Domain\Exception\UnsupportedProjectException;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\File;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Filename;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\AbstractAction;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
 final readonly class GitlabClient implements SourceCodeRepositoryInterface, ContinuousIntegrationClientInterface, MergeRequestManagerInterface
 {

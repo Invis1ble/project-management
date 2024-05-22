@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration;
+namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration;
 
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
 
 interface MergeRequestManagerInterface
 {

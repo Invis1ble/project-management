@@ -10,13 +10,13 @@ doctrine:
         use_savepoints: true
 
         types:
-            utc_datetime_microseconds_immutable: ReleaseManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\UtcDateTimeMicrosecondsImmutableType
+            utc_datetime_microseconds_immutable: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\UtcDateTimeMicrosecondsImmutableType
 
-            release_publication_id: ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleasePublicationIdType
-            release_branch_name: ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleaseBranchNameType
-            release_publication_status: ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\StatusType
+            release_publication_id: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleasePublicationIdType
+            release_branch_name: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleaseBranchNameType
+            release_publication_status: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\StatusType
             
-            issue_list: ReleaseManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\IssueListType
+            issue_list: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\IssueListType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -29,7 +29,7 @@ doctrine:
                 is_bundle: false
                 type: xml
                 dir: '%kernel.project_dir%/src/ReleasePublication/Infrastructure/config/doctrine'
-                prefix: ReleaseManagement\ReleasePublication\Domain\Model
+                prefix: ProjectManagement\ReleasePublication\Domain\Model
                 alias: ReleasePublication
         controller_resolver:
             auto_mapping: true

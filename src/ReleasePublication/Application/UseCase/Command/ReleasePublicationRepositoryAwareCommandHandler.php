@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Application\UseCase\Command;
+namespace ProjectManagement\ReleasePublication\Application\UseCase\Command;
 
 use Invis1ble\Messenger\Command\CommandHandlerInterface;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ReleaseManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
 
 abstract readonly class ReleasePublicationRepositoryAwareCommandHandler implements CommandHandlerInterface
 {

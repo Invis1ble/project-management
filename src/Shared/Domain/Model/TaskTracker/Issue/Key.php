@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue;
+namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
 final readonly class Key implements \Stringable, \JsonSerializable
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Application\UseCase\Query\GetProjectSupported;
+namespace ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported;
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
 
 final readonly class GetProjectSupportedQueryHandler implements QueryHandlerInterface
 {

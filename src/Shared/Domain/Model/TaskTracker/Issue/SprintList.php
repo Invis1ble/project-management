@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue;
+namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-use ReleaseManagement\Shared\Domain\Model\AbstractList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
+use ProjectManagement\Shared\Domain\Model\AbstractList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
 
 /**
  * @extends AbstractList<Sprint>

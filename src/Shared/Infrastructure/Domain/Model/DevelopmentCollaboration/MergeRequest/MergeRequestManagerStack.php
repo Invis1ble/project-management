@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
-use ReleaseManagement\Shared\Domain\Exception\UnsupportedProjectException;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Exception\UnsupportedProjectException;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
 
 final readonly class MergeRequestManagerStack implements MergeRequestManagerInterface
 {

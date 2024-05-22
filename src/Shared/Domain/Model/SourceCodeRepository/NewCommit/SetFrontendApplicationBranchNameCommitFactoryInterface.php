@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit;
+namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
 interface SetFrontendApplicationBranchNameCommitFactoryInterface
 {

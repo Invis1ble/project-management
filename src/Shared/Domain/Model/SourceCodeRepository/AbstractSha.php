@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\SourceCodeRepository;
+namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository;
 
-use ReleaseManagement\Shared\Domain\Model\NonEmptyString;
+use ProjectManagement\Shared\Domain\Model\NonEmptyString;
 
 abstract readonly class AbstractSha extends NonEmptyString
 {

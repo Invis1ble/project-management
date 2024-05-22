@@ -1,7 +1,7 @@
 Release Management
 ===============================
 
-![CI Status](https://github.com/Invis1ble/release-management/actions/workflows/ci.yml/badge.svg?event=push)
+![CI Status](https://github.com/Invis1ble/project-management/actions/workflows/ci.yml/badge.svg?event=push)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 

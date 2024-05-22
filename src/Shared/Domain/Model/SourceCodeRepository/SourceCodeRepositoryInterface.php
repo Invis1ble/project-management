@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\SourceCodeRepository;
+namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\File;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\File;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
 
 interface SourceCodeRepositoryInterface
 {

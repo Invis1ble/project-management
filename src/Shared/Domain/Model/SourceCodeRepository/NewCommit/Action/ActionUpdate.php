@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
+namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
 
 final readonly class ActionUpdate extends AbstractAction
 {

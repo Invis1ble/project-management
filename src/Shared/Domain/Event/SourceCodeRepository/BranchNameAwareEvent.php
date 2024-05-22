@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Event\SourceCodeRepository;
+namespace ProjectManagement\Shared\Domain\Event\SourceCodeRepository;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
 abstract readonly class BranchNameAwareEvent implements EventInterface, \Serializable, \JsonSerializable
 {

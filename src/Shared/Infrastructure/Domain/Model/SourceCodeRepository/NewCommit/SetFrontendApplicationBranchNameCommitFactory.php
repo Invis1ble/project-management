@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\NewCommit;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\NewCommit;
 
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionUpdate;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\NewCommit;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionUpdate;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\NewCommit;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
 final readonly class SetFrontendApplicationBranchNameCommitFactory implements SetFrontendApplicationBranchNameCommitFactoryInterface
 {

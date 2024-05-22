@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File;
+namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
 
 final readonly class File
 {

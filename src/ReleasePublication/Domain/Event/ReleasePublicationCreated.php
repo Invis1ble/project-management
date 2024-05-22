@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Event;
+namespace ProjectManagement\ReleasePublication\Domain\Event;
 
 final readonly class ReleasePublicationCreated extends AbstractReleasePublicationEvent
 {

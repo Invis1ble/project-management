@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Exception;
+namespace ProjectManagement\Shared\Domain\Exception;
 
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 
 class UnsupportedProjectException extends \InvalidArgumentException
 {

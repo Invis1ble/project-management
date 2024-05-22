@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
 
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\SprintList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\SprintList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface;
 
 final readonly class IssueFactory implements IssueFactoryInterface
 {

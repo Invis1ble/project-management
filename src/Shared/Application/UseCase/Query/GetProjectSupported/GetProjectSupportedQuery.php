@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Application\UseCase\Query\GetProjectSupported;
+namespace ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported;
 
 use Invis1ble\Messenger\Query\QueryInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 
 final readonly class GetProjectSupportedQuery implements QueryInterface
 {

@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Ui\Command\PrepareRelease;
+namespace ProjectManagement\ReleasePublication\Ui\Command\PrepareRelease;
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
-use ReleaseManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
-use ReleaseManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
-use ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
-use ReleaseManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
-use ReleaseManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Version\Version;
+use ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
+use ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
+use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
+use ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
+use ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

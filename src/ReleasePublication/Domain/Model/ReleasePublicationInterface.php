@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Model;
+namespace ProjectManagement\ReleasePublication\Domain\Model;
 
-use ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
-use ReleaseManagement\Shared\Domain\Model\AggregateRootInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
+use ProjectManagement\Shared\Domain\Model\AggregateRootInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 interface ReleasePublicationInterface extends AggregateRootInterface
 {

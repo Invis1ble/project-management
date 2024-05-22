@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\TaskTracker;
+namespace ProjectManagement\Shared\Domain\Model\TaskTracker;
 
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 interface TaskTrackerInterface
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Model;
+namespace ProjectManagement\ReleasePublication\Domain\Model;
 
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 
 interface ProjectResolverInterface
 {

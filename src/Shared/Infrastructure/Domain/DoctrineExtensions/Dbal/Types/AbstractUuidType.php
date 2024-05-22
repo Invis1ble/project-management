@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
+namespace ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\GuidType;
-use ReleaseManagement\Shared\Domain\Model\AbstractUuid;
+use ProjectManagement\Shared\Domain\Model\AbstractUuid;
 use Symfony\Component\Uid\Uuid;
 
 abstract class AbstractUuidType extends GuidType

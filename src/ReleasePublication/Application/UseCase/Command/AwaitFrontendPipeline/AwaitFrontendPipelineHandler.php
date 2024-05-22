@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Application\UseCase\Command\AwaitFrontendPipeline;
+namespace ProjectManagement\ReleasePublication\Application\UseCase\Command\AwaitFrontendPipeline;
 
-use ReleaseManagement\ReleasePublication\Application\UseCase\Command\ReleasePublicationRepositoryAwareCommandHandler;
-use ReleaseManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use ProjectManagement\ReleasePublication\Application\UseCase\Command\ReleasePublicationRepositoryAwareCommandHandler;
+use ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 
 final readonly class AwaitFrontendPipelineHandler extends ReleasePublicationRepositoryAwareCommandHandler
 {

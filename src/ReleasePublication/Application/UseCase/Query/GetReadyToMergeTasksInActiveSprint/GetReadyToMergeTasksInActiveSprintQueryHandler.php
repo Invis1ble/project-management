@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint;
+namespace ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint;
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
-use ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 final readonly class GetReadyToMergeTasksInActiveSprintQueryHandler implements QueryHandlerInterface
 {

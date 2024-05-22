@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Model;
+namespace ProjectManagement\ReleasePublication\Domain\Model;
 
-use ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\Shared\Domain\Model\AbstractUuid;
+use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\AbstractUuid;
 use Symfony\Component\Uid\Uuid;
 
 final readonly class ReleasePublicationId extends AbstractUuid

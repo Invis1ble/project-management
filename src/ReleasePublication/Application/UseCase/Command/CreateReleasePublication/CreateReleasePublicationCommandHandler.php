@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication;
+namespace ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication;
 
-use ReleaseManagement\ReleasePublication\Application\UseCase\Command\ReleasePublicationRepositoryAwareCommandHandler;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface;
-use ReleaseManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
+use ProjectManagement\ReleasePublication\Application\UseCase\Command\ReleasePublicationRepositoryAwareCommandHandler;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface;
+use ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
 
 final readonly class CreateReleasePublicationCommandHandler extends ReleasePublicationRepositoryAwareCommandHandler
 {

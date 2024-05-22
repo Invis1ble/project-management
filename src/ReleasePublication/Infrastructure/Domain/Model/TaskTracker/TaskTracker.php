@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
+namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
-use ReleaseManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
-use ReleaseManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
-use ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ReleaseManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Board;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Project;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Version;
-use ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
+use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
+use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
+use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
+use ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
 
 final readonly class TaskTracker extends BasicTaskTracker implements TaskTrackerInterface
 {

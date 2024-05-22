@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Board;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Project;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
 
 readonly class TaskTracker implements TaskTrackerInterface
 {

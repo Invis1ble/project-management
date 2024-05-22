@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Model\Status;
+namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
 
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 
 trait FrontendPipelineFinishedTrait
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
+namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
 
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use ReleaseManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\AbstractUuidType;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\AbstractUuidType;
 
 final class ReleasePublicationIdType extends AbstractUuidType
 {

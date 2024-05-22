@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\Model;
+namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Model;
 
-use ReleaseManagement\ReleasePublication\Domain\Model\ProjectResolverInterface;
-use ReleaseManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\ReleasePublication\Domain\Model\ProjectResolverInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 
 final readonly class ProjectResolver implements ProjectResolverInterface
 {

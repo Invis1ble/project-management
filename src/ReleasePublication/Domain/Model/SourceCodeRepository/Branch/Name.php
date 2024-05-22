@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
+namespace ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicName;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicName;
 
 final readonly class Name extends BasicName
 {

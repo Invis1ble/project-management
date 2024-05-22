@@ -1,8 +1,8 @@
 <?php
 
-namespace ReleaseManagement;
+namespace ProjectManagement;
 
-use ReleaseManagement\Shared\Infrastructure\DependencyInjection\AdjustMessageHandlersPass;
+use ProjectManagement\Shared\Infrastructure\DependencyInjection\AdjustMessageHandlersPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

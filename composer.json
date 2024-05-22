@@ -1,5 +1,5 @@
 {
-    "name": "invis1ble/release-management",
+    "name": "invis1ble/project-management",
     "authors": [
         {
             "name": "Invis1ble",
@@ -9,7 +9,7 @@
     ],
     "type": "project",
     "license": "MIT",
-    "description": "A release management tool",
+    "description": "A project management tools",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
@@ -49,12 +49,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ReleaseManagement\\": "src/"
+            "ProjectManagement\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ReleaseManagement\\Tests\\": "tests/"
+            "ProjectManagement\\Tests\\": "tests/"
         }
     },
     "replace": {

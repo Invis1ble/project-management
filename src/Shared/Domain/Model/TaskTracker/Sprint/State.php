@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\TaskTracker\Sprint;
+namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint;
 
 enum State: string implements \JsonSerializable
 {

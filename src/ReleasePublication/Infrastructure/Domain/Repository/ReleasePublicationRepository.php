@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Infrastructure\Domain\Repository;
+namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
-use ReleaseManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublication;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ReleaseManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
-use ReleaseManagement\Shared\Domain\Repository\EventDispatchingRepository;
+use ProjectManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
+use ProjectManagement\Shared\Domain\Repository\EventDispatchingRepository;
 
 final class ReleasePublicationRepository extends EventDispatchingRepository implements ReleasePublicationRepositoryInterface
 {

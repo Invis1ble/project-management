@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
+namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
 
-use ReleaseManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
 
 final readonly class ActionChmod extends AbstractAction
 {

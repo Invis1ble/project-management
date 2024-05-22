@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
 
 use Psr\Http\Message\UriInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
-use ReleaseManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
 
 final readonly class GuiUrlFactory implements GuiUrlFactoryInterface
 {

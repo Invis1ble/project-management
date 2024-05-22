@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Repository;
+namespace ProjectManagement\Shared\Domain\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
-use ReleaseManagement\Shared\Domain\Model\AggregateRootInterface;
+use ProjectManagement\Shared\Domain\Model\AggregateRootInterface;
 
 abstract class EventDispatchingRepository extends ServiceEntityRepository
 {

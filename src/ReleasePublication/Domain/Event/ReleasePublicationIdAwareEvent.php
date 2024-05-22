@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\ReleasePublication\Domain\Event;
+namespace ProjectManagement\ReleasePublication\Domain\Event;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use ReleaseManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 
 abstract readonly class ReleasePublicationIdAwareEvent implements EventInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
 
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\Model\Gitlab;
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab;
 
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientInterface;
