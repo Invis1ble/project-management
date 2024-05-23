@@ -13,6 +13,11 @@ use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeReposit
 
 final readonly class StatusReleaseCandidateCreated extends AbstractStatus
 {
+    public function prepared(): bool
+    {
+        return true;
+    }
+
     public function proceedToNext(
         MergeRequestManagerInterface $mergeRequestManager,
         SourceCodeRepositoryInterface $frontendSourceCodeRepository,

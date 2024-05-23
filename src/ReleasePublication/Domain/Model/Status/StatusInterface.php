@@ -23,4 +23,6 @@ interface StatusInterface extends \Stringable
         TaskTrackerInterface $taskTracker,
         ReleasePublicationInterface $context,
     ): void;
+
+    public function prepared(): bool;
 }

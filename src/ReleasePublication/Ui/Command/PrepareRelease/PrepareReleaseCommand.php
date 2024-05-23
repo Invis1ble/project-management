@@ -6,6 +6,7 @@ namespace ProjectManagement\ReleasePublication\Ui\Command\PrepareRelease;
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
+use ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\ProceedToNextStatusCommand;
 use ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
 use ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
 use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
@@ -84,37 +85,16 @@ final class PrepareReleaseCommand extends Command
         $this->io->block('Merge requests will be merged', null, 'fg=green');
         $this->listMergeRequests($tasks->mergeRequestsToMerge());
 
-        $confirmed = $this->io->confirm('OK');
+        $confirmed = $this->io->confirm('OK', false);
 
         if (!$confirmed) {
             $this->abort();
         }
 
-
-        dump($tasks);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        $this->commandBus->dispatch(new CreateReleaseCommand($releaseBranchName));
-
-
-
-
+        $this->commandBus->dispatch(new ProceedToNextStatusCommand(
+            branchName: $newReleaseBranchName,
+            readyToMergeTasks: $tasks,
+        ));
 
         return Command::SUCCESS;
     }

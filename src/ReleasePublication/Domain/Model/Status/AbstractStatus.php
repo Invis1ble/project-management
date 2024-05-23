@@ -10,6 +10,11 @@ use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterfac
 
 abstract readonly class AbstractStatus implements StatusInterface
 {
+    public function prepared(): bool
+    {
+        return false;
+    }
+
     protected function setReleaseStatus(ReleasePublicationInterface $release, StatusInterface $status): void
     {
         $previousStatus = $release->status();

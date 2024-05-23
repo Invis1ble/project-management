@@ -6,10 +6,13 @@ namespace ProjectManagement\ReleasePublication\Application\UseCase\Command\Creat
 
 use Invis1ble\Messenger\Command\CommandInterface;
 use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
-final readonly class CreateReleaseCommand implements CommandInterface
+final readonly class CreateReleasePublicationCommand implements CommandInterface
 {
-    public function __construct(public ?Name $branchName)
-    {
+    public function __construct(
+        public Name $branchName,
+        public IssueList $readyToMergeTasks,
+    ) {
     }
 }

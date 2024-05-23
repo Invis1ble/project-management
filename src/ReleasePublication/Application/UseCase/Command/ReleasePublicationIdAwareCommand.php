@@ -7,7 +7,7 @@ namespace ProjectManagement\ReleasePublication\Application\UseCase\Command;
 use Invis1ble\Messenger\Command\CommandInterface;
 use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 
-abstract readonly class ReleaseIdAwareCommand implements CommandInterface
+abstract readonly class ReleasePublicationIdAwareCommand implements CommandInterface
 {
     public function __construct(public ReleasePublicationId $id)
     {
