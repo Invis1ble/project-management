@@ -17,7 +17,7 @@ final readonly class CreateReleasePublicationCommandHandler extends ReleasePubli
         parent::__construct($repository);
     }
 
-    public function __invoke(ProceedToNextStatusCommand $command): void
+    public function __invoke(CreateReleasePublicationCommand $command): void
     {
         $releasePublication = $this->factory->createReleasePublication(
             $command->branchName,
