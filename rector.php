@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
@@ -30,4 +31,8 @@ return RectorConfig::configure()
     ])
     ->withRules([
         AddVoidReturnTypeWhereNoReturnRector::class,
-    ]);
+    ])
+    ->withCache(
+        cacheDirectory: '/tmp/rector',
+        cacheClass: FileCacheStorage::class,
+    );

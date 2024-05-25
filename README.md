@@ -69,6 +69,12 @@ Run PHP-CS-Fixer checks:
 docker compose exec -it php bin/php-cs-fixer
 ```
 
+Run Rector checks:
+
+```sh
+docker compose exec -it php bin/rector
+```
+
 
 License
 -------
