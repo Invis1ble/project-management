@@ -52,6 +52,24 @@ Monitoring
 RabbiMQ Management http://localhost:15672/#/queues/%2F/messages
 
 
+Development
+-----------
+
+### Check for Coding Standards violations
+
+Run PHP_CodeSniffer checks:
+
+```sh
+docker compose exec -it php bin/php_codesniffer
+```
+
+Run PHP-CS-Fixer checks:
+
+```sh
+docker compose exec -it php bin/php-cs-fixer
+```
+
+
 License
 -------
 
