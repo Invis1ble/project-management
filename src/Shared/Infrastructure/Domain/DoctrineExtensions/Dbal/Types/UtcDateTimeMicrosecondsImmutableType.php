@@ -16,7 +16,7 @@ class UtcDateTimeMicrosecondsImmutableType extends DateTimeImmutableType
 
     public const string PLATFORM_DATE_TIME_FORMAT = 'Y-m-d H:i:s.u';
 
-    protected static ?\DateTimeZone $utcTimezone;
+    protected static ?\DateTimeZone $utcTimezone = null;
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {

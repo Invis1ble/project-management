@@ -25,7 +25,7 @@ abstract readonly class AbstractUuid implements IdInterface
 
     public function equals(IdInterface $id): bool
     {
-        return $this::class === $id::class && (string) $this->uuid === (string) $id;
+        return static::class === $id::class && (string) $this->uuid === (string) $id;
     }
 
     public function serialize(): string

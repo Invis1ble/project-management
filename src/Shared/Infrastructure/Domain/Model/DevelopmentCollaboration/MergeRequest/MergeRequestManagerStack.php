@@ -26,7 +26,7 @@ final readonly class MergeRequestManagerStack implements MergeRequestManagerInte
                 throw new \InvalidArgumentException(sprintf(
                     'Merge Request Manager must be an instance of %s, %s given',
                     MergeRequestManagerInterface::class,
-                    is_object($manager) ? $manager::class : gettype($manager),
+                    get_debug_type($manager),
                 ));
             }
 

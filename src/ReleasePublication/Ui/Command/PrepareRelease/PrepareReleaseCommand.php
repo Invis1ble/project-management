@@ -317,7 +317,7 @@ final class PrepareReleaseCommand extends Command
         return $task->withMergeRequestsToMerge($mergeRequests);
     }
 
-    private function abort(): void
+    private function abort(): never
     {
         throw new \RuntimeException('Aborted');
     }

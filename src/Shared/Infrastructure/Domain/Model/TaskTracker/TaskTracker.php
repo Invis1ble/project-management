@@ -124,7 +124,7 @@ readonly class TaskTracker implements TaskTrackerInterface
         foreach ($data['detail'] as $detail) {
             foreach ($detail['pullRequests'] ?? [] as $pullRequest) {
                 $mergeRequests = $mergeRequests->append($this->mergeRequestFactory->createMergeRequest(
-                    id: (int) explode('!', $pullRequest['id'])[1],
+                    id: (int) explode('!', (string) $pullRequest['id'])[1],
                     name: $pullRequest['name'],
                     projectId: (int) $pullRequest['repositoryId'],
                     projectName: $pullRequest['repositoryName'],
