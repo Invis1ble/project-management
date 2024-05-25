@@ -10,7 +10,7 @@ interface ContinuousIntegrationClientInterface
 {
     /**
      * @param ?\DateInterval $maxAwaitingTime default max awaiting time is 30 min
-     * @param ?\DateInterval $tickInterval default tick interval is 10 sec
+     * @param ?\DateInterval $tickInterval    default tick interval is 10 sec
      *
      * @return array{
      *     status: string|null,

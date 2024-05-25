@@ -47,14 +47,20 @@ jobs:
         name: Run migrations
         run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
       -
+        name: Doctrine Schema Validator
+        # @see https://github.com/doctrine/migrations/issues/1406
+        #        run: docker compose exec -T php bin/console -e test doctrine:schema:validate
+        run: docker compose exec -T php bin/console -e test doctrine:schema:validate --skip-sync
+      -
+        name: Check Code Quality via PHP_CodeSniffer
+        run: docker compose exec -T php bin/php_codesniffer
+      -
+        name: Check Code Quality via PHP-CS-Fixer
+        run: docker compose exec -T php bin/php-cs-fixer
+      -
         name: Run PHPUnit
         if: false # Remove this line if PHPUnit is installed
         run: docker compose exec -T php bin/phpunit
-      -
-        name: Doctrine Schema Validator
-        # @see https://github.com/doctrine/migrations/issues/1406
-#        run: docker compose exec -T php bin/console -e test doctrine:schema:validate
-        run: docker compose exec -T php bin/console -e test doctrine:schema:validate --skip-sync
   lint:
     name: Docker Lint
     runs-on: ubuntu-latest

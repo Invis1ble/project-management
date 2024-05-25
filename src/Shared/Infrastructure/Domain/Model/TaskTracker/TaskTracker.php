@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
 
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\UriFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
@@ -16,6 +12,10 @@ use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 
 readonly class TaskTracker implements TaskTrackerInterface
 {
@@ -33,8 +33,8 @@ readonly class TaskTracker implements TaskTrackerInterface
     }
 
     public function issuesFromActiveSprint(
-        string $status = null,
-        array $types = null,
+        ?string $status = null,
+        ?array $types = null,
     ): IssueList {
         $jqlAnd = ["project=\"$this->projectKey\""];
 

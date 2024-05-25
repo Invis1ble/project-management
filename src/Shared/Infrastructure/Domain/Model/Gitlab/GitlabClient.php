@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab;
 
 use Invis1ble\Messenger\Event\EventBusInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\UriFactoryInterface;
 use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineAwaitingTick;
 use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStatusChanged;
 use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\LatestPipelineStuck;
@@ -34,6 +30,10 @@ use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\AbstractAction;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class GitlabClient implements SourceCodeRepositoryInterface, ContinuousIntegrationClientInterface, MergeRequestManagerInterface
 {
@@ -157,8 +157,8 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         ?Name $startBranchName = null,
     ): void {
         $data = [
-            'branch' => (string)$branchName,
-            'commit_message' => (string)$message,
+            'branch' => (string) $branchName,
+            'commit_message' => (string) $message,
             'actions' => iterator_to_array($actions->map(fn (AbstractAction $action): array => $action->toArray())),
         ];
 

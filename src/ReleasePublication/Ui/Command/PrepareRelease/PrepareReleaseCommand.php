@@ -145,7 +145,7 @@ final class PrepareReleaseCommand extends Command
         $this->listIssues($tasks);
 
         $tasks = $tasks->filter(
-            fn (Issue $task): bool => $this->io->confirm( "Add $task->key to the new release"),
+            fn (Issue $task): bool => $this->io->confirm("Add $task->key to the new release"),
         );
 
         $this->io->info('Tasks in the new release');
@@ -197,7 +197,7 @@ final class PrepareReleaseCommand extends Command
     {
         $this->io->section("Fetching Details for $mergeRequest->projectName!$mergeRequest->id");
 
-        do {
+        while (true) {
             /** @var Details $details */
             $details = $this->queryBus->ask(new GetMergeRequestDetailsQuery($mergeRequest->projectId, $mergeRequest->id));
 
@@ -219,7 +219,7 @@ final class PrepareReleaseCommand extends Command
             if (!$confirmed) {
                 $this->abort();
             }
-        } while (true);
+        }
 
         return $details;
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventBusInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\UriFactoryInterface;
 use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
 use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
 use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
@@ -20,6 +16,10 @@ use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class TaskTracker extends BasicTaskTracker implements TaskTrackerInterface
 {
@@ -171,7 +171,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
 
         $releases = json_decode($content, true)['values'];
 
-        $heap = new class extends \SplMaxHeap {
+        $heap = new class() extends \SplMaxHeap {
             /**
              * @param array $value1
              * @param array $value2

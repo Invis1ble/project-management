@@ -15,11 +15,6 @@ final class StatusType extends StringType
 {
     public const string NAME = 'release_publication_status';
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ConversionException
-     */
     public function convertToPHPValue($value, AbstractPlatform $platform): StatusInterface
     {
         if ($value instanceof StatusInterface) {
@@ -33,11 +28,6 @@ final class StatusType extends StringType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ConversionException
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         if ($value instanceof StatusInterface || (is_string($value) && null !== Dictionary::tryFrom($value))) {

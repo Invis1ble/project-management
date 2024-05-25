@@ -14,11 +14,6 @@ abstract class AbstractStringableType extends StringType
 
     public const string PHP_TYPE_FQCN = '';
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ConversionException
-     */
     public function convertToPHPValue($value, AbstractPlatform $platform): ?\Stringable
     {
         $phpTypeFqcn = $this->phpTypeFqcn();
@@ -42,11 +37,6 @@ abstract class AbstractStringableType extends StringType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ConversionException
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value || '' === $value) {

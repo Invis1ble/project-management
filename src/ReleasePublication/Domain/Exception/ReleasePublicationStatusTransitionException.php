@@ -15,7 +15,7 @@ class ReleasePublicationStatusTransitionException extends StateTransitionExcepti
         StatusInterface $from,
         StatusInterface $to,
         int $code = 0,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
     ) {
         parent::__construct(
             message: "Invalid transition from \"$from\" to \"$to\" status of the release publication $releaseBranchName.",

@@ -12,7 +12,7 @@ trait FrontendPipelineFinishedTrait
     public function awaitLatestFrontendPipeline(
         ContinuousIntegrationClientInterface $ciClient,
         ReleasePublicationInterface $context,
-        \DateInterval $maxAwaitingTime = null,
+        ?\DateInterval $maxAwaitingTime = null,
     ): void {
         // do nothing
     }

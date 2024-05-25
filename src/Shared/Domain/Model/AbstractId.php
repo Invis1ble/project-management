@@ -74,7 +74,10 @@ abstract readonly class AbstractId implements IdInterface
         $minValue = 1;
 
         if ($value < $minValue) {
-            throw new \InvalidArgumentException(static::class . " value cannot be lower than $minValue.");
+            throw new \InvalidArgumentException(sprintf(
+                "%s value cannot be lower than $minValue.",
+                static::class,
+            ));
         }
     }
 }

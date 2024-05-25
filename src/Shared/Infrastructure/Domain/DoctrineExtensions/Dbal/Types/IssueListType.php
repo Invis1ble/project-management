@@ -30,8 +30,6 @@ final class IssueListType extends JsonType
     public const string NAME = 'issue_list';
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
@@ -64,8 +62,6 @@ final class IssueListType extends JsonType
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
     public function convertToPHPValue($value, AbstractPlatform $platform): IssueList
@@ -105,7 +101,7 @@ final class IssueListType extends JsonType
             return null;
         }
 
-        return new MergeRequest\MergeRequestList(
+        return new MergeRequestList(
             ...array_map(
                 fn (array $mr): MergeRequest\MergeRequest => new MergeRequest\MergeRequest(
                     id: MergeRequest\MergeRequestId::from($mr['id']),
@@ -116,8 +112,10 @@ final class IssueListType extends JsonType
                     targetBranchName: Branch\Name::fromString($mr['target_branch_name']),
                     status: MergeRequest\Status::from($mr['status']),
                     guiUrl: new Uri($mr['gui_url']),
-                    details: new Details(MergeRequest\Details\Status\StatusFactory::createStatus(
-                        MergeRequest\Details\Status\Dictionary::from($mr['details']['status'])),
+                    details: new Details(
+                        status: MergeRequest\Details\Status\StatusFactory::createStatus(
+                            MergeRequest\Details\Status\Dictionary::from($mr['details']['status']),
+                        ),
                     ),
                 ),
                 $mergeRequests,

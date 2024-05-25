@@ -18,7 +18,7 @@ final readonly class Name extends BasicName
     {
         parent::__construct($value);
 
-        preg_match("/^v-([0-9]+)-([0-9]+)-([0-9]+)$/", $value, $matches);
+        preg_match('/^v-([0-9]+)-([0-9]+)-([0-9]+)$/', $value, $matches);
 
         $this->majorVersion = (int) $matches[1];
         $this->minorVersion = (int) $matches[2];
@@ -46,7 +46,7 @@ final readonly class Name extends BasicName
     {
         parent::validate($value);
 
-        if (!preg_match("/^v(?:-[0-9]+){3}$/", $value)) {
+        if (!preg_match('/^v(?:-[0-9]+){3}$/', $value)) {
             throw new \InvalidArgumentException("Invalid release branch name format: $value");
         }
     }

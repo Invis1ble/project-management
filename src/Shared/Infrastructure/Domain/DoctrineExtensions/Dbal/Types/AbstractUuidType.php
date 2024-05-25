@@ -16,11 +16,6 @@ abstract class AbstractUuidType extends GuidType
 
     public const string ID_CLASS_NAME = AbstractUuid::class;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ConversionException
-     */
     public function convertToPHPValue($value, AbstractPlatform $platform): ?AbstractUuid
     {
         if ($value instanceof AbstractUuid) {
@@ -46,19 +41,13 @@ abstract class AbstractUuidType extends GuidType
         return $uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ConversionException
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return null;
         }
 
-        if (
-            $value instanceof AbstractUuid
+        if ($value instanceof AbstractUuid
             || (
                 (is_string($value)
                 || (is_object($value) && method_exists($value, '__toString')))

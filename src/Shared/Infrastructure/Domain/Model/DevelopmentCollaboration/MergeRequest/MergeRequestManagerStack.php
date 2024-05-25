@@ -24,7 +24,7 @@ final readonly class MergeRequestManagerStack implements MergeRequestManagerInte
         foreach ($mergeRequestManagers as $manager) {
             if (!$manager instanceof MergeRequestManagerInterface) {
                 throw new \InvalidArgumentException(sprintf(
-                    "Merge Request Manager must be an instance of %s, %s given",
+                    'Merge Request Manager must be an instance of %s, %s given',
                     MergeRequestManagerInterface::class,
                     is_object($manager) ? $manager::class : gettype($manager),
                 ));

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ProjectManagement;
 
 use ProjectManagement\Shared\Infrastructure\DependencyInjection\AdjustMessageHandlersPass;

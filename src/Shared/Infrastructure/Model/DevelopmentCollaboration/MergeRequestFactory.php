@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ProjectManagement\Shared\Infrastructure\Model\DevelopmentCollaboration;
 
-use Psr\Http\Message\UriFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
@@ -12,6 +11,7 @@ use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Name;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class MergeRequestFactory implements MergeRequestFactoryInterface
 {

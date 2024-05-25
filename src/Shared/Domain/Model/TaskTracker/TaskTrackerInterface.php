@@ -11,8 +11,8 @@ use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 interface TaskTrackerInterface
 {
     public function issuesFromActiveSprint(
-        string $status = null,
-        array $types = null,
+        ?string $status = null,
+        ?array $types = null,
     ): IssueList;
 
     public function mergeRequestsRelatedToIssue(IssueId $issueId): MergeRequestList;

@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
-use Psr\Http\Message\UriInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Psr\Http\Message\UriInterface;
 
 final readonly class MergeRequest
 {

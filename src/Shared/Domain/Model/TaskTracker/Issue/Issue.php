@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
