@@ -1,0 +1,78 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+
+final readonly class Issue implements \Stringable
+{
+    public function __construct(
+        public IssueId $id,
+        public Key $key,
+        public TypeId $typeId,
+        public Summary $summary,
+        public SprintList $sprints,
+        public ?MergeRequestList $mergeRequests,
+        public ?MergeRequestList $mergeRequestsToMerge,
+    ) {
+    }
+
+    public function mergeMergeRequests(MergeRequestManagerInterface $mergeRequestManager): self
+    {
+        return new self(
+            $this->id,
+            $this->key,
+            $this->typeId,
+            $this->summary,
+            $this->sprints,
+            $this->mergeRequests,
+            $this->mergeRequestsToMerge?->mergeMergeRequests($mergeRequestManager),
+        );
+    }
+
+    public function canonicalBranchName(): Name
+    {
+        return $this->key->toBranchName();
+    }
+
+    public function withMergeRequests(MergeRequestList $mergeRequests): self
+    {
+        return new self(
+            $this->id,
+            $this->key,
+            $this->typeId,
+            $this->summary,
+            $this->sprints,
+            $mergeRequests,
+            $this->mergeRequestsToMerge,
+        );
+    }
+
+    public function withMergeRequestsToMerge(MergeRequestList $mergeRequests): self
+    {
+        return new self(
+            $this->id,
+            $this->key,
+            $this->typeId,
+            $this->summary,
+            $this->sprints,
+            $this->mergeRequests,
+            $mergeRequests,
+        );
+    }
+
+    public function inActiveSprintOnBoard(BoardId $boardId): bool
+    {
+        return $this->sprints->containsActiveOnBoard($boardId);
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->key;
+    }
+}

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Domain\Model;
+namespace ProjectManagement\Shared\Domain\Model;
 
 abstract readonly class AbstractId implements IdInterface
 {
@@ -38,7 +38,32 @@ abstract readonly class AbstractId implements IdInterface
 
     public function equals(IdInterface $id): bool
     {
-        return $this->value === $id->value() && $this::class === $id::class;
+        return (string) $this === (string) $id && static::class === $id::class;
+    }
+
+    public function serialize(): string
+    {
+        return (string) $this;
+    }
+
+    public function unserialize(string $data): void
+    {
+        $this->value = (int) $data;
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->serialize()];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->unserialize($data[0]);
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->serialize();
     }
 
     /**
@@ -49,7 +74,10 @@ abstract readonly class AbstractId implements IdInterface
         $minValue = 1;
 
         if ($value < $minValue) {
-            throw new \InvalidArgumentException(static::class . " value cannot be lower than $minValue.");
+            throw new \InvalidArgumentException(sprintf(
+                "%s value cannot be lower than $minValue.",
+                static::class,
+            ));
         }
     }
 }

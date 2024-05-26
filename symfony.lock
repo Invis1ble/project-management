@@ -1,16 +1,4 @@
 {
-    "broadway/broadway-bundle": {
-        "version": "0.7",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "0.4",
-            "ref": "0601c67ff07896a752e5a72381a22254ff754ea1"
-        },
-        "files": [
-            "config/packages/broadway.yaml"
-        ]
-    },
     "doctrine/doctrine-bundle": {
         "version": "2.12",
         "recipe": {
@@ -38,8 +26,44 @@
             "migrations/.gitignore"
         ]
     },
+    "friendsofphp/php-cs-fixer": {
+        "version": "3.57",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "3.0",
+            "ref": "be2103eb4a20942e28a6dd87736669b757132435"
+        },
+        "files": [
+            ".php-cs-fixer.dist.php"
+        ]
+    },
     "invis1ble/messenger-bundle": {
         "version": "v2.0.0"
+    },
+    "phpstan/phpstan": {
+        "version": "1.11",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "5e490cc197fb6bb1ae22e5abbc531ddc633b6767"
+        },
+        "files": [
+            "phpstan.dist.neon"
+        ]
+    },
+    "squizlabs/php_codesniffer": {
+        "version": "3.10",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "3.6",
+            "ref": "1019e5c08d4821cb9b77f4891f8e9c31ff20ac6f"
+        },
+        "files": [
+            "phpcs.xml.dist"
+        ]
     },
     "symfony/console": {
         "version": "7.0",
@@ -94,6 +118,18 @@
         },
         "files": [
             "config/packages/messenger.yaml"
+        ]
+    },
+    "symfony/monolog-bundle": {
+        "version": "3.10",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "3.7",
+            "ref": "aff23899c4440dd995907613c1dd709b6f59503f"
+        },
+        "files": [
+            "config/packages/monolog.yaml"
         ]
     },
     "symfony/routing": {

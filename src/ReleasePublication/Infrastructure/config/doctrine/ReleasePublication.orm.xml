@@ -1,0 +1,18 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+        https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication"
+            repository-class="ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository\ReleasePublicationRepository">
+        <indexes>
+            <index columns="created_at" />
+        </indexes>
+
+        <id name="id" type="release_publication_id" />
+
+        <field name="branchName" type="release_branch_name" length="24" />
+        <field name="status" type="release_publication_status" length="32" />
+        <field name="readyToMergeTasks" type="issue_list" />
+        <field name="createdAt" type="utc_datetime_microseconds_immutable" />
+    </entity>
+</doctrine-mapping>

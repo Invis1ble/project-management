@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ReleaseManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
+namespace ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -16,12 +16,12 @@ class UtcDateTimeMicrosecondsImmutableType extends DateTimeImmutableType
 
     public const string PLATFORM_DATE_TIME_FORMAT = 'Y-m-d H:i:s.u';
 
-    protected static ?\DateTimeZone $utcTimezone;
+    protected static ?\DateTimeZone $utcTimezone = null;
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         return match (true) {
-            $platform instanceof AbstractMySQLPlatform => isset($column['version']) && $column['version'] === true
+            $platform instanceof AbstractMySQLPlatform => isset($column['version']) && true === $column['version']
                 ? 'TIMESTAMP(6)'
                 : 'DATETIME(6)',
             $platform instanceof PostgreSQLPlatform => 'TIMESTAMP(6) WITHOUT TIME ZONE',
@@ -29,8 +29,6 @@ class UtcDateTimeMicrosecondsImmutableType extends DateTimeImmutableType
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
@@ -53,8 +51,6 @@ class UtcDateTimeMicrosecondsImmutableType extends DateTimeImmutableType
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
     public function convertToPHPValue($value, AbstractPlatform $platform): ?\DateTimeImmutable
@@ -92,9 +88,6 @@ class UtcDateTimeMicrosecondsImmutableType extends DateTimeImmutableType
         return static::NAME;
     }
 
-    /**
-     * @return \DateTimeZone
-     */
     protected static function getUTC(): \DateTimeZone
     {
         if (!isset(static::$utcTimezone)) {
