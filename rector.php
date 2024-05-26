@@ -20,7 +20,6 @@ return RectorConfig::configure()
 
         AddOverrideAttributeToOverriddenMethodsRector::class,
     ])
-    // uncomment to reach your current PHP version
     ->withPhpSets()
     ->withSets([
         SymfonySetList::SYMFONY_64,
