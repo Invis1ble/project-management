@@ -72,10 +72,10 @@ final class PublishHotfixCommand extends IssuesAwareCommand
             $this->abort();
         }
 
-//        $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
-//            branchName: $newReleaseBranchName,
-//            readyToMergeTasks: $tasks,
-//        ));
+        // $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
+        //    branchName: $newReleaseBranchName,
+        //    readyToMergeTasks: $tasks,
+        // ));
 
         return Command::SUCCESS;
     }
