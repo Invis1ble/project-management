@@ -70,6 +70,23 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
     }
 
     /**
+     * @template R
+     *
+     * @param callable(?R, T): ?R $callback
+     * @param ?R                  $initial
+     *
+     * @return ?R
+     */
+    public function reduce(callable $callback, $initial = null)
+    {
+        foreach ($this->elements() as $element) {
+            $initial = $callback($initial, $element);
+        }
+
+        return $initial;
+    }
+
+    /**
      * @return array<T>
      */
     public function toArray(): array

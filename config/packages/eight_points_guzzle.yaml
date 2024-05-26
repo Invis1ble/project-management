@@ -1,0 +1,20 @@
+# EightPoints GuzzleBundle
+# A full list of configuration options can be found here:
+# https://github.com/8p/EightPointsGuzzleBundle/blob/master/src/Resources/doc/configuration-reference.md
+eight_points_guzzle:
+    logging: true
+    slow_response_time: 1
+    clients:
+        gitlab:
+            base_url: '%env(GITLAB_URL)%'
+            options:
+#                debug: '%kernel.debug%'
+                headers:
+                    Authorization: 'Bearer %env(GITLAB_ACCESS_TOKEN)%'
+        jira:
+            base_url: '%env(JIRA_URL)%'
+            options:
+#                debug: '%kernel.debug%'
+                auth:
+                    - '%env(JIRA_USERNAME)%'
+                    - '%env(JIRA_ACCESS_TOKEN)%'

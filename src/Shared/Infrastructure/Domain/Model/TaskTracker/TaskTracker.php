@@ -10,6 +10,7 @@ use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -35,8 +36,13 @@ readonly class TaskTracker implements TaskTrackerInterface
     public function issuesFromActiveSprint(
         ?string $status = null,
         ?array $types = null,
+        Key ...$keys,
     ): IssueList {
         $jqlAnd = ["project=\"$this->projectKey\""];
+
+        if (0 !== iterator_count($keys)) {
+            $jqlAnd[] = 'issueKey IN (' . implode(',', iterator_to_array($keys)) . ')';
+        }
 
         if (null !== $status) {
             $jqlAnd[] = "status=\"$status\"";

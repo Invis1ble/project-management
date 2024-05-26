@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    eight_points_guzzle.symfony_log_formatter.pattern: '{method} {uri} {code} {res_headers} {res_body}'
 
 services:
     # default configuration for services in *this* file
@@ -11,9 +12,7 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            bool $debug: '%kernel.debug%'
             Psr\Http\Message\UriInterface $jiraUrl: '@release_management.jira_url'
-            Psr\Http\Message\UriInterface $gitlabUrl: '@release_management.gitlab_url'
             ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $backendProjectId: '@release_management.gitlab_project.backend'
             ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $frontendProjectId: '@release_management.gitlab_project.frontend'
             ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $backendSourceCodeRepository: '@release_management.gitlab_backend_client'
@@ -51,11 +50,6 @@ services:
         factory: ['@Psr\Http\Message\UriFactoryInterface', 'createUri']
         arguments: ['%env(JIRA_URL)%']
     
-    release_management.gitlab_url:
-        class: Psr\Http\Message\UriInterface
-        factory: ['@Psr\Http\Message\UriFactoryInterface', 'createUri']
-        arguments: ['%env(GITLAB_URL)%']
-    
     release_management.gitlab_project.backend:
         class: ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId
         arguments:
@@ -76,39 +70,26 @@ services:
 
 
 
-    ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab\HttpClientFactory:
-        arguments:
-            $gitlabAccessToken: '%env(GITLAB_ACCESS_TOKEN)%'
-
-    release_management.gitlab_http_client:
-        class: GuzzleHttp\Client
-        factory: ['@ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab\HttpClientFactoryInterface', 'createHttpClient']
-
-    ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\HttpClientFactory:
-        arguments:
-            $jiraUsername: '%env(JIRA_USERNAME)%'
-            $jiraAccessToken: '%env(JIRA_ACCESS_TOKEN)%'
-
-    release_management.task_tracker.http_client:
-        class: GuzzleHttp\Client
-        factory: ['@ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\HttpClientFactoryInterface', 'createHttpClient']
     
     release_management.gitlab_backend_client:
         class: ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab\GitlabClient
         arguments:
-            $httpClient: '@release_management.gitlab_http_client'
+            $httpClient: '@eight_points_guzzle.client.gitlab'
             $projectId: '@release_management.gitlab_project.backend'
     
     release_management.gitlab_frontend_client:
         class: ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab\GitlabClient
         arguments:
-            $httpClient: '@release_management.gitlab_http_client'
+            $httpClient: '@eight_points_guzzle.client.gitlab'
             $projectId: '@release_management.gitlab_project.frontend'
     
     ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         arguments:
-            $httpClient: '@release_management.task_tracker.http_client'
+            $httpClient: '@eight_points_guzzle.client.jira'
             $sprintFieldId: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
+    
+    ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
+        parent: ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
     
     ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
@@ -119,17 +100,21 @@ services:
 
 
 
+
     GuzzleHttp\Psr7\HttpFactory: ~
     Psr\Http\Message\UriFactoryInterface: '@GuzzleHttp\Psr7\HttpFactory'
     Psr\Http\Message\RequestFactoryInterface: '@GuzzleHttp\Psr7\HttpFactory'
     Psr\Http\Message\StreamFactoryInterface: '@GuzzleHttp\Psr7\HttpFactory'
     
     
-    ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab\HttpClientFactoryInterface: '@ProjectManagement\Shared\Infrastructure\Domain\Model\Gitlab\HttpClientFactory'
-    ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\HttpClientFactoryInterface: '@ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\HttpClientFactory'
+
+    
     ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface: '@ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactory'
     ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactoryInterface: '@ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactory'
     ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface: '@ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\IssueFactory'
+    ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationFactoryInterface: '@ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\HotfixPublicationFactory'
+    ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface: '@ProjectManagement\HotfixPublication\Infrastructure\Domain\Repository\HotfixPublicationRepository'
+    ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface: '@ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\ReleasePublicationFactory'
     ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface: '@ProjectManagement\Shared\Infrastructure\Model\DevelopmentCollaboration\MergeRequestFactory'
     ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface: '@ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Sprint\SprintFactory'

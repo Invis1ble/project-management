@@ -35,7 +35,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         Board\BoardId $sprintBoardId,
         int $sprintFieldId,
         private string $readyToMergeStatus = 'Ready to Merge',
-        private array $supportedIssueTypes = ['Story', 'Tech Dept'],
+        private array $supportedIssueTypes = ['Bug', 'Story', 'Tech Dept'],
     ) {
         parent::__construct(
             $httpClient,

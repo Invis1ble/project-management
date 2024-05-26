@@ -31,6 +31,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/ReleasePublication/Infrastructure/config/doctrine'
                 prefix: ProjectManagement\ReleasePublication\Domain\Model
                 alias: ReleasePublication
+            HotfixPublication:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/HotfixPublication/Infrastructure/config/doctrine'
+                prefix: ProjectManagement\HotfixPublication\Domain\Model
+                alias: HotfixPublication
         controller_resolver:
             auto_mapping: true
 

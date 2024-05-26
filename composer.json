@@ -21,7 +21,7 @@
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.1",
-        "guzzlehttp/guzzle": "^7.8",
+        "eightpoints/guzzle-bundle": "^8.5",
         "invis1ble/messenger-bundle": "^3.0",
         "ramsey/uuid": "^4.7",
         "runtime/frankenphp-symfony": "^0.2.0",
