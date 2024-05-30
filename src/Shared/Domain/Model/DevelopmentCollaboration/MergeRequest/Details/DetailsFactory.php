@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details;
 
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface;
 
 final readonly class DetailsFactory implements DetailsFactoryInterface
 {

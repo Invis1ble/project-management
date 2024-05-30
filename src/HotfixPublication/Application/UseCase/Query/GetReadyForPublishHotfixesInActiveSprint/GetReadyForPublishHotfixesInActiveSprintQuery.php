@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint;
 
 use Invis1ble\Messenger\Query\QueryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
 
 final readonly class GetReadyForPublishHotfixesInActiveSprintQuery implements QueryInterface
 {

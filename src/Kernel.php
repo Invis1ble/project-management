@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement;
+namespace Invis1ble\ProjectManagement;
 
-use ProjectManagement\Shared\Infrastructure\DependencyInjection\AdjustMessageHandlersPass;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\DependencyInjection\AdjustMessageHandlersPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

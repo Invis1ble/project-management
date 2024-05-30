@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\ContinuousIntegration;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration;
 
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\Job;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Pipeline;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\Job;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Pipeline;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
 
 interface ContinuousIntegrationClientInterface
 {

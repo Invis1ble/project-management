@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Model\Status;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status;
 
 final readonly class StatusDeploymentPipelineStuck extends StatusDeploymentPipelineNotInProgress
 {

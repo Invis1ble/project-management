@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model;
 
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;

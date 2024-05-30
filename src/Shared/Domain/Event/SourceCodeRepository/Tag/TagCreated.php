@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag;
 
-use ProjectManagement\Shared\Domain\Event\SourceCodeRepository\ProjectIdAwareEvent;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\ProjectIdAwareEvent;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Name;
 
 final readonly class TagCreated extends ProjectIdAwareEvent
 {

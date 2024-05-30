@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
 
 final readonly class FileFactory implements FileFactoryInterface
 {

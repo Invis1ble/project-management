@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 
 final readonly class Job
 {

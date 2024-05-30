@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Event;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Event;
 
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
-use ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 final readonly class HotfixPublicationStatusChanged extends AbstractHotfixPublicationEvent
 {

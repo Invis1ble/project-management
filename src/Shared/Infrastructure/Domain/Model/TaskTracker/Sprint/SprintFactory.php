@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Sprint;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Sprint;
 
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Name;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\State;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\State;
 
 final readonly class SprintFactory implements SprintFactoryInterface
 {

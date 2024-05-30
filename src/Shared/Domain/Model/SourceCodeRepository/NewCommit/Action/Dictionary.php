@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
 
 enum Dictionary: string
 {

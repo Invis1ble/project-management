@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Model\Status;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status;
 
-use ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication;
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 
 abstract readonly class AbstractStatus implements StatusInterface
 {

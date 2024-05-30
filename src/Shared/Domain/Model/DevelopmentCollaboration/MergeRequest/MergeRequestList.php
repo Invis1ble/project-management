@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
-use ProjectManagement\Shared\Domain\Model\AbstractList;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 
 /**
  * @extends AbstractList<MergeRequest>

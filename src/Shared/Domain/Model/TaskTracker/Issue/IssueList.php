@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-use ProjectManagement\Shared\Domain\Model\AbstractList;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 
 /**
  * @extends AbstractList<Issue>

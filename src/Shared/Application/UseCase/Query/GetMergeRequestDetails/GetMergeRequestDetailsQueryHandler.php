@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails;
+namespace Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails;
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 
 final readonly class GetMergeRequestDetailsQueryHandler implements QueryHandlerInterface
 {

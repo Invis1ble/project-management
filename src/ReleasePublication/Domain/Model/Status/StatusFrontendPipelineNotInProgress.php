@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
 abstract readonly class StatusFrontendPipelineNotInProgress extends AbstractStatus
 {

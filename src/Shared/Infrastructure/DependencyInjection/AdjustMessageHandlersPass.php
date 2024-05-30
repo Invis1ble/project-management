@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Infrastructure\DependencyInjection;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\DependencyInjection;
 
 use Invis1ble\Messenger\Command\CommandHandlerInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

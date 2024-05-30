@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
 
 final readonly class ActionCreate extends AbstractAction
 {

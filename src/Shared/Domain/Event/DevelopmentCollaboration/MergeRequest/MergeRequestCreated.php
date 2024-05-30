@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest;
 
 final readonly class MergeRequestCreated extends AbstractMergeRequestEvent
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Exception;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Exception;
 
 class ConflictException extends DomainException
 {

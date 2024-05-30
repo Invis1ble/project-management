@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
 
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
-use ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\AbstractUuidType;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\AbstractUuidType;
 
 final class HotfixPublicationIdType extends AbstractUuidType
 {

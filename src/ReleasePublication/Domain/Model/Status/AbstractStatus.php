@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 
-use ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationStatusChanged;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationStatusChanged;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 
 abstract readonly class AbstractStatus implements StatusInterface
 {

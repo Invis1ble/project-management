@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Psr\Http\Message\UriInterface;
 
 final readonly class MergeRequest

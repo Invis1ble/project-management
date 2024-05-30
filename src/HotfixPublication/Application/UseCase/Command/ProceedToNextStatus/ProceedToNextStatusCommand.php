@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Application\UseCase\Command\ProceedToNextStatus;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\ProceedToNextStatus;
 
-use ProjectManagement\HotfixPublication\Application\UseCase\Command\HotfixPublicationIdAwareCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\HotfixPublicationIdAwareCommand;
 
 final readonly class ProceedToNextStatusCommand extends HotfixPublicationIdAwareCommand
 {

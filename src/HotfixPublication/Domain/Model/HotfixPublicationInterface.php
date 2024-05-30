@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Model;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model;
 
-use ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
-use ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\AggregateRootInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\AggregateRootInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 interface HotfixPublicationInterface extends AggregateRootInterface
 {

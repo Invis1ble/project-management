@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
 
 final readonly class TagFactory implements TagFactoryInterface
 {

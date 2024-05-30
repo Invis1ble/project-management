@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
 interface MergeRequestFactoryInterface
 {

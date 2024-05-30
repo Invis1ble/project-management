@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\StringType;
-use ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary;
-use ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFactory;
-use ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFactory;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
 
 final class StatusType extends StringType
 {

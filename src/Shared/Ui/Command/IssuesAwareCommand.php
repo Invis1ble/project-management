@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Ui\Command;
+namespace Invis1ble\ProjectManagement\Shared\Ui\Command;
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
-use ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
-use ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
-use ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
+use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
+use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 

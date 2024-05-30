@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Model;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model;
 
-use ProjectManagement\Shared\Domain\Model\AbstractUuid;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractUuid;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
 use Symfony\Component\Uid\Uuid;
 
 final readonly class HotfixPublicationId extends AbstractUuid

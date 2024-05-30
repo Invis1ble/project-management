@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model;
 
 // phpcs:disable Squiz.Classes.ValidClassName.NotCamelCaps
 readonly class String_ implements \Stringable, \Serializable, \JsonSerializable

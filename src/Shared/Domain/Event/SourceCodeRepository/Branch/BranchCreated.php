@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Branch;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Branch;
 
-use ProjectManagement\Shared\Domain\Event\SourceCodeRepository\RefAwareEvent;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\RefAwareEvent;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Psr\Http\Message\UriInterface;
 
 final readonly class BranchCreated extends RefAwareEvent

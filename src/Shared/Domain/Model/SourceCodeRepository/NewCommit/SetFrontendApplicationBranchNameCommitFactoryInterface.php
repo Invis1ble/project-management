@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
 interface SetFrontendApplicationBranchNameCommitFactoryInterface
 {
