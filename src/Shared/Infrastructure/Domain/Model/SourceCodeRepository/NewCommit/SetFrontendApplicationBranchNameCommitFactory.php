@@ -26,7 +26,7 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
     public function createSetFrontendApplicationBranchNameCommit(
         Name $targetBranchName,
         ?Name $startBranchName = null,
-    ): NewCommit {
+    ): ?NewCommit {
         $configFilePath = FilePath::fromString('.helm/values.yaml');
 
         $file = $this->backendSourceCodeRepository->file(Name::fromString('develop'), $configFilePath);
@@ -36,6 +36,10 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
             replacement: "\$1\"$targetBranchName\"",
             subject: (string) $file->content,
         );
+
+        if ((string) $file->content === $config) {
+            return null;
+        }
 
         return new NewCommit(
             projectId: $this->backendProjectId,

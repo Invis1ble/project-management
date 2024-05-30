@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ProjectManagement\Shared\Domain\Model;
 
-readonly class NonEmptyString extends Str
+readonly class NonEmptyString extends String_
 {
     /**
      * @throws \InvalidArgumentException

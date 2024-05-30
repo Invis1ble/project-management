@@ -12,11 +12,17 @@ doctrine:
         types:
             utc_datetime_microseconds_immutable: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\UtcDateTimeMicrosecondsImmutableType
 
+            tag_version_name: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Tag\VersionNameType
+            tag_message: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Tag\MessageType
+            issue_list: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\TaskTracker\Issue\IssueListType
+
             release_publication_id: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleasePublicationIdType
-            release_branch_name: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleaseBranchNameType
+            release_branch_name: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Branch\ReleaseBranchNameType
             release_publication_status: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\StatusType
             
-            issue_list: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\IssueListType
+            hotfix_publication_id: ProjectManagement\HotfixPublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\HotfixPublicationIdType
+            hotfix_publication_status: ProjectManagement\HotfixPublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\StatusType
+
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -31,6 +37,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/ReleasePublication/Infrastructure/config/doctrine'
                 prefix: ProjectManagement\ReleasePublication\Domain\Model
                 alias: ReleasePublication
+            HotfixPublication:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/HotfixPublication/Infrastructure/config/doctrine'
+                prefix: ProjectManagement\HotfixPublication\Domain\Model
+                alias: HotfixPublication
         controller_resolver:
             auto_mapping: true
 

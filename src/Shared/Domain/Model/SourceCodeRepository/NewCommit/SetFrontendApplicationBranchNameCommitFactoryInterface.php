@@ -11,5 +11,5 @@ interface SetFrontendApplicationBranchNameCommitFactoryInterface
     public function createSetFrontendApplicationBranchNameCommit(
         Name $targetBranchName,
         ?Name $startBranchName = null,
-    ): NewCommit;
+    ): ?NewCommit;
 }

@@ -15,7 +15,5 @@ interface TaskTrackerInterface extends BasicTaskTrackerInterface
 
     public function createReleaseCandidate(): Version;
 
-    public function latestRelease(): ?Version;
-
     public function readyToMergeTasksInActiveSprint(): IssueList;
 }

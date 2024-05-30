@@ -19,9 +19,11 @@ abstract class EventDispatchingRepository extends ServiceEntityRepository
         parent::__construct($registry, $entityClass);
     }
 
-    public function flush(object $entity): void
+    protected function persist(object $entity): void
     {
-        $this->getEntityManager()->flush();
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($entity);
+        $entityManager->flush();
 
         if (!$entity instanceof AggregateRootInterface) {
             return;

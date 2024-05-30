@@ -35,6 +35,6 @@ final class ReleasePublicationRepository extends EventDispatchingRepository impl
 
     public function store(ReleasePublicationInterface $releasePublication): void
     {
-        $this->flush($releasePublication);
+        $this->persist($releasePublication);
     }
 }

@@ -7,7 +7,7 @@ namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
 use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
@@ -25,7 +25,7 @@ final readonly class StatusReleaseCandidateRenamed extends AbstractStatus
     ): void {
         $taskTracker->createReleaseCandidate();
 
-        $this->setReleaseStatus($context, new StatusReleaseCandidateRenamed());
+        $this->setPublicationStatus($context, new StatusReleaseCandidateRenamed());
     }
 
     public function __toString(): string

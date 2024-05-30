@@ -9,7 +9,7 @@ use ProjectManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
 use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use ProjectManagement\Shared\Domain\Model\AggregateRootInterface;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;

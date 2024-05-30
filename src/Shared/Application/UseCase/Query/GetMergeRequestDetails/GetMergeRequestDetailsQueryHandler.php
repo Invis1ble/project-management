@@ -6,7 +6,7 @@ namespace ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDeta
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 
 final readonly class GetMergeRequestDetailsQueryHandler implements QueryHandlerInterface
 {

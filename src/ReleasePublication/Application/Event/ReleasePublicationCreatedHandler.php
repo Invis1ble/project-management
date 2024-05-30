@@ -12,10 +12,6 @@ final class ReleasePublicationCreatedHandler extends CommandBusAwareEventHandler
 {
     public function __invoke(ReleasePublicationCreated $event): void
     {
-        if ($event->status->prepared()) {
-            return;
-        }
-
         $this->dispatch(new ProceedToNextStatusCommand($event->id));
     }
 }
