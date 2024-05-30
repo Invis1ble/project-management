@@ -6,6 +6,11 @@ namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRe
 
 final readonly class StatusChecking extends AbstractStatus
 {
+    public function mayBeMergeable(): bool
+    {
+        return true;
+    }
+
     public function __toString(): string
     {
         return Dictionary::Checking->value;

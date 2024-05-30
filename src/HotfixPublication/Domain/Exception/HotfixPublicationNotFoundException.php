@@ -9,8 +9,8 @@ use ProjectManagement\Shared\Domain\Exception\NotFoundException;
 
 class HotfixPublicationNotFoundException extends NotFoundException
 {
-    public function __construct(HotfixPublicationId $hotfixPublicationId)
+    public function __construct(HotfixPublicationId $publicationId)
     {
-        parent::__construct("Release publication $hotfixPublicationId not found.");
+        parent::__construct("Hotfix publication $publicationId not found.");
     }
 }

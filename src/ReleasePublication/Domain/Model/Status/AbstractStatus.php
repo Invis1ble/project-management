@@ -15,35 +15,40 @@ abstract readonly class AbstractStatus implements StatusInterface
         return false;
     }
 
-    protected function setReleaseStatus(ReleasePublicationInterface $release, StatusInterface $status): void
-    {
-        $previousStatus = $release->status();
-        $this->setReleaseProperty($release, 'status', $status);
+    protected function setPublicationStatus(
+        ReleasePublicationInterface $publication,
+        StatusInterface $status,
+    ): void {
+        $previousStatus = $publication->status();
+        $this->setPublicationProperty($publication, 'status', $status);
 
-        $reflection = new \ReflectionMethod($release, 'raiseDomainEvent');
-        $reflection->invoke($release, new ReleasePublicationStatusChanged(
-            id: $release->id(),
-            branchName: $release->branchName(),
-            status: $release->status(),
+        $reflection = new \ReflectionMethod($publication, 'raiseDomainEvent');
+        $reflection->invoke($publication, new ReleasePublicationStatusChanged(
+            id: $publication->id(),
+            branchName: $publication->branchName(),
+            status: $publication->status(),
             previousStatus: $previousStatus,
-            readyToMergeTasks: $release->readyToMergeTasks(),
-            createdAt: $release->createdAt(),
+            readyToMergeTasks: $publication->readyToMergeTasks(),
+            createdAt: $publication->createdAt(),
         ));
     }
 
-    protected function setReleaseProperty(ReleasePublicationInterface $release, string $propertyName, $value): void
-    {
-        if (!$release instanceof ReleasePublication) {
+    protected function setPublicationProperty(
+        ReleasePublicationInterface $publication,
+        string $propertyName,
+        $value,
+    ): void {
+        if (!$publication instanceof ReleasePublication) {
             throw new \InvalidArgumentException(sprintf(
                 'Unsupported implementation %s: expected %s, got %s.',
                 ReleasePublicationInterface::class,
                 ReleasePublication::class,
-                $release::class,
+                $publication::class,
             ));
         }
 
-        $reflection = new \ReflectionClass($release);
+        $reflection = new \ReflectionClass($publication);
         $property = $reflection->getProperty($propertyName);
-        $property->setValue($release, $value);
+        $property->setValue($publication, $value);
     }
 }

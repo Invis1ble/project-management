@@ -17,10 +17,7 @@ use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as Ba
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class IssuesAwareCommand extends Command
@@ -53,6 +50,8 @@ abstract class IssuesAwareCommand extends Command
 
     protected function configure(): void
     {
+        parent::configure();
+
         $this
             ->addOption(
                 'dry-run',
@@ -61,13 +60,6 @@ abstract class IssuesAwareCommand extends Command
                 'Execute the command as a dry run.',
             )
         ;
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $this->io = new SymfonyStyle($input, $output);
-
-        return Command::SUCCESS;
     }
 
     protected function listIssues(IssueList $issues): void
@@ -111,7 +103,7 @@ abstract class IssuesAwareCommand extends Command
                     Status::Open => 'bright-cyan',
                 };
 
-                return "<fg=$fg>[{$mr->status->value}]</> $mr->guiUrl $mr->sourceBranchName -> $mr->targetBranchName | $mr->name";
+                return "<fg=$fg>[{$mr->status->value}]</> $mr->guiUrl $mr->sourceBranchName -> $mr->targetBranchName | $mr->title";
             },
         )));
     }
@@ -123,7 +115,7 @@ abstract class IssuesAwareCommand extends Command
 
     protected function phase(string $text): void
     {
-        $this->io->block($text);
+        $this->io->block($text, null, 'fg=gray');
     }
 
     protected function listing(array $elements): void
@@ -186,16 +178,20 @@ abstract class IssuesAwareCommand extends Command
 
             $this->io->warning([
                 "Merge request $mergeRequest->projectName!$mergeRequest->id is not mergeable.",
-                "Merge status: {$mergeRequest->status->value}",
+                "Merge request status: $details->status",
                 $mergeRequest->guiUrl,
             ]);
 
+            $retryTimeout = 10;
+
             $confirmed = $this->io->confirm(
-                question: "Check merge request $mergeRequest->guiUrl merge status again",
-                default: false,
+                question: "Check merge request $mergeRequest->guiUrl merge status again in $retryTimeout seconds",
+                default: $details->mayBeMergeable(),
             );
 
-            if (!$confirmed) {
+            if ($confirmed) {
+                sleep($retryTimeout);
+            } else {
                 $this->abort();
             }
         }
@@ -230,7 +226,7 @@ abstract class IssuesAwareCommand extends Command
 
         $mergeRequests = $mergeRequests->filter(
             fn (MergeRequest $mr): bool => $this->io->confirm(
-                question: "Merge $mr->projectName: $mr->sourceBranchName -> $mr->targetBranchName | $mr->name",
+                question: "Merge $mr->projectName: $mr->sourceBranchName -> $mr->targetBranchName | $mr->title",
                 default: $onlyOneMergeRequest || $mr->sourceEquals($issue->canonicalBranchName()),
             ),
         );

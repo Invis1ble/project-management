@@ -7,8 +7,11 @@ namespace ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollab
 use ProjectManagement\Shared\Domain\Exception\UnsupportedProjectException;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 
 final readonly class MergeRequestManagerStack implements MergeRequestManagerInterface
 {
@@ -36,11 +39,31 @@ final readonly class MergeRequestManagerStack implements MergeRequestManagerInte
         $this->mergeRequestManagers = $managers;
     }
 
-    public function merge(ProjectId $projectId, MergeRequestId $mergeRequestId): Details
+    public function createMergeRequest(
+        ProjectId $projectId,
+        Title $title,
+        Branch\Name $sourceBranchName,
+        Branch\Name $targetBranchName,
+    ): MergeRequest {
+        foreach ($this->mergeRequestManagers as $manager) {
+            if ($manager->supports($projectId)) {
+                return $manager->createMergeRequest(
+                    projectId: $projectId,
+                    title: $title,
+                    sourceBranchName: $sourceBranchName,
+                    targetBranchName: $targetBranchName,
+                );
+            }
+        }
+
+        throw new UnsupportedProjectException($projectId);
+    }
+
+    public function mergeMergeRequest(ProjectId $projectId, MergeRequestId $mergeRequestId): MergeRequest
     {
         foreach ($this->mergeRequestManagers as $manager) {
             if ($manager->supports($projectId)) {
-                return $manager->merge($projectId, $mergeRequestId);
+                return $manager->mergeMergeRequest($projectId, $mergeRequestId);
             }
         }
 

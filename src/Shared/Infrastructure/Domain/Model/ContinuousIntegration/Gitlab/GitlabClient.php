@@ -1,0 +1,565 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Gitlab;
+
+use Invis1ble\Messenger\Event\EventBusInterface;
+use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
+use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
+use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStatusChanged;
+use ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStuck;
+use ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestCreated;
+use ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
+use ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Branch\BranchCreated;
+use ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Commit\CommitCreated;
+use ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag\TagCreated;
+use ProjectManagement\Shared\Domain\Exception\NotFoundException;
+use ProjectManagement\Shared\Domain\Exception\UnsupportedProjectException;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
+
+final readonly class GitlabClient implements SourceCodeRepositoryInterface, ContinuousIntegrationClientInterface, MergeRequest\MergeRequestManagerInterface
+{
+    public function __construct(
+        private ClientInterface $httpClient,
+        private UriFactoryInterface $uriFactory,
+        private RequestFactoryInterface $requestFactory,
+        private StreamFactoryInterface $streamFactory,
+        private Job\JobFactoryInterface $jobFactory,
+        private Pipeline\PipelineFactoryInterface $pipelineFactory,
+        private Tag\TagFactoryInterface $tagFactory,
+        private Branch\BranchFactoryInterface $branchFactory,
+        private Commit\CommitFactoryInterface $commitFactory,
+        private File\FileFactoryInterface $fileFactory,
+        private MergeRequest\MergeRequestFactoryInterface $mergeRequestFactory,
+        private MergeRequest\Details\DetailsFactoryInterface $detailsFactory,
+        private EventBusInterface $eventBus,
+        private ProjectId $projectId,
+    ) {
+    }
+
+    public function awaitLatestPipeline(
+        Ref $ref,
+        \DateTimeImmutable $createdAfter,
+        ?\DateInterval $maxAwaitingTime = null,
+        ?\DateInterval $tickInterval = null,
+    ): ?Pipeline\Pipeline {
+        $startTime = new \DateTimeImmutable();
+
+        if (null === $maxAwaitingTime) {
+            $maxAwaitingTime = new \DateInterval('PT30M');
+        }
+
+        $untilTime = $startTime->add($maxAwaitingTime);
+
+        if (null === $tickInterval) {
+            $tickInterval = new \DateInterval('PT10S');
+        }
+
+        $now = new \DateTimeImmutable();
+        $tickIntervalInSeconds = $now->add($tickInterval)->getTimestamp() - $now->getTimestamp();
+        $previousStatus = null;
+
+        while (new \DateTimeImmutable() <= $untilTime) {
+            $pipeline = $this->getPipeline($ref);
+
+            if ($pipeline->createdAfter($createdAfter)) {
+                if (null === $previousStatus || !$pipeline->status->equals($previousStatus)) {
+                    $this->eventBus->dispatch(new LatestPipelineStatusChanged(
+                        projectId: $pipeline->projectId,
+                        ref: $pipeline->ref,
+                        pipelineId: $pipeline->id,
+                        previousStatus: $previousStatus,
+                        status: $pipeline->status,
+                        maxAwaitingTime: $maxAwaitingTime,
+                    ));
+
+                    $previousStatus = $pipeline->status;
+                }
+
+                if ($pipeline->finished() || !$pipeline->inProgress()) {
+                    return $pipeline;
+                }
+            }
+
+            $this->eventBus->dispatch(new LatestPipelineAwaitingTick(
+                projectId: $pipeline->projectId,
+                ref: $pipeline->ref,
+                pipelineId: $pipeline->id,
+                status: $pipeline->status,
+                maxAwaitingTime: $maxAwaitingTime,
+            ));
+
+            sleep($tickIntervalInSeconds);
+        }
+
+        $this->eventBus->dispatch(new LatestPipelineStuck(
+            projectId: $this->projectId,
+            ref: $ref,
+            maxAwaitingTime: $maxAwaitingTime,
+        ));
+
+        return $pipeline ?? null;
+    }
+
+    public function deployOnProduction(VersionName $tagName): Job\Job
+    {
+        $pipeline = $this->getPipeline($tagName);
+
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri(
+                "/api/v4/projects/$pipeline->projectId/pipelines/$pipeline->id/jobs?" . http_build_query([
+                    'scope' => 'manual',
+                ]),
+            ),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $found = false;
+        $deployJobName = 'Production-AWS';
+
+        foreach ($data as $job) {
+            if ($deployJobName === $job['name']) {
+                $found = true;
+
+                break;
+            }
+        }
+
+        if (!$found) {
+            throw new NotFoundException("Job $deployJobName not found");
+        }
+
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/jobs/{$data['id']}/play"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $job = $this->jobFactory->createJob(
+            id: $data['id'],
+            name: $data['name'],
+            ref: $data['ref'],
+            createdAt: $data['created_at'],
+        );
+
+        $this->eventBus->dispatch(new JobRan(
+            projectId: $this->projectId,
+            ref: $job->ref,
+            pipelineId: $pipeline->id,
+            jobId: $job->id,
+            name: $job->name,
+            createdAt: $job->createdAt,
+        ));
+
+        return $job;
+    }
+
+    public function createBranch(
+        Branch\Name $name,
+        Ref $ref,
+    ): Branch\Branch {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/branches?" . http_build_query([
+                'branch' => (string) $name,
+                'ref' => (string) $ref,
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $branch = $this->branchFactory->createBranch(
+            name: $data['name'],
+            protected: $data['protected'],
+            guiUrl: $data['web_url'],
+            commitId: $data['commit']['id'],
+            commitMessage: $data['commit']['message'],
+            commitCreatedAt: $data['commit']['created_at'],
+        );
+
+        $this->eventBus->dispatch(new BranchCreated(
+            projectId: $this->projectId,
+            ref: $ref,
+            name: $branch->name,
+            protected: $branch->protected,
+            guiUrl: $branch->guiUrl,
+            commitId: $branch->commit->id,
+            commitMessage: $branch->commit->message,
+            commitCreatedAt: $branch->commit->createdAt,
+        ));
+
+        return $branch;
+    }
+
+    public function createTag(
+        Tag\Name $name,
+        Ref $ref,
+        ?Tag\Message $message = null,
+    ): Tag\Tag {
+        $data = [];
+
+        if (null !== $message) {
+            $data['message'] = (string) $message;
+        }
+
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/tags?" . http_build_query([
+                'tag_name' => (string) $name,
+                'ref' => (string) $ref,
+            ])),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode($data)))
+        ;
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $tag = $this->tagFactory->createTag(
+            name: $data['name'],
+            commitId: $data['commit']['id'],
+            commitMessage: $data['commit']['message'],
+            commitCreatedAt: $data['commit']['created_at'],
+            target: $data['target'],
+            message: $data['message'],
+            createdAt: $data['created_at'],
+        );
+
+        $this->eventBus->dispatch(new TagCreated(
+            projectId: $this->projectId,
+            tagName: $tag->name,
+            ref: $ref,
+            message: $message,
+            createdAt: $tag->createdAt,
+        ));
+
+        return $tag;
+    }
+
+    public function commit(
+        Branch\Name $branchName,
+        Commit\Message $message,
+        NewCommit\Action\ActionList $actions,
+        ?Branch\Name $startBranchName = null,
+    ): Commit\Commit {
+        $data = [
+            'branch' => (string) $branchName,
+            'commit_message' => (string) $message,
+            'actions' => iterator_to_array($actions->map(fn (NewCommit\Action\AbstractAction $action): array => $action->toArray())),
+        ];
+
+        if (null !== $startBranchName) {
+            $data['start_branch_name'] = (string) $startBranchName;
+        }
+
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/commits"),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode($data)))
+        ;
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $commit = $this->commitFactory->createCommit(
+            id: $data['id'],
+            message: $data['message'],
+            createdAt: $data['created_at'],
+        );
+
+        $this->eventBus->dispatch(new CommitCreated(
+            projectId: $this->projectId,
+            branchName: $branchName,
+            startBranchName: $startBranchName,
+            commitId: $commit->id,
+            message: $commit->message,
+            guiUrl: $this->uriFactory->createUri($data['web_url']),
+            createdAt: $commit->createdAt,
+        ));
+
+        return $commit;
+    }
+
+    public function latestTagToday(): ?Tag\Tag
+    {
+        $now = new \DateTimeImmutable();
+
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/tags?" . http_build_query([
+                'search' => '^v.' . $now->format('y-m-d') . '.',
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $heap = new class() extends \SplMaxHeap {
+            /**
+             * @param array $value1
+             * @param array $value2
+             */
+            protected function compare(mixed $value1, mixed $value2): int
+            {
+                return VersionName::fromString($value1['name'])
+                    ->versionCompare(VersionName::fromString($value2['name']));
+            }
+        };
+
+        foreach (json_decode($content, true) as $tag) {
+            try {
+                VersionName::fromString($tag['name']);
+            } catch (\InvalidArgumentException) {
+                continue;
+            }
+
+            $heap->insert($tag);
+        }
+
+        if ($heap->isEmpty()) {
+            return null;
+        }
+
+        $tag = $heap->top();
+
+        return $this->tagFactory->createTag(
+            name: $tag['name'],
+            commitId: $tag['commit']['id'],
+            commitMessage: $tag['commit']['message'],
+            commitCreatedAt: $tag['commit']['created_at'],
+            target: $tag['target'],
+            message: $tag['message'],
+            createdAt: $tag['commit']['created_at'],
+        );
+    }
+
+    public function file(
+        Branch\Name $branchName,
+        File\FilePath $filePath,
+    ): File\File {
+        $encodedFilePath = urlencode((string) $filePath);
+
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/files/$encodedFilePath?" . http_build_query([
+                'ref' => (string) $branchName,
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return $this->fileFactory->createFile(
+            fileName: $data['file_name'],
+            filePath: $data['file_path'],
+            content: $data['content'],
+            ref: $data['ref'],
+            commitId: $data['commit_id'],
+            lastCommitId: $data['last_commit_id'],
+            executeFilemode: $data['execute_filemode'],
+        );
+    }
+
+    public function createMergeRequest(
+        ProjectId $projectId,
+        MergeRequest\Title $title,
+        Branch\Name $sourceBranchName,
+        Branch\Name $targetBranchName,
+    ): MergeRequest\MergeRequest {
+        $this->assertSupportsProject($projectId);
+
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/merge_requests"),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode([
+                'source_branch' => (string) $sourceBranchName,
+                'target_branch' => (string) $targetBranchName,
+                'title' => (string) $title,
+            ])))
+        ;
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $mergeRequest = $this->createMergeRequestObject($data);
+
+        $this->eventBus->dispatch(new MergeRequestCreated(
+            projectId: $mergeRequest->projectId,
+            mergeRequestId: $mergeRequest->id,
+            title: $mergeRequest->title,
+            sourceBranchName: $mergeRequest->sourceBranchName,
+            targetBranchName: $mergeRequest->targetBranchName,
+            details: $mergeRequest->details,
+        ));
+
+        return $mergeRequest;
+    }
+
+    public function mergeMergeRequest(
+        ProjectId $projectId,
+        MergeRequest\MergeRequestId $mergeRequestId,
+    ): MergeRequest\MergeRequest {
+        $this->assertSupportsProject($projectId);
+
+        $request = $this->requestFactory->createRequest(
+            'PUT',
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        $mergeRequest = $this->createMergeRequestObject($data);
+
+        $this->eventBus->dispatch(new MergeRequestMerged(
+            projectId: $mergeRequest->projectId,
+            mergeRequestId: $mergeRequest->id,
+            title: $mergeRequest->title,
+            sourceBranchName: $mergeRequest->sourceBranchName,
+            targetBranchName: $mergeRequest->targetBranchName,
+            details: $mergeRequest->details,
+        ));
+
+        return $mergeRequest;
+    }
+
+    public function supports(ProjectId $projectId): bool
+    {
+        return $this->projectId->equals($projectId);
+    }
+
+    public function details(
+        ProjectId $projectId,
+        MergeRequest\MergeRequestId $mergeRequestId,
+    ): MergeRequest\Details\Details {
+        $this->assertSupportsProject($projectId);
+
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $mergeRequest = json_decode($content, true);
+
+        return $this->createDetailsObject($mergeRequest);
+    }
+
+    private function assertSupportsProject(ProjectId $projectId): void
+    {
+        if (!$this->supports($projectId)) {
+            throw new UnsupportedProjectException($projectId);
+        }
+    }
+
+    private function createDetailsObject(array $mergeRequest): MergeRequest\Details\Details
+    {
+        return $this->detailsFactory->createDetails(
+            status: $mergeRequest['detailed_merge_status'],
+        );
+    }
+
+    private function createMergeRequestObject(array $data): MergeRequest\MergeRequest
+    {
+        $mergeRequest = $this->mergeRequestFactory->createMergeRequest(
+            id: $data['id'],
+            title: $data['title'],
+            projectId: $data['project_id'],
+            projectName: $data['project_name'],
+            sourceBranchName: $data['source_branch'],
+            targetBranchName: $data['target_branch'],
+            status: MergeRequest\Status::Open->value,
+            guiUrl: $data['web_url'],
+        );
+
+        $details = $this->createDetailsObject($data);
+
+        return $mergeRequest->withDetails($details);
+    }
+
+    private function getPipeline(Ref $ref): Pipeline\Pipeline
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/pipelines/latest?" . http_build_query([
+                'ref' => (string) $ref,
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return $this->pipelineFactory->createPipeline(
+            projectId: $data['project_id'],
+            ref: $data['ref'],
+            id: $data['id'],
+            sha: $data['sha'],
+            status: $data['status'],
+            createdAt: $data['created_at'],
+            updatedAt: $data['updated_at'],
+            startedAt: $data['started_at'],
+            finishedAt: $data['finished_at'],
+            committedAt: $data['committed_at'],
+            guiUrl: $data['web_url'],
+        );
+    }
+}

@@ -12,10 +12,6 @@ final class HotfixPublicationCreatedHandler extends CommandBusAwareEventHandler
 {
     public function __invoke(HotfixPublicationCreated $event): void
     {
-        if ($event->status->prepared()) {
-            return;
-        }
-
         $this->dispatch(new ProceedToNextStatusCommand($event->id));
     }
 }

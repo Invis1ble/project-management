@@ -12,10 +12,12 @@ doctrine:
         types:
             utc_datetime_microseconds_immutable: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\UtcDateTimeMicrosecondsImmutableType
 
-            issue_list: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\IssueListType
+            tag_version_name: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Tag\VersionNameType
+            tag_message: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Tag\MessageType
+            issue_list: ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\TaskTracker\Issue\IssueListType
 
             release_publication_id: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleasePublicationIdType
-            release_branch_name: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\ReleaseBranchNameType
+            release_branch_name: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Branch\ReleaseBranchNameType
             release_publication_status: ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\StatusType
             
             hotfix_publication_id: ProjectManagement\HotfixPublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\HotfixPublicationIdType

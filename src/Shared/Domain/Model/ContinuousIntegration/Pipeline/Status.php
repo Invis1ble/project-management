@@ -49,6 +49,11 @@ enum Status: string implements \JsonSerializable
         );
     }
 
+    public function equals(self $status): bool
+    {
+        return $this === $status;
+    }
+
     public function jsonSerialize(): string
     {
         return $this->value;

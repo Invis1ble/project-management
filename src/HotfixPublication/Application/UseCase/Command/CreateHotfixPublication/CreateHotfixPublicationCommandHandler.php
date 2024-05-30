@@ -20,8 +20,9 @@ final readonly class CreateHotfixPublicationCommandHandler extends HotfixPublica
     public function __invoke(CreateHotfixPublicationCommand $command): void
     {
         $hotfixPublication = $this->factory->createHotfixPublication(
-            $command->branchName,
-            $command->readyToMergeTasks,
+            $command->tagName,
+            $command->tagMessage,
+            $command->hotfixes,
         );
 
         $this->storeHotfixPublication($hotfixPublication);

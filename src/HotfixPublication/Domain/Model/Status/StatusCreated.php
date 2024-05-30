@@ -7,7 +7,8 @@ namespace ProjectManagement\HotfixPublication\Domain\Model\Status;
 use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
@@ -21,13 +22,15 @@ final readonly class StatusCreated extends AbstractStatus
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
+        ProjectResolverInterface $projectResolver,
         HotfixPublicationInterface $context,
     ): void {
-        $tasks = $context->readyToMergeHotfixes()
-            ->mergeMergeRequests($mergeRequestManager);
+        $hotfixes = $context->hotfixes()
+            ->mergeMergeRequests($mergeRequestManager)
+        ;
 
-        $this->setReleaseProperty($context, 'readyToMergeTasks', $tasks);
-        $this->setReleaseStatus($context, new StatusMergeRequestsMerged());
+        $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
+        $this->setPublicationStatus($context, new StatusMergeRequestsMerged());
     }
 
     public function __toString(): string

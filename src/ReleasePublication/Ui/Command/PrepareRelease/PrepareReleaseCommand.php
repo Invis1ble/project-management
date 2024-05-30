@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'release:prepare', description: 'Prepares new release')]
+#[AsCommand(name: 'pm:release:prepare', description: 'Prepares a new release')]
 final class PrepareReleaseCommand extends IssuesAwareCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -70,7 +70,7 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
 
     private function newReleaseBranchName(): Name
     {
-        $this->io->section('Fetching latest release');
+        $this->phase('Fetching latest release...');
 
         /** @var Version $release */
         $release = $this->queryBus->ask(new GetLatestReleaseQuery());
@@ -85,7 +85,7 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
 
         $latestReleaseBranchName = Name::fromString((string) $release->name);
 
-        $this->io->info("Latest release branch name: $latestReleaseBranchName");
+        $this->caption("Latest release branch name: $latestReleaseBranchName");
 
         return $this->io->ask(
             question: 'New release branch name',
@@ -104,18 +104,18 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
 
     private function readyToMergeTasks(): IssueList
     {
-        $this->io->section('Fetching Ready to Merge tasks');
+        $this->phase('Fetching Ready to Merge tasks...');
 
         /** @var IssueList $tasks */
         $tasks = $this->queryBus->ask(new GetReadyToMergeTasksInActiveSprintQuery());
 
         if ($tasks->empty()) {
-            $this->io->info('No Ready to Merge tasks found in the active sprint.');
+            $this->caption('No Ready to Merge tasks found in the active sprint.');
 
             return $tasks;
         }
 
-        $this->io->info('Ready to Merge tasks');
+        $this->caption('Ready to Merge tasks');
 
         $this->listIssues($tasks);
 
@@ -123,7 +123,7 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
             fn (Issue $task): bool => $this->io->confirm("Add $task->key to the new release"),
         );
 
-        $this->io->info('Tasks to merge');
+        $this->caption('Tasks to merge');
 
         $this->listIssues($tasks);
 

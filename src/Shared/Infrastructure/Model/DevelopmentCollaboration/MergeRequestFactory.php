@@ -8,8 +8,8 @@ use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Name;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Psr\Http\Message\UriFactoryInterface;
 
@@ -21,7 +21,7 @@ final readonly class MergeRequestFactory implements MergeRequestFactoryInterface
 
     public function createMergeRequest(
         int $id,
-        string $name,
+        string $title,
         int $projectId,
         string $projectName,
         string $sourceBranchName,
@@ -31,7 +31,7 @@ final readonly class MergeRequestFactory implements MergeRequestFactoryInterface
     ): MergeRequest {
         return new MergeRequest(
             id: MergeRequestId::from($id),
-            name: Name::fromString($name),
+            title: Title::fromString($title),
             projectId: Project\ProjectId::from($projectId),
             projectName: Project\Name::fromString($projectName),
             sourceBranchName: Branch\Name::fromString($sourceBranchName),

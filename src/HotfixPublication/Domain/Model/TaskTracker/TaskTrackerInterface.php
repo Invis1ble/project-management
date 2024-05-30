@@ -11,4 +11,6 @@ use ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface as Ba
 interface TaskTrackerInterface extends BasicTaskTrackerInterface
 {
     public function readyForPublishHotfixes(Key ...$keys): IssueList;
+
+    public function transitionHotfixesToDone(Key ...$keys): void;
 }

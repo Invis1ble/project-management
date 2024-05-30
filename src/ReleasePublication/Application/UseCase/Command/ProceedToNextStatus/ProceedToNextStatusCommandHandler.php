@@ -8,7 +8,7 @@ use ProjectManagement\ReleasePublication\Application\UseCase\Command\ReleasePubl
 use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported;
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 
 final readonly class GetProjectSupportedQueryHandler implements QueryHandlerInterface
 {

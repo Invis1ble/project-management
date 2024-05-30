@@ -8,7 +8,7 @@ interface MergeRequestFactoryInterface
 {
     public function createMergeRequest(
         int $id,
-        string $name,
+        string $title,
         int $projectId,
         string $projectName,
         string $sourceBranchName,

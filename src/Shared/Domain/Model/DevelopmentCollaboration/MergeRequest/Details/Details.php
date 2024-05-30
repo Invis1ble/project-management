@@ -6,7 +6,7 @@ namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRe
 
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusInterface;
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 
 final readonly class Details
 {
@@ -20,6 +20,11 @@ final readonly class Details
         MergeRequest $context,
     ): MergeRequest {
         return $this->status->merge($mergeRequestManager, $context);
+    }
+
+    public function mayBeMergeable(): bool
+    {
+        return $this->status->mayBeMergeable();
     }
 
     public function mergeable(): bool

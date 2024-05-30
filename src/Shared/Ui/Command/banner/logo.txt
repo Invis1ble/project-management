@@ -1,0 +1,13 @@
+
+
+       <fg=red>#######</>     <fg=gray>#</><fg=red>######</><fg=gray>#</>
+    <fg=gray>//</> <fg=gray>#</><fg=red>#####################</>
+   <fg=gray>*</><fg=bright-red>///</><fg=gray>/</>      <fg=red>######</>      <fg=red>####</>
+   <fg=gray>/</><fg=bright-red>///</>     <fg=gray>/</>   <fg=gray>#</>         <fg=red>####</>
+    <fg=bright-red>/////</> <fg=bright-red>/////</>          <fg=red>####</>
+      <fg=bright-red>///////</>  <fg=red>###</>    <fg=red>#####</><fg=gray>#</>
+        <fg=gray>/</><fg=bright-red>////</><fg=gray>/</> <fg=gray>#</><fg=red>#########</>
+           <fg=bright-red>/////</>  <fg=red>#####</>
+             <fg=bright-red>/////</><fg=gray>,</> <fg=gray>#</>
+               <fg=gray>/</><fg=bright-red>//</>
+

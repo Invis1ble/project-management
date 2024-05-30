@@ -35,6 +35,6 @@ final class HotfixPublicationRepository extends EventDispatchingRepository imple
 
     public function store(HotfixPublicationInterface $hotfixPublication): void
     {
-        $this->flush($hotfixPublication);
+        $this->persist($hotfixPublication);
     }
 }

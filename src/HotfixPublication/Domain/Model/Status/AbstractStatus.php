@@ -10,40 +10,39 @@ use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 
 abstract readonly class AbstractStatus implements StatusInterface
 {
-    public function prepared(): bool
-    {
-        return false;
-    }
+    protected function setPublicationStatus(
+        HotfixPublicationInterface $publication,
+        StatusInterface $status,
+    ): void {
+        $previousStatus = $publication->status();
+        $this->setPublicationProperty($publication, 'status', $status);
 
-    protected function setReleaseStatus(HotfixPublicationInterface $release, StatusInterface $status): void
-    {
-        $previousStatus = $release->status();
-        $this->setReleaseProperty($release, 'status', $status);
-
-        $reflection = new \ReflectionMethod($release, 'raiseDomainEvent');
-        $reflection->invoke($release, new HotfixPublicationStatusChanged(
-            id: $release->id(),
-            branchName: $release->branchName(),
-            status: $release->status(),
+        $reflection = new \ReflectionMethod($publication, 'raiseDomainEvent');
+        $reflection->invoke($publication, new HotfixPublicationStatusChanged(
+            id: $publication->id(),
+            status: $publication->status(),
             previousStatus: $previousStatus,
-            readyToMergeTasks: $release->readyToMergeHotfixes(),
-            createdAt: $release->createdAt(),
+            readyToMergeTasks: $publication->hotfixes(),
+            createdAt: $publication->createdAt(),
         ));
     }
 
-    protected function setReleaseProperty(HotfixPublicationInterface $release, string $propertyName, $value): void
-    {
-        if (!$release instanceof HotfixPublication) {
+    protected function setPublicationProperty(
+        HotfixPublicationInterface $publication,
+        string $propertyName,
+        $value,
+    ): void {
+        if (!$publication instanceof HotfixPublication) {
             throw new \InvalidArgumentException(sprintf(
                 'Unsupported implementation %s: expected %s, got %s.',
                 HotfixPublicationInterface::class,
                 HotfixPublication::class,
-                $release::class,
+                $publication::class,
             ));
         }
 
-        $reflection = new \ReflectionClass($release);
+        $reflection = new \ReflectionClass($publication);
         $property = $reflection->getProperty($propertyName);
-        $property->setValue($release, $value);
+        $property->setValue($publication, $value);
     }
 }

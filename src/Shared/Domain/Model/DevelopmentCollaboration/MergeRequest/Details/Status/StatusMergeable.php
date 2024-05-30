@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status;
 
 use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 
 final readonly class StatusMergeable extends AbstractStatus
 {
@@ -14,22 +13,15 @@ final readonly class StatusMergeable extends AbstractStatus
         MergeRequestManagerInterface $mergeRequestManager,
         MergeRequest $context,
     ): MergeRequest {
-        $details = $mergeRequestManager->merge(
+        return $mergeRequestManager->mergeMergeRequest(
             projectId: $context->projectId,
             mergeRequestId: $context->id,
         );
+    }
 
-        return new MergeRequest(
-            id: $context->id,
-            name: $context->name,
-            projectId: $context->projectId,
-            projectName: $context->projectName,
-            sourceBranchName: $context->sourceBranchName,
-            targetBranchName: $context->targetBranchName,
-            status: Status::Merged,
-            guiUrl: $context->guiUrl,
-            details: $details,
-        );
+    public function mayBeMergeable(): bool
+    {
+        return true;
     }
 
     public function mergeable(): bool

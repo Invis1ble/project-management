@@ -28,6 +28,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         UriFactoryInterface $uriFactory,
         StreamFactoryInterface $streamFactory,
         RequestFactoryInterface $requestFactory,
+        Version\VersionFactoryInterface $versionFactory,
         IssueFactoryInterface $issueFactory,
         MergeRequestFactoryInterface $mergeRequestFactory,
         private EventBusInterface $eventBus,
@@ -42,6 +43,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
             $uriFactory,
             $streamFactory,
             $requestFactory,
+            $versionFactory,
             $issueFactory,
             $mergeRequestFactory,
             $projectKey,
@@ -153,60 +155,6 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         ));
 
         return $version;
-    }
-
-    public function latestRelease(): ?Version\Version
-    {
-        $request = $this->requestFactory->createRequest(
-            'GET',
-            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
-                'query' => 'v-',
-                'orderBy' => '-releaseDate',
-            ])),
-        );
-
-        $content = $this->httpClient->sendRequest($request)
-            ->getBody()
-            ->getContents();
-
-        $releases = json_decode($content, true)['values'];
-
-        $heap = new class() extends \SplMaxHeap {
-            /**
-             * @param array $value1
-             * @param array $value2
-             */
-            protected function compare(mixed $value1, mixed $value2): int
-            {
-                return Name::fromString($value1['name'])
-                    ->versionCompare(Name::fromString($value2['name']));
-            }
-        };
-
-        foreach ($releases as $release) {
-            try {
-                Name::fromString($release['name']);
-            } catch (\InvalidArgumentException) {
-                continue;
-            }
-
-            $heap->insert($release);
-        }
-
-        if ($heap->isEmpty()) {
-            return null;
-        }
-
-        $release = $heap->top();
-
-        return new Version\Version(
-            Version\VersionId::fromString($release['id']),
-            Version\Name::fromString($release['name']),
-            isset($release['description']) ? Version\Description::fromString($release['description']) : null,
-            $release['archived'],
-            $release['released'],
-            isset($release['releaseDate']) ? new \DateTimeImmutable($release['releaseDate']) : null,
-        );
     }
 
     public function readyToMergeTasksInActiveSprint(): IssueList

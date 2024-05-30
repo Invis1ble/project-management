@@ -8,7 +8,8 @@ use ProjectManagement\HotfixPublication\Application\UseCase\Command\HotfixPublic
 use ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface;
 use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
@@ -23,6 +24,7 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
         private ContinuousIntegrationClientInterface $backendCiClient,
         private SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         private TaskTrackerInterface $taskTracker,
+        private ProjectResolverInterface $projectResolver,
     ) {
         parent::__construct($repository);
     }
@@ -39,6 +41,7 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
             backendCiClient: $this->backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $this->setFrontendApplicationBranchNameCommitFactory,
             taskTracker: $this->taskTracker,
+            projectResolver: $this->projectResolver,
         );
 
         $this->storeHotfixPublication($hotfixPublication);

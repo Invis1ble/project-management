@@ -10,7 +10,7 @@ use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
 final readonly class File
 {
     public function __construct(
-        public Filename $filename,
+        public Filename $fileName,
         public FilePath $filePath,
         public Content $content,
         public Name $ref,
