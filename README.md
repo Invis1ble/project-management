@@ -40,9 +40,15 @@ docker compose exec php bin/console messenger:consume async -vvv
 ```
 
 
+Publish hotfix command:
+```sh
+docker compose exec -it php bin/console pm:hotfix:publish
+```
+
+
 Prepare release command:
 ```sh
-docker compose exec -it php bin/console release:prepare
+docker compose exec -it php bin/console pm:release:prepare
 ```
 
 
