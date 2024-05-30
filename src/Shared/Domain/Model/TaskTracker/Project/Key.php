@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 
 final readonly class Key implements \Stringable
 {

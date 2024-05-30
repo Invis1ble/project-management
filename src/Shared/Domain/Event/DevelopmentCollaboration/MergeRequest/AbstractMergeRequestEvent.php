@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 
 abstract readonly class AbstractMergeRequestEvent implements EventInterface
 {

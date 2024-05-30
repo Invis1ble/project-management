@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Event\TaskTracker;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Event\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Description;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Name;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Description;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionId;
 
 abstract readonly class AbstractVersionEvent implements EventInterface
 {

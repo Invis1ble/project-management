@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Model;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model;
 
-use ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationCreated;
-use ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
-use ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
-use ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\AbstractAggregateRoot;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationCreated;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractAggregateRoot;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicationInterface
 {

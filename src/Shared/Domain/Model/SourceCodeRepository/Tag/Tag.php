@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Commit;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Commit;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
 
 /**
  * @template T of Name

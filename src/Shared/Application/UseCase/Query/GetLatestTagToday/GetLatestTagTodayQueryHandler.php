@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday;
+namespace Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday;
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Tag;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Tag;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
 
 final readonly class GetLatestTagTodayQueryHandler implements QueryHandlerInterface
 {

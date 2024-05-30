@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication;
 
 use Invis1ble\Messenger\Command\CommandInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 final readonly class CreateHotfixPublicationCommand implements CommandInterface
 {

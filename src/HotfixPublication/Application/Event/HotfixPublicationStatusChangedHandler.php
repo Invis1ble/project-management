@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Application\Event;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Application\Event;
 
-use ProjectManagement\HotfixPublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
-use ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
-use ProjectManagement\Shared\Application\Event\CommandBusAwareEventHandler;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
+use Invis1ble\ProjectManagement\Shared\Application\Event\CommandBusAwareEventHandler;
 
 final class HotfixPublicationStatusChangedHandler extends CommandBusAwareEventHandler
 {

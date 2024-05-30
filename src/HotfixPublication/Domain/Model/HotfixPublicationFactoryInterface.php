@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Model;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 interface HotfixPublicationFactoryInterface
 {

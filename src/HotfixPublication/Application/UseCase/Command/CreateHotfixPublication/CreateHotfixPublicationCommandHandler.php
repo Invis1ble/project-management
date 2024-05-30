@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication;
 
-use ProjectManagement\HotfixPublication\Application\UseCase\Command\HotfixPublicationRepositoryAwareCommandHandler;
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationFactoryInterface;
-use ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\HotfixPublicationRepositoryAwareCommandHandler;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationFactoryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface;
 
 final readonly class CreateHotfixPublicationCommandHandler extends HotfixPublicationRepositoryAwareCommandHandler
 {

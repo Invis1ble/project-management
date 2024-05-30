@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Application\Event;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Application\Event;
 
-use ProjectManagement\ReleasePublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
-use ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationCreated;
-use ProjectManagement\Shared\Application\Event\CommandBusAwareEventHandler;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationCreated;
+use Invis1ble\ProjectManagement\Shared\Application\Event\CommandBusAwareEventHandler;
 
 final class ReleasePublicationCreatedHandler extends CommandBusAwareEventHandler
 {

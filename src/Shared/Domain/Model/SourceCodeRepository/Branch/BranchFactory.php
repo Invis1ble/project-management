@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class BranchFactory implements BranchFactoryInterface

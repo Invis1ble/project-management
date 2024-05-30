@@ -2,8 +2,8 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
         https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity name="ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication"
-            repository-class="ProjectManagement\HotfixPublication\Infrastructure\Domain\Repository\HotfixPublicationRepository">
+    <entity name="Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication"
+            repository-class="Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Repository\HotfixPublicationRepository">
         <indexes>
             <index columns="created_at" />
         </indexes>

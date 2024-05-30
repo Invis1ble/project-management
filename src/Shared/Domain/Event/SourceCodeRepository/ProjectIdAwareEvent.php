@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Event\SourceCodeRepository;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 
 abstract readonly class ProjectIdAwareEvent implements EventInterface, \Serializable, \JsonSerializable
 {

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventBusInterface;
-use ProjectManagement\HotfixPublication\Domain\Event\TaskTracker\HotfixTransitionedToDone;
-use ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
-use ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\TaskTracker\HotfixTransitionedToDone;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;

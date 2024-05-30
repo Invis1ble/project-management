@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Infrastructure\Model\DevelopmentCollaboration;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Model\DevelopmentCollaboration;
 
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class MergeRequestFactory implements MergeRequestFactoryInterface

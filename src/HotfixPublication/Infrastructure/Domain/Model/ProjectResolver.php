@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Infrastructure\Domain\Model;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model;
 
-use ProjectManagement\HotfixPublication\Domain\Model\ProjectResolverInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 
 final readonly class ProjectResolver implements ProjectResolverInterface
 {

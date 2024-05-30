@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model;
 
 abstract readonly class AbstractId implements IdInterface
 {

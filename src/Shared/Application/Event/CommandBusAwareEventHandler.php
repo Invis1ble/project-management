@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Application\Event;
+namespace Invis1ble\ProjectManagement\Shared\Application\Event;
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Command\CommandInterface;

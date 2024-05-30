@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday;
+namespace Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday;
 
 use Invis1ble\Messenger\Query\QueryInterface;
 

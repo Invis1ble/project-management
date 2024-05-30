@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Branch;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\SourceCodeRepository\Branch;
 
-use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\AbstractStringableType;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\DoctrineExtensions\Dbal\Types\AbstractStringableType;
 
 final class ReleaseBranchNameType extends AbstractStringableType
 {

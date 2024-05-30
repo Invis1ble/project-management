@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Ui\Command\PublishHotfix;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublishHotfix;
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
-use ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
-use ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint\GetReadyForPublishHotfixesInActiveSprintQuery;
-use ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
-use ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Tag;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
-use ProjectManagement\Shared\Ui\Command\IssuesAwareCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint\GetReadyForPublishHotfixesInActiveSprintQuery;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Tag;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\IssuesAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

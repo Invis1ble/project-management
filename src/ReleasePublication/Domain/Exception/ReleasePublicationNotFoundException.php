@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Exception;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Exception;
 
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use ProjectManagement\Shared\Domain\Exception\NotFoundException;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use Invis1ble\ProjectManagement\Shared\Domain\Exception\NotFoundException;
 
 class ReleasePublicationNotFoundException extends NotFoundException
 {

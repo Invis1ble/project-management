@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Event\SourceCodeRepository;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository;
 
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 
 abstract readonly class RefAwareEvent extends ProjectIdAwareEvent
 {

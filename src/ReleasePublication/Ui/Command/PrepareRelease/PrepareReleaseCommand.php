@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Ui\Command\PrepareRelease;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\PrepareRelease;
 
-use ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
-use ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
-use ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
-use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
-use ProjectManagement\Shared\Ui\Command\IssuesAwareCommand;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\IssuesAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

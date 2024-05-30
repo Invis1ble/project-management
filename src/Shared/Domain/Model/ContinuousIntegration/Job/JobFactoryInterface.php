@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 
 interface JobFactoryInterface
 {

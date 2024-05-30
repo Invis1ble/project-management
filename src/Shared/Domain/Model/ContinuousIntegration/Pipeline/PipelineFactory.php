@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class PipelineFactory implements PipelineFactoryInterface

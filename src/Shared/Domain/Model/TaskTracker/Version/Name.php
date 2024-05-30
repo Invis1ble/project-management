@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 
-use ProjectManagement\Shared\Domain\Model\NonEmptyString;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\NonEmptyString;
 
 final readonly class Name extends NonEmptyString
 {

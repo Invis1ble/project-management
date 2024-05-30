@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Exception;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception;
 
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
-use ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
-use ProjectManagement\Shared\Domain\Exception\StateTransitionException;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Exception\StateTransitionException;
 
 class HotfixPublicationStatusTransitionException extends StateTransitionException
 {

@@ -52,12 +52,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ProjectManagement\\": "src/"
+            "Invis1ble\\ProjectManagement\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ProjectManagement\\Tests\\": "tests/"
+            "Invis1ble\\ProjectManagement\\Tests\\": "tests/"
         }
     },
     "replace": {

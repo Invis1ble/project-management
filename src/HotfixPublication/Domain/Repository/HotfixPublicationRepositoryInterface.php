@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Repository;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository;
 
-use ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
-use ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 
 interface HotfixPublicationRepositoryInterface
 {

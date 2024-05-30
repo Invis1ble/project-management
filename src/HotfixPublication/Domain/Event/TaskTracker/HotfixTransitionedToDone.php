@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\HotfixPublication\Domain\Event\TaskTracker;
+namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 
 final readonly class HotfixTransitionedToDone implements EventInterface
 {

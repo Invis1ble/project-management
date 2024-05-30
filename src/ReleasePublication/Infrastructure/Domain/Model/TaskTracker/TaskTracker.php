@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventBusInterface;
-use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
-use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
-use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
-use ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
