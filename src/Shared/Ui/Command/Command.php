@@ -43,7 +43,7 @@ abstract class Command extends BasicCommand
             $this->showBanner($this->io, !$input->getOption('no-logo'));
         }
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     protected function showBanner(SymfonyStyle $io, bool $showLogo): void
