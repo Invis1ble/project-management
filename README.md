@@ -34,11 +34,6 @@ In the `.env` file set following variables:
 Usage
 -----
 
-Run queue workers:
-```sh
-docker compose exec php bin/console messenger:consume async -vvv
-```
-
 
 Publish hotfix command:
 ```sh
