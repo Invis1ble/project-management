@@ -17,18 +17,4 @@ final readonly class LatestPipelineStuck extends RefAwareEvent
     ) {
         parent::__construct($projectId, $ref);
     }
-
-    public function __unserialize(array $data): void
-    {
-        parent::__unserialize($data);
-
-        $this->maxAwaitingTime = $data['max_awaiting_time'];
-    }
-
-    public function jsonSerialize(): array
-    {
-        return [
-            'max_awaiting_time' => $this->maxAwaitingTime,
-        ] + parent::jsonSerialize();
-    }
 }

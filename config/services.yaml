@@ -26,9 +26,21 @@ services:
 
 
 
-    Invis1ble\Messenger\Command\CommandBus:
-        arguments: ['@messenger.bus.command.async']
 
+
+    serializer.normalizer.property:
+        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Serializer\UriNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 990 }
+
+
+
+
+
+    Invis1ble\Messenger\Command\CommandBus:
+        arguments: ['@messenger.bus.command.async']    
     
     
     
@@ -129,7 +141,7 @@ services:
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Repository\HotfixPublicationRepository'
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\ReleasePublicationFactory'
-    Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Model\DevelopmentCollaboration\MergeRequestFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Sprint\SprintFactory'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository\ReleasePublicationRepository'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
@@ -138,5 +150,3 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerStack'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactory'
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactory'
-    
-    
