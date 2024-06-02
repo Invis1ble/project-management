@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint;
 
-enum State: string implements \JsonSerializable
+enum State: string
 {
     case Active = 'active';
     case Closed = 'closed';
@@ -12,10 +12,5 @@ enum State: string implements \JsonSerializable
     public function active(): bool
     {
         return self::Active === $this;
-    }
-
-    public function jsonSerialize(): string
-    {
-        return $this->value;
     }
 }

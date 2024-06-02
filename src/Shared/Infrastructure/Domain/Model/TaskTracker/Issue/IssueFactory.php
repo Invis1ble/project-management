@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
 
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\SprintList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\SprintList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface;
 
 final readonly class IssueFactory implements IssueFactoryInterface
 {

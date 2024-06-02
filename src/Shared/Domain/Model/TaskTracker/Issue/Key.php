@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
-final readonly class Key implements \Stringable, \JsonSerializable
+final readonly class Key implements \Stringable
 {
     protected string $value;
 
@@ -28,11 +28,6 @@ final readonly class Key implements \Stringable, \JsonSerializable
     }
 
     public function __toString(): string
-    {
-        return $this->value;
-    }
-
-    public function jsonSerialize(): string
     {
         return $this->value;
     }

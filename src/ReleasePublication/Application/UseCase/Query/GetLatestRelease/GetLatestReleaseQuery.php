@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease;
 
 use Invis1ble\Messenger\Query\QueryInterface;
 

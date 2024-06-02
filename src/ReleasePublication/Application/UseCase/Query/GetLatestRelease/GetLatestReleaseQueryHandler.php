@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease;
 
 use Invis1ble\Messenger\Query\QueryHandlerInterface;
-use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
 
 final readonly class GetLatestReleaseQueryHandler implements QueryHandlerInterface
 {

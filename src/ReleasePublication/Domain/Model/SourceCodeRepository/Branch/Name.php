@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicName;
 
 final readonly class Name extends BasicName
 {
@@ -46,7 +46,7 @@ final readonly class Name extends BasicName
     {
         parent::validate($value);
 
-        if (!preg_match('/^v(?:-[0-9]+){3}$/', $value)) {
+        if (!preg_match('/^v(?:-[0-9]){3}$/', $value)) {
             throw new \InvalidArgumentException("Invalid release branch name format: $value");
         }
     }

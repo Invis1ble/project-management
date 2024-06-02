@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Model;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model;
 
-use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 interface ReleasePublicationFactoryInterface
 {

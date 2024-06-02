@@ -2,8 +2,8 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
         https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity name="ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication"
-            repository-class="ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository\ReleasePublicationRepository">
+    <entity name="Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication"
+            repository-class="Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository\ReleasePublicationRepository">
         <indexes>
             <index columns="created_at" />
         </indexes>

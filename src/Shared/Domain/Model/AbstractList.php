@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model;
 
 /**
  * @template T
@@ -67,6 +67,23 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
         }
 
         return false;
+    }
+
+    /**
+     * @template R
+     *
+     * @param callable(?R, T): ?R $callback
+     * @param ?R                  $initial
+     *
+     * @return ?R
+     */
+    public function reduce(callable $callback, $initial = null)
+    {
+        foreach ($this->elements() as $element) {
+            $initial = $callback($initial, $element);
+        }
+
+        return $initial;
     }
 
     /**

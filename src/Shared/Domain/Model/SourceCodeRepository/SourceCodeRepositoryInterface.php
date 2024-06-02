@@ -2,24 +2,40 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\SourceCodeRepository;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository;
 
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\File;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
 
 interface SourceCodeRepositoryInterface
 {
-    public function createBranch(Name $name, Name $ref): void;
+    public function createBranch(
+        Branch\Name $name,
+        Ref $ref,
+    ): Branch\Branch;
+
+    /**
+     * @return Tag\Tag<VersionName>
+     */
+    public function createTag(
+        Tag\Name $name,
+        Ref $ref,
+        ?Tag\Message $message = null,
+    ): Tag\Tag;
 
     public function commit(
-        Name $branchName,
-        Message $message,
-        ActionList $actions,
-        ?Name $startBranchName = null,
-    ): void;
+        Branch\Name $branchName,
+        Commit\Message $message,
+        NewCommit\Action\ActionList $actions,
+        ?Branch\Name $startBranchName = null,
+    ): Commit\Commit;
 
-    public function file(Name $branchName, FilePath $filePath): File;
+    /**
+     * @return ?Tag\Tag<VersionName>
+     */
+    public function latestTagToday(): ?Tag\Tag;
+
+    public function file(
+        Branch\Name $branchName,
+        File\FilePath $filePath,
+    ): File\File;
 }

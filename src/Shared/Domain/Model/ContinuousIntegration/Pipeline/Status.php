@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 
 /**
  * @see https://docs.gitlab.com/ee/api/pipelines.html
  */
-enum Status: string implements \JsonSerializable
+enum Status: string
 {
     case Created = 'created';
 
@@ -49,8 +49,8 @@ enum Status: string implements \JsonSerializable
         );
     }
 
-    public function jsonSerialize(): string
+    public function equals(self $status): bool
     {
-        return $this->value;
+        return $this === $status;
     }
 }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Application\UseCase\Command;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command;
 
 use Invis1ble\Messenger\Command\CommandInterface;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 
 abstract readonly class ReleasePublicationIdAwareCommand implements CommandInterface
 {

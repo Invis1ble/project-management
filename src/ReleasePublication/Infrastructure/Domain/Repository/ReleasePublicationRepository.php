@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
-use ProjectManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
-use ProjectManagement\Shared\Domain\Repository\EventDispatchingRepository;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Repository\EventDispatchingRepository;
 
 final class ReleasePublicationRepository extends EventDispatchingRepository implements ReleasePublicationRepositoryInterface
 {
@@ -35,6 +35,6 @@ final class ReleasePublicationRepository extends EventDispatchingRepository impl
 
     public function store(ReleasePublicationInterface $releasePublication): void
     {
-        $this->flush($releasePublication);
+        $this->persist($releasePublication);
     }
 }

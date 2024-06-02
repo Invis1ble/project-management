@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventBusInterface;
-use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
-use ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
-use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
-use ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -28,6 +28,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         UriFactoryInterface $uriFactory,
         StreamFactoryInterface $streamFactory,
         RequestFactoryInterface $requestFactory,
+        Version\VersionFactoryInterface $versionFactory,
         IssueFactoryInterface $issueFactory,
         MergeRequestFactoryInterface $mergeRequestFactory,
         private EventBusInterface $eventBus,
@@ -35,13 +36,14 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         Board\BoardId $sprintBoardId,
         int $sprintFieldId,
         private string $readyToMergeStatus = 'Ready to Merge',
-        private array $supportedIssueTypes = ['Story', 'Tech Dept'],
+        private array $supportedIssueTypes = ['Bug', 'Story', 'Tech Dept'],
     ) {
         parent::__construct(
             $httpClient,
             $uriFactory,
             $streamFactory,
             $requestFactory,
+            $versionFactory,
             $issueFactory,
             $mergeRequestFactory,
             $projectKey,
@@ -153,60 +155,6 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         ));
 
         return $version;
-    }
-
-    public function latestRelease(): ?Version\Version
-    {
-        $request = $this->requestFactory->createRequest(
-            'GET',
-            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
-                'query' => 'v-',
-                'orderBy' => '-releaseDate',
-            ])),
-        );
-
-        $content = $this->httpClient->sendRequest($request)
-            ->getBody()
-            ->getContents();
-
-        $releases = json_decode($content, true)['values'];
-
-        $heap = new class() extends \SplMaxHeap {
-            /**
-             * @param array $value1
-             * @param array $value2
-             */
-            protected function compare(mixed $value1, mixed $value2): int
-            {
-                return Name::fromString($value1['name'])
-                    ->versionCompare(Name::fromString($value2['name']));
-            }
-        };
-
-        foreach ($releases as $release) {
-            try {
-                Name::fromString($release['name']);
-            } catch (\InvalidArgumentException) {
-                continue;
-            }
-
-            $heap->insert($release);
-        }
-
-        if ($heap->isEmpty()) {
-            return null;
-        }
-
-        $release = $heap->top();
-
-        return new Version\Version(
-            Version\VersionId::fromString($release['id']),
-            Version\Name::fromString($release['name']),
-            isset($release['description']) ? Version\Description::fromString($release['description']) : null,
-            $release['archived'],
-            $release['released'],
-            isset($release['releaseDate']) ? new \DateTimeImmutable($release['releaseDate']) : null,
-        );
     }
 
     public function readyToMergeTasksInActiveSprint(): IssueList

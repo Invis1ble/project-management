@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
 
 final readonly class Issue implements \Stringable
 {
@@ -64,6 +65,16 @@ final readonly class Issue implements \Stringable
             $this->mergeRequests,
             $mergeRequests,
         );
+    }
+
+    public function containsBackendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
+    {
+        return $this->mergeRequestsToMerge->containsBackendMergeRequest($projectResolver);
+    }
+
+    public function containsFrontendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
+    {
+        return $this->mergeRequestsToMerge->containsFrontendMergeRequest($projectResolver);
     }
 
     public function inActiveSprintOnBoard(BoardId $boardId): bool

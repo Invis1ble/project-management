@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Psr\Http\Message\UriInterface;
 
 final readonly class MergeRequest
 {
     public function __construct(
         public MergeRequestId $id,
-        public Name $name,
+        public Title $title,
         public Project\ProjectId $projectId,
         public Project\Name $projectName,
         public Branch\Name $sourceBranchName,
@@ -36,6 +36,52 @@ final readonly class MergeRequest
         }
 
         return $this->details->merge($mergeRequestManager, $this);
+    }
+
+    public function createCopyWithNewTargetBranch(
+        MergeRequestManagerInterface $mergeRequestManager,
+        Branch\Name $targetBranchName,
+        Branch\Name $newTargetBranchName,
+    ): ?self {
+        if (!$this->targetBranchName->equals($targetBranchName)) {
+            return null;
+        }
+
+        if (null === $this->details) {
+            throw new \RuntimeException("Merge request $this->id details not set");
+        }
+
+        return $mergeRequestManager->createMergeRequest(
+            projectId: $this->projectId,
+            title: $this->title,
+            sourceBranchName: $this->sourceBranchName,
+            targetBranchName: $newTargetBranchName,
+        );
+    }
+
+    public function withDetails(Details $details): self
+    {
+        return new self(
+            $this->id,
+            $this->title,
+            $this->projectId,
+            $this->projectName,
+            $this->sourceBranchName,
+            $this->targetBranchName,
+            $this->status,
+            $this->guiUrl,
+            $details,
+        );
+    }
+
+    public function backend(ProjectResolverInterface $projectResolver): bool
+    {
+        return $projectResolver->backend($this->projectId);
+    }
+
+    public function frontend(ProjectResolverInterface $projectResolver): bool
+    {
+        return $projectResolver->frontend($this->projectId);
     }
 
     public function open(): bool
@@ -61,34 +107,5 @@ final readonly class MergeRequest
     public function sourceRelevant(Branch\Name $branchName): bool
     {
         return $this->sourceBranchName->relevant($branchName);
-    }
-
-    public function withDetails(Details $details): self
-    {
-        return new self(
-            $this->id,
-            $this->name,
-            $this->projectId,
-            $this->projectName,
-            $this->sourceBranchName,
-            $this->targetBranchName,
-            $this->status,
-            $this->guiUrl,
-            $details,
-        );
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id->value(),
-            'name' => (string) $this->name,
-            'project_id' => $this->projectId->value(),
-            'project_name' => (string) $this->projectName,
-            'source_branch_name' => (string) $this->sourceBranchName,
-            'target_branch_name' => (string) $this->targetBranchName,
-            'status' => $this->status->value,
-            'gui_url' => (string) $this->guiUrl,
-        ];
     }
 }

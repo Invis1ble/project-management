@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Exception;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Exception;
 
-use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
-use ProjectManagement\Shared\Domain\Exception\StateTransitionException;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Exception\StateTransitionException;
 
 class ReleasePublicationStatusTransitionException extends StateTransitionException
 {

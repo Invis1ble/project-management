@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Repository;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
-use ProjectManagement\Shared\Domain\Model\AggregateRootInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\AggregateRootInterface;
 
 abstract class EventDispatchingRepository extends ServiceEntityRepository
 {
@@ -19,9 +19,11 @@ abstract class EventDispatchingRepository extends ServiceEntityRepository
         parent::__construct($registry, $entityClass);
     }
 
-    public function flush(object $entity): void
+    protected function persist(object $entity): void
     {
-        $this->getEntityManager()->flush();
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($entity);
+        $entityManager->flush();
 
         if (!$entity instanceof AggregateRootInterface) {
             return;

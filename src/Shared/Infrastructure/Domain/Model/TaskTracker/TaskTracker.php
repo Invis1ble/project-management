@@ -2,16 +2,19 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
 
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -24,6 +27,7 @@ readonly class TaskTracker implements TaskTrackerInterface
         protected UriFactoryInterface $uriFactory,
         protected StreamFactoryInterface $streamFactory,
         protected RequestFactoryInterface $requestFactory,
+        protected Version\VersionFactoryInterface $versionFactory,
         protected IssueFactoryInterface $issueFactory,
         protected MergeRequestFactoryInterface $mergeRequestFactory,
         protected Project\Key $projectKey,
@@ -32,11 +36,70 @@ readonly class TaskTracker implements TaskTrackerInterface
     ) {
     }
 
+    public function latestRelease(): ?Version\Version
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
+                'query' => 'v-',
+                'orderBy' => '-releaseDate',
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $releases = json_decode($content, true)['values'];
+
+        $heap = new class() extends \SplMaxHeap {
+            /**
+             * @param array $value1
+             * @param array $value2
+             */
+            protected function compare(mixed $value1, mixed $value2): int
+            {
+                return Name::fromString($value1['name'])
+                    ->versionCompare(Name::fromString($value2['name']));
+            }
+        };
+
+        foreach ($releases as $release) {
+            try {
+                Name::fromString($release['name']);
+            } catch (\InvalidArgumentException) {
+                continue;
+            }
+
+            $heap->insert($release);
+        }
+
+        if ($heap->isEmpty()) {
+            return null;
+        }
+
+        $release = $heap->top();
+
+        return $this->versionFactory->createVersion(
+            id: $release['id'],
+            name: $release['name'],
+            description: $release['description'],
+            archived: $release['archived'],
+            released: $release['released'],
+            releaseDate: $release['releaseDate'],
+        );
+    }
+
     public function issuesFromActiveSprint(
         ?string $status = null,
         ?array $types = null,
+        Key ...$keys,
     ): IssueList {
         $jqlAnd = ["project=\"$this->projectKey\""];
+
+        if (0 !== iterator_count($keys)) {
+            $jqlAnd[] = 'issueKey IN (' . implode(',', iterator_to_array($keys)) . ')';
+        }
 
         if (null !== $status) {
             $jqlAnd[] = "status=\"$status\"";
@@ -119,23 +182,39 @@ readonly class TaskTracker implements TaskTrackerInterface
             ));
         }
 
-        $mergeRequests = new MergeRequestList();
+        return new MergeRequestList(
+            ...(function ($data): iterable {
+                foreach ($data['detail'] as $detail) {
+                    foreach ($detail['pullRequests'] ?? [] as $pullRequest) {
+                        yield $this->mergeRequestFactory->createMergeRequest(
+                            id: (int) explode('!', (string) $pullRequest['id'])[1],
+                            title: $pullRequest['name'],
+                            projectId: (int) $pullRequest['repositoryId'],
+                            projectName: $pullRequest['repositoryName'],
+                            sourceBranchName: $pullRequest['source']['branch'],
+                            targetBranchName: $pullRequest['destination']['branch'],
+                            status: $pullRequest['status'],
+                            guiUrl: $pullRequest['url'],
+                        );
+                    }
+                }
+            })($data),
+        );
+    }
 
-        foreach ($data['detail'] as $detail) {
-            foreach ($detail['pullRequests'] ?? [] as $pullRequest) {
-                $mergeRequests = $mergeRequests->append($this->mergeRequestFactory->createMergeRequest(
-                    id: (int) explode('!', (string) $pullRequest['id'])[1],
-                    name: $pullRequest['name'],
-                    projectId: (int) $pullRequest['repositoryId'],
-                    projectName: $pullRequest['repositoryName'],
-                    sourceBranchName: $pullRequest['source']['branch'],
-                    targetBranchName: $pullRequest['destination']['branch'],
-                    status: $pullRequest['status'],
-                    guiUrl: $pullRequest['url'],
-                ));
-            }
-        }
+    public function issueTransitions(Key $key): array
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/rest/api/3/issue/$key/transitions"),
+        );
 
-        return $mergeRequests;
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return $data['transitions'];
     }
 }

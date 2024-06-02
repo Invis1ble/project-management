@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model;
 
 abstract readonly class AbstractId implements IdInterface
 {
@@ -39,31 +39,6 @@ abstract readonly class AbstractId implements IdInterface
     public function equals(IdInterface $id): bool
     {
         return (string) $this === (string) $id && static::class === $id::class;
-    }
-
-    public function serialize(): string
-    {
-        return (string) $this;
-    }
-
-    public function unserialize(string $data): void
-    {
-        $this->value = (int) $data;
-    }
-
-    public function __serialize(): array
-    {
-        return [$this->serialize()];
-    }
-
-    public function __unserialize(array $data): void
-    {
-        $this->unserialize($data[0]);
-    }
-
-    public function jsonSerialize(): string
-    {
-        return $this->serialize();
     }
 
     /**

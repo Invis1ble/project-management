@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Infrastructure\Domain\Model;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model;
 
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
 final readonly class ReleasePublicationFactory implements ReleasePublicationFactoryInterface
 {

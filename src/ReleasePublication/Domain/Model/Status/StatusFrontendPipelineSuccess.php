@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
-use ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
-use ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
-use ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
-final readonly class StatusFrontendPipelineSuccess extends StatusFrontendPipelineFinished
+final readonly class StatusFrontendPipelineSuccess extends StatusFrontendPipelineNotInProgress
 {
     public function proceedToNext(
         MergeRequestManagerInterface $mergeRequestManager,
@@ -24,19 +24,14 @@ final readonly class StatusFrontendPipelineSuccess extends StatusFrontendPipelin
         TaskTrackerInterface $taskTracker,
         ReleasePublicationInterface $context,
     ): void {
-        $commit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
+        $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
             targetBranchName: $context->branchName(),
             startBranchName: Name::fromString('develop'),
         );
 
-        $backendSourceCodeRepository->commit(
-            branchName: $commit->branchName,
-            message: $commit->message,
-            actions: $commit->actions,
-            startBranchName: $commit->startBranchName,
-        );
+        $newCommit?->commit($backendSourceCodeRepository);
 
-        $this->setReleaseStatus($context, new StatusBackendBranchCreated());
+        $this->setPublicationStatus($context, new StatusBackendBranchCreated());
     }
 
     public function __toString(): string

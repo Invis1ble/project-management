@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-use ProjectManagement\Shared\Domain\Model\AbstractList;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 
 /**
  * @extends AbstractList<Issue>
@@ -50,6 +51,30 @@ final readonly class IssueList extends AbstractList
                 yield $issue;
             })($issue),
         );
+    }
+
+    public function containsBackendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
+    {
+        return $this->exists(
+            fn (Issue $issue): bool => $issue->containsBackendMergeRequestToMerge($projectResolver),
+        );
+    }
+
+    public function containsFrontendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
+    {
+        return $this->exists(
+            fn (Issue $issue): bool => $issue->containsFrontendMergeRequestToMerge($projectResolver),
+        );
+    }
+
+    /**
+     * @return iterable<Key>
+     */
+    public function toKeys(): iterable
+    {
+        foreach ($this->elements as $element) {
+            yield $element->key;
+        }
     }
 
     protected function elements(): iterable

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Model\Status;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 
 final readonly class StatusFrontendPipelineCreated extends StatusFrontendPipelineAwaitable
 {

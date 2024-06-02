@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
 interface MergeRequestFactoryInterface
 {
     public function createMergeRequest(
         int $id,
-        string $name,
+        string $title,
         int $projectId,
         string $projectName,
         string $sourceBranchName,

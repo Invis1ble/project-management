@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ProjectManagement\ReleasePublication\Domain\Repository;
+namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository;
 
-use ProjectManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 
 interface ReleasePublicationRepositoryInterface
 {
