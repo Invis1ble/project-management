@@ -6,7 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 
-final readonly class Key
+final readonly class Key implements \Stringable
 {
     protected string $value;
 
