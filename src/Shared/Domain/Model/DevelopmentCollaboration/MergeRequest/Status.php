@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
-enum Status: string implements \JsonSerializable
+enum Status: string
 {
     case Open = 'OPEN';
 
@@ -25,10 +25,5 @@ enum Status: string implements \JsonSerializable
     public function declined(): bool
     {
         return self::Declined === $this;
-    }
-
-    public function jsonSerialize(): string
-    {
-        return $this->value;
     }
 }
