@@ -23,6 +23,7 @@
         "doctrine/orm": "^3.1",
         "eightpoints/guzzle-bundle": "^8.5",
         "invis1ble/messenger-bundle": "^4.0",
+        "invis1ble/serializer-extension-bundle": "^1.0",
         "phpdocumentor/reflection-docblock": "^5.4",
         "phpstan/phpdoc-parser": "^1.29",
         "ramsey/uuid": "^4.7",

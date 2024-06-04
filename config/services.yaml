@@ -31,10 +31,6 @@ services:
     serializer.normalizer.property:
         class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
 
-    Invis1ble\ProjectManagement\Shared\Infrastructure\Serializer\UriNormalizer:
-        tags:
-            - { name: serializer.normalizer, priority: 990 }
-
 
 
 

@@ -53,6 +53,9 @@
     "invis1ble/messenger-bundle": {
         "version": "v2.0.0"
     },
+    "invis1ble/serializer-extension-bundle": {
+        "version": "v1.0.4"
+    },
     "phpstan/phpstan": {
         "version": "1.11",
         "recipe": {
