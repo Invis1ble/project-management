@@ -31,6 +31,8 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
 
     public function __invoke(ProceedToNextStatusCommand $command): void
     {
+        return;
+
         $hotfixPublication = $this->getHotfixPublication($command->id);
 
         $hotfixPublication->proceedToNextStatus(
