@@ -15,7 +15,7 @@ abstract class AbstractStringableValueObjectNormalizer extends AbstractValueObje
         ?string $format = null,
         array $context = [],
     ): object {
-        [$type, $value] = explode(':', $data, 2);
+        [$type, $value] = explode(':', (string) $data, 2);
 
         return $this->createValueObject($value, $type);
     }

@@ -12,7 +12,7 @@ abstract readonly class AbstractStatus implements StatusInterface
 {
     public function equals(StatusInterface $status): bool
     {
-        return $this::class === $status::class;
+        return static::class === $status::class;
     }
 
     protected function setPublicationStatus(

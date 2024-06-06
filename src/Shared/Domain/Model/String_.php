@@ -29,7 +29,7 @@ readonly class String_ implements \Stringable
 
     public function equals(self $other): bool
     {
-        return $this::class === $other::class && $this->value === $other->value;
+        return static::class === $other::class && $this->value === $other->value;
     }
 
     protected function validate(string $value): void

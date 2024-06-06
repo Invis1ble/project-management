@@ -10,7 +10,7 @@ use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\Abstract
 
 final class StatusNormalizer extends AbstractValueObjectNormalizer
 {
-    public function __construct(private StatusFactoryInterface $statusFactory)
+    public function __construct(private readonly StatusFactoryInterface $statusFactory)
     {
     }
 
