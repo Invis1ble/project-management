@@ -21,4 +21,11 @@ abstract readonly class AbstractAction
             'file_path' => (string) $this->filePath,
         ];
     }
+
+    public function equals(self $other): bool
+    {
+        return $this->action->equals($other->action)
+            && $this->filePath->equals($other->filePath)
+        ;
+    }
 }

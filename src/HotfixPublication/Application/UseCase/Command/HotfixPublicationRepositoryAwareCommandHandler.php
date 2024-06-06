@@ -11,7 +11,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublic
 
 abstract readonly class HotfixPublicationRepositoryAwareCommandHandler implements CommandHandlerInterface
 {
-    public function __construct(private HotfixPublicationRepositoryInterface $repository)
+    public function __construct(protected HotfixPublicationRepositoryInterface $repository)
     {
     }
 

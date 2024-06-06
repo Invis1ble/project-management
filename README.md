@@ -2,6 +2,7 @@ Project Management
 ===============================
 
 ![CI Status](https://github.com/Invis1ble/project-management/actions/workflows/ci.yml/badge.svg?event=push)
+[![codecov](https://codecov.io/gh/Invis1ble/project-management/graph/badge.svg?token=296M82SE17)](https://codecov.io/gh/Invis1ble/project-management)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 
@@ -74,6 +75,23 @@ Run Rector checks:
 
 ```sh
 docker compose exec -it php bin/rector
+```
+
+
+Testing
+-------
+
+To run unit tests:
+
+```sh
+docker compose exec -it php bin/phpunit
+```
+
+To run unit tests with coverage, you need to enable XDEBUG first:
+
+```sh
+XDEBUG_MODE=coverage docker compose up -d --wait
+docker compose exec -it php bin/phpunit --coverage-clover var/log/coverage-clover.xml
 ```
 
 

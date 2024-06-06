@@ -32,30 +32,30 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
-#  php-worker:
-#    build:
-#      context: .
-#      target: frankenphp_dev
-#    image: ${IMAGES_PREFIX:-}app-php
-#    restart: unless-stopped
-#    environment:
-#      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-16}&charset=${POSTGRES_CHARSET:-utf8}
-#      MESSENGER_TRANSPORT_DSN: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672/%2f/messages
-#    command: php bin/console messenger:consume async --time-limit=600 --limit=100 --memory-limit=128M -vvv
-#    healthcheck:
-#      test: ["CMD-SHELL", "pgrep -f 'php bin/console messenger:consume async' || exit 1"]
-#      interval: 30s
-#      timeout: 5s
-#      retries: 3
-#    volumes:
-#      - ./var/log:/app/var/log
-#    depends_on:
-#      php:
-#        condition: service_started
-#      database:
-#        condition: service_healthy
-#      rabbitmq:
-#        condition: service_healthy
+  php-worker:
+    build:
+      context: .
+      target: frankenphp_dev
+    image: ${IMAGES_PREFIX:-}app-php
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-16}&charset=${POSTGRES_CHARSET:-utf8}
+      MESSENGER_TRANSPORT_DSN: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672/%2f/messages
+    command: php bin/console messenger:consume async --time-limit=600 --limit=100 --memory-limit=128M -vvv
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'php bin/console messenger:consume async' || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./var/log:/app/var/log
+    depends_on:
+      php:
+        condition: service_started
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###

@@ -8,11 +8,6 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\NonEmptyString;
 
 final readonly class FilePath extends NonEmptyString
 {
-    public function equals(self $path): bool
-    {
-        return $path->value === $this->value;
-    }
-
     protected function validate(string $value): void
     {
         parent::validate($value);

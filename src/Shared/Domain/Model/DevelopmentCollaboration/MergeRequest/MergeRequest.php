@@ -108,4 +108,18 @@ final readonly class MergeRequest
     {
         return $this->sourceBranchName->relevant($branchName);
     }
+
+    public function equals(self $other): bool
+    {
+        return $this->id->equals($other->id)
+            && $this->title->equals($other->title)
+            && $this->projectId->equals($other->projectId)
+            && $this->projectName->equals($other->projectName)
+            && $this->sourceBranchName->equals($other->sourceBranchName)
+            && $this->targetBranchName->equals($other->targetBranchName)
+            && $this->status->equals($other->status)
+            && (string) $this->guiUrl === (string) $other->guiUrl
+            && $this->details?->equals($other->details)
+        ;
+    }
 }

@@ -13,4 +13,9 @@ enum State: string
     {
         return self::Active === $this;
     }
+
+    public function equals(self $other): bool
+    {
+        return $other === $this;
+    }
 }

@@ -10,11 +10,11 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class HotfixPublicationId extends AbstractUuid
 {
-    public static function generate(VersionName $tagName): self
+    public static function fromVersionName(VersionName $name): self
     {
         return new self(Uuid::v5(
             namespace: Uuid::fromString(Uuid::NAMESPACE_OID),
-            name: (string) $tagName,
+            name: (string) $name,
         ));
     }
 }

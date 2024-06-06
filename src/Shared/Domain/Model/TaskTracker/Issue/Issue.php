@@ -9,6 +9,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintList;
 
 final readonly class Issue implements \Stringable
 {
@@ -85,5 +86,17 @@ final readonly class Issue implements \Stringable
     public function __toString(): string
     {
         return (string) $this->key;
+    }
+
+    public function equals(self $other): bool
+    {
+        return $this->id->equals($other->id)
+            && $this->key->equals($other->key)
+            && $this->typeId->equals($other->typeId)
+            && $this->summary->equals($other->summary)
+            && $this->sprints->equals($other->sprints)
+            && $this->mergeRequests?->equals($other->mergeRequests)
+            && $this->mergeRequestsToMerge?->equals($other->mergeRequestsToMerge)
+        ;
     }
 }

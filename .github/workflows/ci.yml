@@ -70,9 +70,13 @@ jobs:
         name: Rector Dry Run
         run: docker compose exec -T php bin/rector
       -
-        name: Run PHPUnit
-        if: false # Remove this line if PHPUnit is installed
-        run: docker compose exec -T php bin/phpunit
+        name: Execute tests via PHPUnit
+        run: docker compose exec -T php vendor/bin/phpunit --coverage-clover var/log/coverage-clover.xml
+      -
+        name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
   lint:
     name: Docker Lint
     runs-on: ubuntu-latest

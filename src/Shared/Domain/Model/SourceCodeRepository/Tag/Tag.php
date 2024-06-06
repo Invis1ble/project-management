@@ -23,4 +23,14 @@ final readonly class Tag
         public ?\DateTimeImmutable $createdAt,
     ) {
     }
+
+    public function equals(self $element2): bool
+    {
+        return $this->commit->equals($element2->commit)
+            && $this->name->equals($element2->name)
+            && $this->target->equals($element2->target)
+            && $this->message?->equals($element2->message)
+            && $this->createdAt === $element2->createdAt
+        ;
+    }
 }

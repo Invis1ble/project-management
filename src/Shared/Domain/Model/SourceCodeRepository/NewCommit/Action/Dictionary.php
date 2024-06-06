@@ -15,4 +15,9 @@ enum Dictionary: string
     case Update = 'update';
 
     case Chmod = 'chmod';
+
+    public function equals(self $other): bool
+    {
+        return $other === $this;
+    }
 }

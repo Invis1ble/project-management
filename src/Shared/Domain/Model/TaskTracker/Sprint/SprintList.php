@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
 
 /**
  * @extends AbstractList<Sprint>
@@ -30,5 +29,11 @@ final readonly class SprintList extends AbstractList
     protected function elements(): iterable
     {
         return $this->elements;
+    }
+
+    protected function elementsEquals($element1, $element2): bool
+    {
+        return $element1::class === $element2::class
+            && $element1->equals($element2);
     }
 }

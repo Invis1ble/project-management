@@ -27,6 +27,11 @@ readonly class String_ implements \Stringable
         return $this->value;
     }
 
+    public function equals(self $other): bool
+    {
+        return $this::class === $other::class && $this->value === $other->value;
+    }
+
     protected function validate(string $value): void
     {
     }

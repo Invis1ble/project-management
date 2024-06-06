@@ -10,6 +10,8 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 
 interface HotfixPublicationRepositoryInterface
 {
+    public function contains(HotfixPublicationId $id): bool;
+
     /**
      * @throws HotfixPublicationNotFoundException
      */
