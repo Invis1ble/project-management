@@ -27,7 +27,7 @@ abstract readonly class AbstractStatus implements StatusInterface
             id: $publication->id(),
             status: $publication->status(),
             previousStatus: $previousStatus,
-            readyToMergeTasks: $publication->hotfixes(),
+            hotfixes: $publication->hotfixes(),
             createdAt: $publication->createdAt(),
         ));
     }

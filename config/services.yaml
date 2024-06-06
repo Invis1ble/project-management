@@ -33,6 +33,12 @@ services:
         tags:
             - { name: serializer.normalizer, priority: -930 }
 
+    serializer.normalizer.datetime:
+        class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+        arguments:
+            $defaultContext:
+                datetime_format: 'Y-m-d H:i:s.u'
+
     invis1ble_project_management.normalizer.string:
         class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\StringNormalizer
         tags:

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Tests\HotfixPublication\Application\UseCase\Command;
+namespace HotfixPublication\Application\UseCase\Command\CreateHotfixPublication;
 
 use Invis1ble\Messenger\Command\TraceableCommandBus;
 use Invis1ble\Messenger\Event\TraceableEventBus;
