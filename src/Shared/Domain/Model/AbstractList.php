@@ -94,8 +94,35 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
         return iterator_to_array($this->elements());
     }
 
+    public function equals(self $other): bool
+    {
+        if ($this->count() !== $other->count()) {
+            return false;
+        }
+
+        $otherElements = $other->elements();
+
+        foreach ($this->elements() as $k => $element) {
+            if (!isset($otherElements[$k])) {
+                return false;
+            }
+
+            if (!$this->elementsEquals($element, $otherElements[$k])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @return iterable<T>
      */
     abstract protected function elements(): iterable;
+
+    /**
+     * @param T $element1
+     * @param T $element2
+     */
+    abstract protected function elementsEquals($element1, $element2): bool;
 }

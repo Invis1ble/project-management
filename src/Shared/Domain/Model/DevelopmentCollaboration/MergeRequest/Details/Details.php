@@ -31,4 +31,9 @@ final readonly class Details
     {
         return $this->status->mergeable();
     }
+
+    public function equals(self $other): bool
+    {
+        return $this->status->equals($other->status);
+    }
 }

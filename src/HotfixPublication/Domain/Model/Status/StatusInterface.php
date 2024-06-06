@@ -25,4 +25,6 @@ interface StatusInterface extends \Stringable
         ProjectResolverInterface $projectResolver,
         HotfixPublicationInterface $context,
     ): void;
+
+    public function equals(self $status): bool;
 }

@@ -4,30 +4,10 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 
-final readonly class Key implements \Stringable
+use Invis1ble\ProjectManagement\Shared\Domain\Model\NonEmptyString;
+
+final readonly class Key extends NonEmptyString
 {
-    protected string $value;
-
-    public function __construct(string $value)
-    {
-        $this->validate($value);
-
-        $this->value = $value;
-    }
-
-    public static function fromString(string $value): self
-    {
-        return new self($value);
-    }
-
-    public function __toString(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * @throws \InvalidArgumentException
-     */
     protected function validate(string $value): void
     {
         if (!preg_match('/^[A-Z][A-Z]+$/', $value)) {

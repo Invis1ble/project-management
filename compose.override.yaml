@@ -17,9 +17,9 @@ services:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
     tty: true
-#  php-worker:
-#    volumes:
-#      - ./:/app
+  php-worker:
+    volumes:
+      - ./:/app
 
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###

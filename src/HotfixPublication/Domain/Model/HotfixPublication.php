@@ -39,7 +39,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         }
 
         $hotfix = new self(
-            id: HotfixPublicationId::generate($tagName),
+            id: HotfixPublicationId::fromVersionName($tagName),
             tagName: $tagName,
             tagMessage: $tagMessage,
             status: new StatusCreated(),

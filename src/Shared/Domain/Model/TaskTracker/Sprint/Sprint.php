@@ -19,4 +19,12 @@ final readonly class Sprint
     {
         return State::Active === $this->state;
     }
+
+    public function equals(self $other): bool
+    {
+        return $this->boardId->equals($other->boardId)
+            && $this->name->equals($other->name)
+            && $this->state->equals($other->state)
+        ;
+    }
 }

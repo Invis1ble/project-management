@@ -12,4 +12,12 @@ final readonly class Commit
         public \DateTimeImmutable $createdAt,
     ) {
     }
+
+    public function equals(self $other): bool
+    {
+        return $this->id->equals($other->id)
+            && $this->message?->equals($other->message)
+            && $this->createdAt === $other->createdAt
+        ;
+    }
 }
