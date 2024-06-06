@@ -10,6 +10,11 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 
 abstract readonly class AbstractStatus implements StatusInterface
 {
+    public function equals(StatusInterface $status): bool
+    {
+        return static::class === $status::class;
+    }
+
     protected function setPublicationStatus(
         HotfixPublicationInterface $publication,
         StatusInterface $status,

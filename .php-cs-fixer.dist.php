@@ -14,6 +14,7 @@ $finder = Finder::create()
     ->notPath([
         'config/preload.php',
         'public/index.php',
+        'tests/bootstrap.php',
     ])
     ->in(__DIR__)
 ;

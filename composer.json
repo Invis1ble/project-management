@@ -22,7 +22,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.1",
         "eightpoints/guzzle-bundle": "^8.5",
-        "invis1ble/messenger-bundle": "^4.0",
+        "invis1ble/messenger-bundle": "^5.0",
         "invis1ble/serializer-extension-bundle": "^1.0",
         "phpdocumentor/reflection-docblock": "^5.4",
         "phpstan/phpdoc-parser": "^1.29",
@@ -42,9 +42,12 @@
         "symfony/yaml": "7.0.*"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^8.2",
         "escapestudios/symfony2-coding-standard": "^3.13",
         "friendsofphp/php-cs-fixer": "^3.57",
+        "phpunit/phpunit": "^9.6",
         "rector/rector": "^1.1",
+        "symfony/phpunit-bridge": "^7.1",
         "symfony/stopwatch": "7.0.*",
         "symfony/web-profiler-bundle": "7.0.*"
     },

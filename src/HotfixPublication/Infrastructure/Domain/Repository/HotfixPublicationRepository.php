@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Repository;
 
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
@@ -20,6 +21,19 @@ final class HotfixPublicationRepository extends EventDispatchingRepository imple
         EventBusInterface $eventBus,
     ) {
         parent::__construct($registry, HotfixPublication::class, $eventBus);
+    }
+
+    public function contains(HotfixPublicationId $id): bool
+    {
+        $result = $this->createQueryBuilder('p')
+            ->select('1')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)
+        ;
+
+        return null !== $result;
     }
 
     public function get(HotfixPublicationId $id): HotfixPublicationInterface

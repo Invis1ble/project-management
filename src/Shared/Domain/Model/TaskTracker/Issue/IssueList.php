@@ -81,4 +81,10 @@ final readonly class IssueList extends AbstractList
     {
         return $this->elements;
     }
+
+    protected function elementsEquals($element1, $element2): bool
+    {
+        return $element1::class === $element2::class
+            && $element1->equals($element2);
+    }
 }

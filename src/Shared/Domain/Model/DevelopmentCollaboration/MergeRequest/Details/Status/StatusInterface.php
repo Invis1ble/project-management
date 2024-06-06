@@ -17,4 +17,6 @@ interface StatusInterface extends \Stringable
         MergeRequestManagerInterface $mergeRequestManager,
         MergeRequest $context,
     ): MergeRequest;
+
+    public function equals(self $other): bool;
 }

@@ -30,6 +30,36 @@ services:
 
     serializer.normalizer.property:
         class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+        tags:
+            - { name: serializer.normalizer, priority: -930 }
+
+    invis1ble_project_management.normalizer.string:
+        class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\StringNormalizer
+        tags:
+            - { name: serializer.normalizer, priority: 10 }
+
+    invis1ble_project_management.normalizer.uid:
+        class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\UidNormalizer
+        arguments: ['@serializer.normalizer.uid']
+        tags:
+            - { name: serializer.normalizer, priority: 10 }
+
+    invis1ble_project_management.normalizer.id:
+        class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\IdNormalizer
+        tags:
+            - { name: serializer.normalizer, priority: 10 }
+
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\ListNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 10 }
+
+    Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\Status\StatusNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 990 }
+
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 990 }
 
 
 

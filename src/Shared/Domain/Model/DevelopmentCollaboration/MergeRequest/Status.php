@@ -26,4 +26,9 @@ enum Status: string
     {
         return self::Declined === $this;
     }
+
+    public function equals(self $other): bool
+    {
+        return $other === $this;
+    }
 }
