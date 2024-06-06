@@ -34,6 +34,9 @@ jobs:
         name: Start services
         run: docker compose up --wait --no-build
       -
+        name: Show logs
+        run: docker compose logs php
+      -
         name: Check HTTP reachability
         run: curl -v --fail-with-body http://localhost
       -
