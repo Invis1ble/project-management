@@ -28,7 +28,6 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 
 	if grep -q ^DATABASE_URL= .env; then
 		echo "Waiting for database to be ready..."
-		php bin/console -e test doctrine:database:create --no-interaction --if-not-exists
 		ATTEMPTS_LEFT_TO_REACH_DATABASE=60
 		until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || DATABASE_ERROR=$(php bin/console dbal:run-sql -q "SELECT 1" 2>&1); do
 			if [ $? -eq 255 ]; then
