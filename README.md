@@ -81,7 +81,14 @@ docker compose exec -it php bin/rector
 Testing
 -------
 
-To run unit tests:
+To get started with testing, you need to create a test database first and run migrations:
+
+```sh
+docker compose exec -it php bin/console -e test doctrine:database:create
+docker compose exec -it php bin/console -e test doctrine:migrations:migrate
+```
+
+After creating the database, you can run unit tests:
 
 ```sh
 docker compose exec -it php bin/phpunit
