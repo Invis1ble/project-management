@@ -23,8 +23,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         private readonly HotfixPublicationId $id,
         private readonly Tag\VersionName $tagName,
         private readonly Tag\Message $tagMessage,
-        private readonly StatusInterface $status,
-        private readonly IssueList $hotfixes,
+        private StatusInterface $status,
+        private IssueList $hotfixes,
         private readonly \DateTimeImmutable $createdAt,
     ) {
     }

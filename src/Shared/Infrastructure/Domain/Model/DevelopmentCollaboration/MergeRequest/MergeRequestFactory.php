@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
@@ -15,8 +16,10 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class MergeRequestFactory implements MergeRequestFactoryInterface
 {
-    public function __construct(private UriFactoryInterface $uriFactory)
-    {
+    public function __construct(
+        private UriFactoryInterface $uriFactory,
+        private DetailsFactoryInterface $detailsFactory,
+    ) {
     }
 
     public function createMergeRequest(
@@ -28,6 +31,7 @@ final readonly class MergeRequestFactory implements MergeRequestFactoryInterface
         string $targetBranchName,
         string $status,
         string $guiUrl,
+        ?string $detailedMergeStatus,
     ): MergeRequest {
         return new MergeRequest(
             id: MergeRequestId::from($id),
@@ -38,7 +42,7 @@ final readonly class MergeRequestFactory implements MergeRequestFactoryInterface
             targetBranchName: Branch\Name::fromString($targetBranchName),
             status: Status::from($status),
             guiUrl: $this->uriFactory->createUri($guiUrl),
-            details: null,
+            details: null === $detailedMergeStatus ? null : $this->detailsFactory->createDetails($detailedMergeStatus),
         );
     }
 }

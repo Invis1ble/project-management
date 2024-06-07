@@ -431,7 +431,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $data = json_decode($content, true);
 
-        $mergeRequest = $this->createMergeRequestObject($data);
+        $mergeRequest = $this->createMergeRequestObject($data, MergeRequest\Status::Open);
 
         $this->eventBus->dispatch(new MergeRequestCreated(
             projectId: $mergeRequest->projectId,
@@ -462,7 +462,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $data = json_decode($content, true);
 
-        $mergeRequest = $this->createMergeRequestObject($data);
+        $mergeRequest = $this->createMergeRequestObject($data, MergeRequest\Status::Merged);
 
         $this->eventBus->dispatch(new MergeRequestMerged(
             projectId: $mergeRequest->projectId,
@@ -496,9 +496,11 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             ->getBody()
             ->getContents();
 
-        $mergeRequest = json_decode($content, true);
+        $data = json_decode($content, true);
 
-        return $this->createDetailsObject($mergeRequest);
+        return $this->detailsFactory->createDetails(
+            status: $data['detailed_merge_status'],
+        );
     }
 
     private function assertSupportsProject(ProjectId $projectId): void
@@ -508,29 +510,19 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         }
     }
 
-    private function createDetailsObject(array $mergeRequest): MergeRequest\Details\Details
+    private function createMergeRequestObject(array $data, MergeRequest\Status $status): MergeRequest\MergeRequest
     {
-        return $this->detailsFactory->createDetails(
-            status: $mergeRequest['detailed_merge_status'],
-        );
-    }
-
-    private function createMergeRequestObject(array $data): MergeRequest\MergeRequest
-    {
-        $mergeRequest = $this->mergeRequestFactory->createMergeRequest(
+        return $this->mergeRequestFactory->createMergeRequest(
             id: $data['id'],
             title: $data['title'],
             projectId: $data['project_id'],
-            projectName: $data['project_name'],
+            projectName: explode('!', $data['references']['full'], 2)[0],
             sourceBranchName: $data['source_branch'],
             targetBranchName: $data['target_branch'],
-            status: MergeRequest\Status::Open->value,
+            status: $status->value,
             guiUrl: $data['web_url'],
+            detailedMergeStatus: $data['detailed_merge_status'],
         );
-
-        $details = $this->createDetailsObject($data);
-
-        return $mergeRequest->withDetails($details);
     }
 
     private function getPipeline(Ref $ref): Pipeline\Pipeline

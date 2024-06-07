@@ -14,6 +14,8 @@ trait CreateMergeRequestsTrait
     public function createMergeRequests(
         UriFactoryInterface $uriFactory,
         int $id = 4,
+        int $projectId = 1,
+        string $projectName = 'my-group/my-project',
         string $title = 'Close PROJECT-2 Fix terrible bug',
         string $sourceBranchName = 'PROJECT-2',
         string $targetBranchName = 'master',
@@ -26,8 +28,8 @@ trait CreateMergeRequestsTrait
             new MergeRequest\MergeRequest(
                 id: $mergeRequestId,
                 title: MergeRequest\Title::fromString($title),
-                projectId: Project\ProjectId::from(5),
-                projectName: Project\Name::fromString('PROJECT'),
+                projectId: Project\ProjectId::from($projectId),
+                projectName: Project\Name::fromString($projectName),
                 sourceBranchName: Branch\Name::fromString($sourceBranchName),
                 targetBranchName: Branch\Name::fromString($targetBranchName),
                 status: $jiraStatus,

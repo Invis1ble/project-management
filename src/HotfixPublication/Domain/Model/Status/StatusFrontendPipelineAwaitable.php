@@ -27,6 +27,8 @@ abstract readonly class StatusFrontendPipelineAwaitable extends AbstractStatus
         ProjectResolverInterface $projectResolver,
         HotfixPublicationInterface $context,
     ): void {
+        return;
+
         if ($context->containsFrontendMergeRequestToMerge($projectResolver)) {
             $pipeline = $frontendCiClient->awaitLatestPipeline(
                 ref: Branch\Name::fromString('master'),

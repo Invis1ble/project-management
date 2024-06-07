@@ -18,6 +18,8 @@ trait CreateIssuesTrait
     public function createIssues(
         UriFactoryInterface $uriFactory,
         string $key = 'PROJECT-2',
+        int $projectId = 1,
+        string $projectName = 'my-group/my-project',
         string $summary = 'Fix terrible bug',
         int $mergeRequestId = 4,
         string $mergeRequestTargetBranchName = 'master',
@@ -28,6 +30,8 @@ trait CreateIssuesTrait
         $mergeRequests = $this->createMergeRequests(
             uriFactory: $uriFactory,
             id: 45,
+            projectId: $projectId,
+            projectName: $projectName,
             title: 'Update issue branch',
             sourceBranchName: 'master',
             targetBranchName: 'PROJECT-2',
@@ -38,6 +42,8 @@ trait CreateIssuesTrait
         $mergeRequestsToMerge = $this->createMergeRequests(
             uriFactory: $uriFactory,
             id: $mergeRequestId,
+            projectId: $projectId,
+            projectName: $projectName,
             title: "Close $key $summary",
             sourceBranchName: $key,
             targetBranchName: $mergeRequestTargetBranchName,

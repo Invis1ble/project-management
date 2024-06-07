@@ -15,5 +15,6 @@ interface MergeRequestFactoryInterface
         string $targetBranchName,
         string $status,
         string $guiUrl,
+        ?string $detailedMergeStatus,
     ): MergeRequest;
 }
