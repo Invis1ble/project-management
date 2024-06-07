@@ -20,6 +20,13 @@ return RectorConfig::configure()
         __DIR__ . '/public/index.php',
 
         AddOverrideAttributeToOverriddenMethodsRector::class,
+
+        /**
+         * Disable due to bug with Reflection
+         *
+         * @see Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\AbstractStatus::setPublicationProperty()
+         * @see Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication::__construct(status)
+         */
         ReadOnlyPropertyRector::class,
     ])
     ->withPhpSets()
