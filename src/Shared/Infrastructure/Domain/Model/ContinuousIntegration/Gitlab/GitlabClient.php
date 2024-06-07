@@ -516,7 +516,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             id: $data['id'],
             title: $data['title'],
             projectId: $data['project_id'],
-            projectName: explode('!', $data['references']['full'], 2)[0],
+            projectName: explode('!', (string) $data['references']['full'], 2)[0],
             sourceBranchName: $data['source_branch'],
             targetBranchName: $data['target_branch'],
             status: $status->value,

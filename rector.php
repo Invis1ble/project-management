@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
+use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Symfony\Set\SymfonySetList;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
@@ -19,6 +20,7 @@ return RectorConfig::configure()
         __DIR__ . '/public/index.php',
 
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        ReadOnlyPropertyRector::class,
     ])
     ->withPhpSets()
     ->withSets([
