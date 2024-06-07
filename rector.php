@@ -21,11 +21,11 @@ return RectorConfig::configure()
 
         AddOverrideAttributeToOverriddenMethodsRector::class,
 
-        /**
+        /*
          * Disable due to bug with Reflection
          *
-         * @see Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\AbstractStatus::setPublicationProperty()
-         * @see Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication::__construct(status)
+         * {@see Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\AbstractStatus::setPublicationProperty()}
+         * {@see Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication::__construct(status)}
          */
         ReadOnlyPropertyRector::class,
     ])
