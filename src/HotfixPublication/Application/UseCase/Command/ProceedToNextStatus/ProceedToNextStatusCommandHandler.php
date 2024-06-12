@@ -25,6 +25,8 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
         private SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         private TaskTrackerInterface $taskTracker,
         private ProjectResolverInterface $projectResolver,
+        private \DateInterval $pipelineMaxAwaitingTime,
+        private \DateInterval $pipelineTickInterval,
     ) {
         parent::__construct($repository);
     }
@@ -42,6 +44,8 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
             setFrontendApplicationBranchNameCommitFactory: $this->setFrontendApplicationBranchNameCommitFactory,
             taskTracker: $this->taskTracker,
             projectResolver: $this->projectResolver,
+            pipelineMaxAwaitingTime: $this->pipelineMaxAwaitingTime,
+            pipelineTickInterval: $this->pipelineTickInterval,
         );
 
         $this->storeHotfixPublication($hotfixPublication);

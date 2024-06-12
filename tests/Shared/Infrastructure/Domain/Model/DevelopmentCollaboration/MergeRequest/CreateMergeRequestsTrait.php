@@ -14,7 +14,8 @@ trait CreateMergeRequestsTrait
     public function createMergeRequests(
         UriFactoryInterface $uriFactory,
         int $id = 4,
-        int $projectId = 1,
+        int $backendProjectId = 1,
+        int $frontendProjectId = 2,
         string $projectName = 'my-group/my-project',
         string $title = 'Close PROJECT-2 Fix terrible bug',
         string $sourceBranchName = 'PROJECT-2',
@@ -28,12 +29,25 @@ trait CreateMergeRequestsTrait
             new MergeRequest\MergeRequest(
                 id: $mergeRequestId,
                 title: MergeRequest\Title::fromString($title),
-                projectId: Project\ProjectId::from($projectId),
+                projectId: Project\ProjectId::from($backendProjectId),
                 projectName: Project\Name::fromString($projectName),
                 sourceBranchName: Branch\Name::fromString($sourceBranchName),
                 targetBranchName: Branch\Name::fromString($targetBranchName),
                 status: $jiraStatus,
-                guiUrl: $uriFactory->createUri("https://gitlab.example.com/example/coolproject/-/merge_requests/$mergeRequestId"),
+                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestId"),
+                details: new MergeRequest\Details\Details(
+                    status: MergeRequest\Details\Status\StatusFactory::createStatus($gitlabStatus),
+                ),
+            ),
+            new MergeRequest\MergeRequest(
+                id: $mergeRequestId,
+                title: MergeRequest\Title::fromString($title),
+                projectId: Project\ProjectId::from($frontendProjectId),
+                projectName: Project\Name::fromString($projectName),
+                sourceBranchName: Branch\Name::fromString($sourceBranchName),
+                targetBranchName: Branch\Name::fromString($targetBranchName),
+                status: $jiraStatus,
+                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestId"),
                 details: new MergeRequest\Details\Details(
                     status: MergeRequest\Details\Status\StatusFactory::createStatus($gitlabStatus),
                 ),

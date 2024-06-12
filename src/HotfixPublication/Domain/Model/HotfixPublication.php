@@ -16,6 +16,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewComm
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Symfony\Component\Clock\Clock;
 
 class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicationInterface
 {
@@ -44,7 +45,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             tagMessage: $tagMessage,
             status: new StatusCreated(),
             hotfixes: $hotfixes,
-            createdAt: new \DateTimeImmutable(),
+            createdAt: Clock::get()->now(),
         );
 
         $hotfix->raiseDomainEvent(new HotfixPublicationCreated(
@@ -66,6 +67,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
     ): void {
         $this->status->proceedToNext(
             mergeRequestManager: $mergeRequestManager,
@@ -76,6 +79,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
             taskTracker: $taskTracker,
             projectResolver: $projectResolver,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+            pipelineTickInterval: $pipelineTickInterval,
             context: $this,
         );
     }

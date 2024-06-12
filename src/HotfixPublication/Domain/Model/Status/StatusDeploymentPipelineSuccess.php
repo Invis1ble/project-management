@@ -23,6 +23,8 @@ final readonly class StatusDeploymentPipelineSuccess extends AbstractStatus
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         $taskTracker->transitionHotfixesToDone(...$context->hotfixes()->toKeys());

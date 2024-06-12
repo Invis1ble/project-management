@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "097ff9c4b1676fc300dc4110730af0cf",
+    "content-hash": "355ac1dc020c1179733e31173931177a",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -1755,16 +1755,16 @@
         },
         {
             "name": "invis1ble/messenger",
-            "version": "v4.0.0",
+            "version": "v5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Invis1ble/messenger.git",
-                "reference": "bce6d70a45bc938f1630b57786eaba90dd2275ca"
+                "reference": "af1de93d4c85cda4e012782265177f8fe0fee7fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Invis1ble/messenger/zipball/bce6d70a45bc938f1630b57786eaba90dd2275ca",
-                "reference": "bce6d70a45bc938f1630b57786eaba90dd2275ca",
+                "url": "https://api.github.com/repos/Invis1ble/messenger/zipball/af1de93d4c85cda4e012782265177f8fe0fee7fe",
+                "reference": "af1de93d4c85cda4e012782265177f8fe0fee7fe",
                 "shasum": ""
             },
             "require": {
@@ -1810,26 +1810,26 @@
             ],
             "support": {
                 "issues": "https://github.com/Invis1ble/messenger/issues",
-                "source": "https://github.com/Invis1ble/messenger/tree/v4.0.0"
+                "source": "https://github.com/Invis1ble/messenger/tree/v5.0.0"
             },
-            "time": "2024-06-06T02:50:49+00:00"
+            "time": "2024-06-12T21:37:15+00:00"
         },
         {
             "name": "invis1ble/messenger-bundle",
-            "version": "v5.0.0",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Invis1ble/messenger-bundle.git",
-                "reference": "7d1bbe59d6a6daaeaf3f6965249fc693646ab698"
+                "reference": "abae6d3de202d9851ad5e6b02808c8ffe5558445"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Invis1ble/messenger-bundle/zipball/7d1bbe59d6a6daaeaf3f6965249fc693646ab698",
-                "reference": "7d1bbe59d6a6daaeaf3f6965249fc693646ab698",
+                "url": "https://api.github.com/repos/Invis1ble/messenger-bundle/zipball/abae6d3de202d9851ad5e6b02808c8ffe5558445",
+                "reference": "abae6d3de202d9851ad5e6b02808c8ffe5558445",
                 "shasum": ""
             },
             "require": {
-                "invis1ble/messenger": "^4.0",
+                "invis1ble/messenger": "^5.0",
                 "php": ">=8.2",
                 "symfony/config": "^6.4|^7.0",
                 "symfony/dependency-injection": "^6.4|^7.0",
@@ -1876,9 +1876,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Invis1ble/messenger-bundle/issues",
-                "source": "https://github.com/Invis1ble/messenger-bundle/tree/v5.0.0"
+                "source": "https://github.com/Invis1ble/messenger-bundle/tree/v6.0.0"
             },
-            "time": "2024-06-06T02:57:47+00:00"
+            "time": "2024-06-12T21:41:56+00:00"
         },
         {
             "name": "invis1ble/serializer-extension-bundle",

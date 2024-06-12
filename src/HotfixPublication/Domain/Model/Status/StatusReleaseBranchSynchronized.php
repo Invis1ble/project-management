@@ -24,6 +24,8 @@ final readonly class StatusReleaseBranchSynchronized extends AbstractStatus
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(

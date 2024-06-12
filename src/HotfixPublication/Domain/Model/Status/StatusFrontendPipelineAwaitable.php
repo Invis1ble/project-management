@@ -25,14 +25,16 @@ abstract readonly class StatusFrontendPipelineAwaitable extends AbstractStatus
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
-        return;
-
         if ($context->containsFrontendMergeRequestToMerge($projectResolver)) {
             $pipeline = $frontendCiClient->awaitLatestPipeline(
                 ref: Branch\Name::fromString('master'),
                 createdAfter: $context->createdAt(),
+                maxAwaitingTime: $pipelineMaxAwaitingTime,
+                tickInterval: $pipelineTickInterval,
             );
 
             if (null === $pipeline) {
@@ -54,6 +56,10 @@ abstract readonly class StatusFrontendPipelineAwaitable extends AbstractStatus
             }
         } else {
             $next = new StatusFrontendPipelineSuccess();
+        }
+
+        if ($next->equals(new StatusFrontendPipelineSuccess())) {
+            return;
         }
 
         $this->setPublicationStatus($context, $next);
