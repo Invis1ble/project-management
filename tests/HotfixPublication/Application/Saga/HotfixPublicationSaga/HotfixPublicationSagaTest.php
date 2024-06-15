@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HotfixPublication\Application\Saga\HotfixPublicationSaga;
+namespace Invis1ble\ProjectManagement\Tests\HotfixPublication\Application\Saga\HotfixPublicationSaga;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -15,11 +15,13 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsMerged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag\TagCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\Name;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
@@ -61,9 +63,20 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $hotfixesArray = $hotfixes->toArray();
         $mrToMerge = $hotfixesArray[0]->mergeRequestsToMerge->toArray();
+        $backendMrToMerge = $mrToMerge[0];
+        $frontendMrToMerge = $mrToMerge[1];
+        $backendProjectId = $backendMrToMerge->projectId;
+        $frontendProjectId = $frontendMrToMerge->projectId;
+        $frontendProjectName = $frontendMrToMerge->projectName;
 
-        $mr = file_get_contents(__DIR__ . '/fixtures/merge_request/response/merge_request.200.json');
+        $tagName = Tag\VersionName::create();
+        $tagMessage = Tag\Message::fromString("{$hotfixesArray[0]->summary} | {$hotfixesArray[0]->key}");
+
+        $mr = file_get_contents(__DIR__ . '/fixture/merge_request/response/merge_request.200.json');
         $mr = json_decode($mr, true);
+
+        $tag = file_get_contents(__DIR__ . '/fixture/tag/response/tag.200.json');
+        $tag = json_decode($tag, true);
 
         $now = new \DateTimeImmutable();
 
@@ -71,66 +84,78 @@ class HotfixPublicationSagaTest extends KernelTestCase
             new Response(
                 status: 200,
                 body: json_encode([
-                    'id' => $mrToMerge[0]->id->value(),
-                    'project_id' => $mrToMerge[0]->projectId->value(),
-                    'project_name' => (string) $mrToMerge[0]->projectName,
-                    'title' => (string) $mrToMerge[0]->title,
-                    'source_branch' => (string) $mrToMerge[0]->sourceBranchName,
-                    'target_branch' => (string) $mrToMerge[0]->targetBranchName,
+                    'id' => $backendMrToMerge->id->value(),
+                    'project_id' => $backendMrToMerge->projectId->value(),
+                    'project_name' => (string) $backendMrToMerge->projectName,
+                    'title' => (string) $backendMrToMerge->title,
+                    'source_branch' => (string) $backendMrToMerge->sourceBranchName,
+                    'target_branch' => (string) $backendMrToMerge->targetBranchName,
                     'status' => MergeRequest\Status::Merged->value,
                     'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
-                    'web_url' => (string) $mrToMerge[0]->guiUrl,
+                    'web_url' => (string) $backendMrToMerge->guiUrl,
                 ] + $mr),
             ),
             new Response(
                 status: 200,
                 body: json_encode([
-                    'id' => $mrToMerge[1]->id->value(),
-                    'project_id' => $mrToMerge[1]->projectId->value(),
-                    'project_name' => (string) $mrToMerge[1]->projectName,
-                    'title' => (string) $mrToMerge[1]->title,
-                    'source_branch' => (string) $mrToMerge[1]->sourceBranchName,
-                    'target_branch' => (string) $mrToMerge[0]->targetBranchName,
+                    'id' => $frontendMrToMerge->id->value(),
+                    'project_id' => $frontendProjectId->value(),
+                    'project_name' => (string) $frontendProjectName,
+                    'title' => (string) $frontendMrToMerge->title,
+                    'source_branch' => (string) $frontendMrToMerge->sourceBranchName,
+                    'target_branch' => (string) $backendMrToMerge->targetBranchName,
                     'status' => MergeRequest\Status::Merged->value,
                     'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
-                    'web_url' => (string) $mrToMerge[1]->guiUrl,
+                    'web_url' => (string) $frontendMrToMerge->guiUrl,
                 ] + $mr),
             ),
             $this->createPipelineResponse(
-                projectId: $mrToMerge[1]->projectId,
-                projectName: $mrToMerge[1]->projectName,
+                projectId: $frontendProjectId,
+                projectName: $frontendProjectName,
                 status: Status::Created,
                 createdAt: $now,
             ),
             $this->createPipelineResponse(
-                projectId: $mrToMerge[1]->projectId,
-                projectName: $mrToMerge[1]->projectName,
+                projectId: $frontendProjectId,
+                projectName: $frontendProjectName,
                 status: Status::WaitingForResource,
                 createdAt: $now,
             ),
             $this->createPipelineResponse(
-                projectId: $mrToMerge[1]->projectId,
-                projectName: $mrToMerge[1]->projectName,
+                projectId: $frontendProjectId,
+                projectName: $frontendProjectName,
                 status: Status::Preparing,
                 createdAt: $now,
             ),
             $this->createPipelineResponse(
-                projectId: $mrToMerge[1]->projectId,
-                projectName: $mrToMerge[1]->projectName,
+                projectId: $frontendProjectId,
+                projectName: $frontendProjectName,
                 status: Status::Pending,
                 createdAt: $now,
             ),
             $this->createPipelineResponse(
-                projectId: $mrToMerge[1]->projectId,
-                projectName: $mrToMerge[1]->projectName,
+                projectId: $frontendProjectId,
+                projectName: $frontendProjectName,
                 status: Status::Running,
                 createdAt: $now,
             ),
             $this->createPipelineResponse(
-                projectId: $mrToMerge[1]->projectId,
-                projectName: $mrToMerge[1]->projectName,
+                projectId: $frontendProjectId,
+                projectName: $frontendProjectName,
                 status: Status::Success,
                 createdAt: $now,
+            ),
+            new Response(
+                status: 200,
+                body: json_encode([
+                    'name' => (string) $tagName,
+                    'commit' => [
+                        'message' => (string) $backendMrToMerge->title,
+                        'created_at' => $now->format(DATE_RFC3339_EXTENDED),
+                    ] + $tag['commit'],
+                    'message' => (string) $tagMessage,
+                    'created_at' => (new \DateTimeImmutable())->format(DATE_RFC3339_EXTENDED),
+                ] + $tag),
             ),
         ]);
 
@@ -138,8 +163,8 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $container->set('eight_points_guzzle.client.gitlab', new Client(['handler' => $handlerStack]));
 
         $createPublicationCommand = new CreateHotfixPublicationCommand(
-            tagName: Tag\VersionName::create(),
-            tagMessage: Tag\Message::fromString("{$hotfixesArray[0]->summary} | {$hotfixesArray[0]->key}"),
+            tagName: $tagName,
+            tagMessage: $tagMessage,
             hotfixes: $hotfixes,
         );
 
@@ -160,7 +185,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(15, $dispatchedEvents);
+        $this->assertCount(17, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -201,79 +226,92 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertObjectEquals($expectedMrsToMerge[1]->projectId, $event->projectId);
         $this->assertNull($event->previousStatus);
         $this->assertObjectEquals(Status::Created, $event->status);
-
-        $projectId = $event->projectId;
         $pipelineId = $event->pipelineId;
 
         $this->assertArrayHasKey(5, $dispatchedEvents);
         $event = $dispatchedEvents[5]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Status::Created, $event->status);
 
         $this->assertArrayHasKey(6, $dispatchedEvents);
         $event = $dispatchedEvents[6]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Status::Created, $event->previousStatus);
         $this->assertObjectEquals(Status::WaitingForResource, $event->status);
 
         $this->assertArrayHasKey(7, $dispatchedEvents);
         $event = $dispatchedEvents[7]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Status::WaitingForResource, $event->status);
 
         $this->assertArrayHasKey(8, $dispatchedEvents);
         $event = $dispatchedEvents[8]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Status::WaitingForResource, $event->previousStatus);
         $this->assertObjectEquals(Status::Preparing, $event->status);
 
         $this->assertArrayHasKey(9, $dispatchedEvents);
         $event = $dispatchedEvents[9]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Status::Preparing, $event->status);
 
         $this->assertArrayHasKey(10, $dispatchedEvents);
         $event = $dispatchedEvents[10]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Status::Preparing, $event->previousStatus);
         $this->assertObjectEquals(Status::Pending, $event->status);
 
         $this->assertArrayHasKey(11, $dispatchedEvents);
         $event = $dispatchedEvents[11]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Status::Pending, $event->status);
 
         $this->assertArrayHasKey(12, $dispatchedEvents);
         $event = $dispatchedEvents[12]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Status::Pending, $event->previousStatus);
         $this->assertObjectEquals(Status::Running, $event->status);
 
         $this->assertArrayHasKey(13, $dispatchedEvents);
         $event = $dispatchedEvents[13]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Status::Running, $event->status);
 
         $this->assertArrayHasKey(14, $dispatchedEvents);
         $event = $dispatchedEvents[14]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($projectId, $event->projectId);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Status::Running, $event->previousStatus);
         $this->assertObjectEquals(Status::Success, $event->status);
+
+        $this->assertArrayHasKey(15, $dispatchedEvents);
+        $event = $dispatchedEvents[15]->event;
+
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusFrontendPipelineSuccess(), $event->status);
+        $this->assertObjectEquals(new StatusMergeRequestsMerged(), $event->previousStatus);
+        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(16, $dispatchedEvents);
+        $event = $dispatchedEvents[16]->event;
+        $this->assertInstanceOf(TagCreated::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($tagName, $event->name);
+        $this->assertObjectEquals($tagMessage, $event->message);
     }
 
     private function createPipelineResponse(
@@ -283,7 +321,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         \DateTimeImmutable $createdAt,
     ): Response {
         $pipeline = json_decode(
-            file_get_contents(__DIR__ . '/fixtures/pipeline/response/pipeline.200.json'),
+            file_get_contents(__DIR__ . '/fixture/pipeline/response/pipeline.200.json'),
             true,
         );
 

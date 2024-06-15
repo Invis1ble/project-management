@@ -14,7 +14,7 @@ final readonly class TagCreated extends ProjectIdAwareEvent
 {
     public function __construct(
         ProjectId $projectId,
-        public Name $tagName,
+        public Name $name,
         public Ref $ref,
         public ?Message $message,
         public ?\DateTimeImmutable $createdAt,

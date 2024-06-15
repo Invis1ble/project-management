@@ -58,10 +58,6 @@ abstract readonly class StatusFrontendPipelineAwaitable extends AbstractStatus
             $next = new StatusFrontendPipelineSuccess();
         }
 
-        if ($next->equals(new StatusFrontendPipelineSuccess())) {
-            return;
-        }
-
         $this->setPublicationStatus($context, $next);
     }
 }

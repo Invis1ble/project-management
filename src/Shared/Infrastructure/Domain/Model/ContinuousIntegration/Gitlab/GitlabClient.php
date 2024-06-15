@@ -263,7 +263,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $this->eventBus->dispatch(new TagCreated(
             projectId: $this->projectId,
-            tagName: $tag->name,
+            name: $tag->name,
             ref: $ref,
             message: $message,
             createdAt: $tag->createdAt,
