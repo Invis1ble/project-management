@@ -16,7 +16,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewComm
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use Symfony\Component\Clock\Clock;
+use Psr\Clock\ClockInterface;
 
 class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicationInterface
 {
@@ -34,6 +34,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         Tag\VersionName $tagName,
         Tag\Message $tagMessage,
         IssueList $hotfixes,
+        ClockInterface $clock,
     ): self {
         if ($hotfixes->empty()) {
             throw new \InvalidArgumentException('No hotfixes provided');
@@ -45,7 +46,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             tagMessage: $tagMessage,
             status: new StatusCreated(),
             hotfixes: $hotfixes,
-            createdAt: Clock::get()->now(),
+            createdAt: $clock->now(),
         );
 
         $hotfix->raiseDomainEvent(new HotfixPublicationCreated(
