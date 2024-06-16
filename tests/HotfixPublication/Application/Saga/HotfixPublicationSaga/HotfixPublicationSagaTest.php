@@ -20,6 +20,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDepl
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDevelopBranchSynchronized;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDone;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFrontendApplicationBranchSet;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusHotfixesTransitionedToDone;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsIntoDevelopCreated;
@@ -28,6 +29,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMerg
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusReleaseBranchSynchronized;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagPipelineSuccess;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusUpdateExtraDeployBranchMergeRequestCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
@@ -148,6 +150,11 @@ Deploy_react:
     host:
         _default: "v-1-0-0"
 CONFIG;
+
+        $updateExtraDeployBranchMrId = MergeRequest\MergeRequestId::from(12345);
+        $updateExtraDeployBranchMrTitle = MergeRequest\Title::fromString('Update from develop');
+        $updateExtraDeployBranchMrSourceBranchName = Branch\Name::fromString('develop');
+        $updateExtraDeployBranchMrTargetBranchName = $container->get('invis1ble_project_management.extra_deploy_branch_name');
 
         $now = new \DateTimeImmutable();
         $frontendPipelineCreatedAt = $now;
@@ -392,6 +399,24 @@ CONFIG;
                     'created_at' => $setFrontendApplicationBranchNameCommitCreatedAt->format(DATE_RFC3339_EXTENDED),
                 ] + $commit),
             ),
+            $this->createCreateMergeRequestResponse(
+                mergeRequestId: $updateExtraDeployBranchMrId,
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                title: $updateExtraDeployBranchMrTitle,
+                sourceBranchName: $updateExtraDeployBranchMrSourceBranchName,
+                targetBranchName: $updateExtraDeployBranchMrTargetBranchName,
+                guiUrl: $backendMrToMerge->guiUrl,
+            ),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestId: $updateExtraDeployBranchMrId,
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                title: $updateExtraDeployBranchMrTitle,
+                sourceBranchName: $updateExtraDeployBranchMrSourceBranchName,
+                targetBranchName: $updateExtraDeployBranchMrTargetBranchName,
+                guiUrl: $backendMrToMerge->guiUrl,
+            ),
         ]);
 
         $handlerStack = HandlerStack::create($mock);
@@ -451,7 +476,7 @@ CONFIG;
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(58, $dispatchedEvents);
+        $this->assertCount(62, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -876,8 +901,47 @@ CONFIG;
         $this->assertArrayHasKey(57, $dispatchedEvents);
         $event = $dispatchedEvents[57]->event;
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusDone(), $event->status);
+        $this->assertObjectEquals(new StatusFrontendApplicationBranchSet(), $event->status);
         $this->assertObjectEquals(new StatusReleaseBranchSynchronized(), $event->previousStatus);
+        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(58, $dispatchedEvents);
+        $event = $dispatchedEvents[58]->event;
+        $this->assertInstanceOf(MergeRequestCreated::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($updateExtraDeployBranchMrTitle, $event->title);
+        $this->assertObjectEquals($updateExtraDeployBranchMrSourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals($updateExtraDeployBranchMrTargetBranchName, $event->targetBranchName);
+        $this->assertObjectEquals(new MergeRequest\Details\Status\StatusMergeable(), $event->details->status);
+
+        $this->assertArrayHasKey(59, $dispatchedEvents);
+        $event = $dispatchedEvents[59]->event;
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusUpdateExtraDeployBranchMergeRequestCreated([
+            'project_id' => $backendProjectId->value(),
+            'merge_request_id' => $updateExtraDeployBranchMrId->value(),
+        ]), $event->status);
+        $this->assertObjectEquals(new StatusFrontendApplicationBranchSet(), $event->previousStatus);
+        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(60, $dispatchedEvents);
+        $event = $dispatchedEvents[60]->event;
+        $this->assertInstanceOf(MergeRequestMerged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($updateExtraDeployBranchMrId, $event->mergeRequestId);
+        $this->assertObjectEquals($updateExtraDeployBranchMrTitle, $event->title);
+        $this->assertObjectEquals($updateExtraDeployBranchMrSourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals($updateExtraDeployBranchMrTargetBranchName, $event->targetBranchName);
+        $this->assertObjectEquals(new MergeRequest\Details\Details(new MergeRequest\Details\Status\StatusNotOpen()), $event->details);
+
+        $this->assertArrayHasKey(61, $dispatchedEvents);
+        $event = $dispatchedEvents[61]->event;
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusDone(), $event->status);
+        $this->assertObjectEquals(new StatusUpdateExtraDeployBranchMergeRequestCreated([
+            'project_id' => $backendProjectId->value(),
+            'merge_request_id' => $updateExtraDeployBranchMrId->value(),
+        ]), $event->previousStatus);
         $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
     }
 

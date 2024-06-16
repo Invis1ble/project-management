@@ -12,10 +12,8 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
-final readonly class StatusMergeRequestsIntoReleaseCreated extends AbstractStatus
+final readonly class StatusFrontendApplicationBranchSet extends AbstractStatus
 {
     public function proceedToNext(
         MergeRequestManagerInterface $mergeRequestManager,
@@ -31,21 +29,22 @@ final readonly class StatusMergeRequestsIntoReleaseCreated extends AbstractStatu
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
-        $hotfixes = new IssueList(
-            ...$context->hotfixes()
-                ->map(function (Issue $hotfix) use ($mergeRequestManager): Issue {
-                    $mergeRequests = $hotfix->mergeRequestsToMerge->mergeMergeRequests($mergeRequestManager);
+        $mergeRequest = $updateExtraDeployBranchMergeRequestFactory->createMergeRequest();
 
-                    return $hotfix->withMergeRequestsToMerge($mergeRequests);
-                }),
-        );
+        if (null === $mergeRequest) {
+            $next = new StatusDone();
+        } else {
+            $next = new StatusUpdateExtraDeployBranchMergeRequestCreated([
+                'project_id' => $mergeRequest->projectId->value(),
+                'merge_request_id' => $mergeRequest->id->value(),
+            ]);
+        }
 
-        $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
-        $this->setPublicationStatus($context, new StatusReleaseBranchSynchronized());
+        $this->setPublicationStatus($context, $next);
     }
 
     public function __toString(): string
     {
-        return Dictionary::MergeRequestsIntoReleaseCreated->value;
+        return Dictionary::FrontendApplicationBranchSet->value;
     }
 }

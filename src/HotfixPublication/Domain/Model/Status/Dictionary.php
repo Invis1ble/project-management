@@ -100,5 +100,9 @@ enum Dictionary: string
 
     case ReleaseBranchSynchronized = 'release_branch_synchronized';
 
+    case FrontendApplicationBranchSet = 'frontend_application_branch_set';
+
+    case UpdateExtraDeployBranchMergeRequestCreated = 'update_extra_deploy_branch_merge_request_created';
+
     case Done = 'done';
 }

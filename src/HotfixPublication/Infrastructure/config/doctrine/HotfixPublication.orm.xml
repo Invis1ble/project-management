@@ -10,7 +10,7 @@
 
         <id name="id" type="hotfix_publication_id" />
 
-        <field name="status" type="hotfix_publication_status" length="64" />
+        <field name="status" type="hotfix_publication_status" />
         <field name="tagName" type="tag_version_name" />
         <field name="tagMessage" type="tag_message" />
         <field name="hotfixes" type="issue_list" />

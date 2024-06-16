@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\Status;
 
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Context;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFactory;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
@@ -17,15 +18,36 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
         ?string $format = null,
         array $context = [],
     ): StatusInterface {
-        return StatusFactory::createStatus(Dictionary::from($data));
+        if (is_string($data)) {
+            $name = $data;
+            $context = null;
+        } else {
+            $name = $data['name'];
+            $context = $data['context'] ?? null;
+        }
+
+        return StatusFactory::createStatus(
+            name: Dictionary::from($name),
+            context: new Context($context),
+        );
     }
 
     public function normalize(
         mixed $object,
         ?string $format = null,
         array $context = [],
-    ): string {
-        return (string) $object;
+    ): array|string {
+        $context = $object->context()
+            ->toArray();
+
+        if (null === $context) {
+            return (string) $object;
+        }
+
+        return [
+            'name' => (string) $object,
+            'context' => $context,
+        ];
     }
 
     protected function getSupportedType(): string

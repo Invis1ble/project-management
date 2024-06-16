@@ -10,9 +10,23 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 
 abstract readonly class AbstractStatus implements StatusInterface
 {
+    protected Context $context;
+
+    public function __construct(?array $context = null)
+    {
+        $this->context = new Context($context);
+    }
+
     public function equals(StatusInterface $status): bool
     {
-        return static::class === $status::class;
+        return static::class === $status::class
+            && $this->context->equals($status->context)
+        ;
+    }
+
+    public function context(): Context
+    {
+        return $this->context;
     }
 
     protected function setPublicationStatus(
