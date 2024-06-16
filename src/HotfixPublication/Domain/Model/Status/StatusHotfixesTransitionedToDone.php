@@ -58,8 +58,6 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
             $next = new StatusDevelopBranchSynchronized();
         }
 
-        return;
-
         $this->setPublicationStatus($context, $next);
     }
 

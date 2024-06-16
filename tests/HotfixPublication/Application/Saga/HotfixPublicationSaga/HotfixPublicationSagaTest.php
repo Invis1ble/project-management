@@ -20,6 +20,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDepl
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusHotfixesTransitionedToDone;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsIntoDevelopCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsMerged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagPipelineSuccess;
@@ -319,6 +320,34 @@ class HotfixPublicationSagaTest extends KernelTestCase
                     'web_url' => (string) $frontendMrToMerge->guiUrl,
                 ] + $mr),
             ),
+            new Response(
+                status: 200,
+                body: json_encode([
+                    'id' => $backendMrToMerge->id->value(),
+                    'project_id' => $backendMrToMerge->projectId->value(),
+                    'project_name' => (string) $backendMrToMerge->projectName,
+                    'title' => (string) $backendMrToMerge->title,
+                    'source_branch' => (string) $backendMrToMerge->sourceBranchName,
+                    'target_branch' => 'develop',
+                    'status' => MergeRequest\Status::Merged->value,
+                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
+                    'web_url' => (string) $backendMrToMerge->guiUrl,
+                ] + $mr),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode([
+                    'id' => $frontendMrToMerge->id->value(),
+                    'project_id' => $frontendMrToMerge->projectId->value(),
+                    'project_name' => (string) $frontendMrToMerge->projectName,
+                    'title' => (string) $frontendMrToMerge->title,
+                    'source_branch' => (string) $frontendMrToMerge->sourceBranchName,
+                    'target_branch' => 'develop',
+                    'status' => MergeRequest\Status::Merged->value,
+                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
+                    'web_url' => (string) $frontendMrToMerge->guiUrl,
+                ] + $mr),
+            ),
         ]);
 
         $handlerStack = HandlerStack::create($mock);
@@ -368,7 +397,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(46, $dispatchedEvents);
+        $this->assertCount(49, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -702,6 +731,33 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertObjectEquals($frontendMrToMerge->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals(Branch\Name::fromString('develop'), $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusMergeable(), $event->details->status);
+
+        $this->assertArrayHasKey(46, $dispatchedEvents);
+        $event = $dispatchedEvents[46]->event;
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusMergeRequestsIntoDevelopCreated(), $event->status);
+        $this->assertObjectEquals(new StatusHotfixesTransitionedToDone(), $event->previousStatus);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(47, $dispatchedEvents);
+        $event = $dispatchedEvents[47]->event;
+        $this->assertInstanceOf(MergeRequestMerged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->details, $event->details);
+
+        $this->assertArrayHasKey(48, $dispatchedEvents);
+        $event = $dispatchedEvents[48]->event;
+        $this->assertInstanceOf(MergeRequestMerged::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->details, $event->details);
     }
 
     private function createPipelineResponse(
