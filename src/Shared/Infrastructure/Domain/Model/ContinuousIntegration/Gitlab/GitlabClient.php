@@ -137,24 +137,22 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $data = json_decode($content, true);
 
-        $found = false;
+        $job = null;
         $deployJobName = 'Production-AWS';
 
         foreach ($data as $job) {
             if ($deployJobName === $job['name']) {
-                $found = true;
-
                 break;
             }
         }
 
-        if (!$found) {
+        if (null === $job) {
             throw new NotFoundException("Job $deployJobName not found");
         }
 
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/jobs/{$data['id']}/play"),
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/jobs/{$job['id']}/play"),
         );
 
         $content = $this->httpClient->sendRequest($request)

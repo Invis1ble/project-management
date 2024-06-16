@@ -34,8 +34,6 @@ final readonly class StatusFrontendPipelineSuccess extends AbstractStatus
             message: $context->tagMessage(),
         );
 
-        return;
-
         $this->setPublicationStatus($context, new StatusTagCreated());
     }
 
