@@ -38,6 +38,7 @@ readonly class TaskTracker implements TaskTrackerInterface
 
     public function latestRelease(): ?Version\Version
     {
+        // {@link} https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-project-versions/#api-rest-api-3-project-projectidorkey-version-get
         $request = $this->requestFactory->createRequest(
             'GET',
             $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
@@ -50,7 +51,7 @@ readonly class TaskTracker implements TaskTrackerInterface
             ->getBody()
             ->getContents();
 
-        $releases = json_decode($content, true)['values'];
+        $versions = json_decode($content, true)['values'];
 
         $heap = new class() extends \SplMaxHeap {
             /**
@@ -64,7 +65,7 @@ readonly class TaskTracker implements TaskTrackerInterface
             }
         };
 
-        foreach ($releases as $release) {
+        foreach ($versions as $release) {
             try {
                 Name::fromString($release['name']);
             } catch (\InvalidArgumentException) {

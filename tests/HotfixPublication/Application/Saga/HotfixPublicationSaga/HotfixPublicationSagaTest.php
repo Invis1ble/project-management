@@ -18,9 +18,11 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentJobInited;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentPipelineSuccess;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDevelopBranchSynchronized;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusHotfixesTransitionedToDone;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsIntoDevelopCreated;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsIntoReleaseCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsMerged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagPipelineSuccess;
@@ -40,9 +42,11 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\State;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\MapMergeRequestsToMergeToMergedTrait;
 use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 
@@ -86,9 +90,6 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $tagName = Tag\VersionName::create();
         $tagMessage = Tag\Message::fromString("{$hotfixesArray[0]->summary} | {$hotfixesArray[0]->key}");
 
-        $mr = file_get_contents(__DIR__ . '/fixture/merge_request/response/merge_request.200.json');
-        $mr = json_decode($mr, true);
-
         $tag = file_get_contents(__DIR__ . '/fixture/tag/response/create_tag.200.json');
         $tag = json_decode($tag, true);
 
@@ -126,38 +127,35 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $transitionToDone = $container->getParameter('invis1ble_project_management.jira.transition_to_done');
         $issueTransitions['transitions'][0]['name'] = $transitionToDone;
 
+        $versions = file_get_contents(__DIR__ . '/fixture/version/response/version.200.json');
+        $versions = json_decode($versions, true);
+
+        $latestReleaseVersionName = Version\Name::fromString('v-1-0-0');
+        $versions['values'][0]['name'] = (string) $latestReleaseVersionName;
+        $versions['values'][0]['released'] = false;
+
         $now = new \DateTimeImmutable();
         $frontendPipelineCreatedAt = $now;
         $tagCreatedAt = $now->add(new \DateInterval('PT1M'));
 
         $mock = new MockHandler([
-            new Response(
-                status: 200,
-                body: json_encode([
-                    'id' => $backendMrToMerge->id->value(),
-                    'project_id' => $backendMrToMerge->projectId->value(),
-                    'project_name' => (string) $backendMrToMerge->projectName,
-                    'title' => (string) $backendMrToMerge->title,
-                    'source_branch' => (string) $backendMrToMerge->sourceBranchName,
-                    'target_branch' => (string) $backendMrToMerge->targetBranchName,
-                    'status' => MergeRequest\Status::Merged->value,
-                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
-                    'web_url' => (string) $backendMrToMerge->guiUrl,
-                ] + $mr),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestId: $backendMrToMerge->id,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: $backendMrToMerge->targetBranchName,
+                guiUrl: $backendMrToMerge->guiUrl,
             ),
-            new Response(
-                status: 200,
-                body: json_encode([
-                    'id' => $frontendMrToMerge->id->value(),
-                    'project_id' => $frontendProjectId->value(),
-                    'project_name' => (string) $frontendProjectName,
-                    'title' => (string) $frontendMrToMerge->title,
-                    'source_branch' => (string) $frontendMrToMerge->sourceBranchName,
-                    'target_branch' => (string) $backendMrToMerge->targetBranchName,
-                    'status' => MergeRequest\Status::Merged->value,
-                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
-                    'web_url' => (string) $frontendMrToMerge->guiUrl,
-                ] + $mr),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestId: $frontendMrToMerge->id,
+                projectId: $frontendMrToMerge->projectId,
+                projectName: $frontendMrToMerge->projectName,
+                title: $frontendMrToMerge->title,
+                sourceBranchName: $frontendMrToMerge->sourceBranchName,
+                targetBranchName: $frontendMrToMerge->targetBranchName,
+                guiUrl: $frontendMrToMerge->guiUrl,
             ),
             $this->createPipelineResponse(
                 projectId: $frontendProjectId,
@@ -292,61 +290,77 @@ class HotfixPublicationSagaTest extends KernelTestCase
                 status: Status::Success,
                 createdAt: $tagCreatedAt,
             ),
-            new Response(
-                status: 200,
-                body: json_encode([
-                    'id' => $backendMrToMerge->id->value(),
-                    'project_id' => $backendMrToMerge->projectId->value(),
-                    'project_name' => (string) $backendMrToMerge->projectName,
-                    'title' => (string) $backendMrToMerge->title,
-                    'source_branch' => (string) $backendMrToMerge->sourceBranchName,
-                    'target_branch' => 'develop',
-                    'status' => MergeRequest\Status::Open->value,
-                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::Mergeable->value,
-                    'web_url' => (string) $backendMrToMerge->guiUrl,
-                ] + $mr),
+            $this->createCreateMergeRequestResponse(
+                mergeRequestId: $backendMrToMerge->id,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString('develop'),
+                guiUrl: $backendMrToMerge->guiUrl,
             ),
-            new Response(
-                status: 200,
-                body: json_encode([
-                    'id' => $frontendMrToMerge->id->value(),
-                    'project_id' => $frontendMrToMerge->projectId->value(),
-                    'project_name' => (string) $frontendMrToMerge->projectName,
-                    'title' => (string) $frontendMrToMerge->title,
-                    'source_branch' => (string) $frontendMrToMerge->sourceBranchName,
-                    'target_branch' => 'develop',
-                    'status' => MergeRequest\Status::Open->value,
-                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::Mergeable->value,
-                    'web_url' => (string) $frontendMrToMerge->guiUrl,
-                ] + $mr),
+            $this->createCreateMergeRequestResponse(
+                mergeRequestId: $frontendMrToMerge->id,
+                projectId: $frontendMrToMerge->projectId,
+                projectName: $frontendMrToMerge->projectName,
+                title: $frontendMrToMerge->title,
+                sourceBranchName: $frontendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString('develop'),
+                guiUrl: $frontendMrToMerge->guiUrl,
             ),
-            new Response(
-                status: 200,
-                body: json_encode([
-                    'id' => $backendMrToMerge->id->value(),
-                    'project_id' => $backendMrToMerge->projectId->value(),
-                    'project_name' => (string) $backendMrToMerge->projectName,
-                    'title' => (string) $backendMrToMerge->title,
-                    'source_branch' => (string) $backendMrToMerge->sourceBranchName,
-                    'target_branch' => 'develop',
-                    'status' => MergeRequest\Status::Merged->value,
-                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
-                    'web_url' => (string) $backendMrToMerge->guiUrl,
-                ] + $mr),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestId: $backendMrToMerge->id,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString('develop'),
+                guiUrl: $backendMrToMerge->guiUrl,
             ),
-            new Response(
-                status: 200,
-                body: json_encode([
-                    'id' => $frontendMrToMerge->id->value(),
-                    'project_id' => $frontendMrToMerge->projectId->value(),
-                    'project_name' => (string) $frontendMrToMerge->projectName,
-                    'title' => (string) $frontendMrToMerge->title,
-                    'source_branch' => (string) $frontendMrToMerge->sourceBranchName,
-                    'target_branch' => 'develop',
-                    'status' => MergeRequest\Status::Merged->value,
-                    'detailed_merge_status' => MergeRequest\Details\Status\Dictionary::NotOpen->value,
-                    'web_url' => (string) $frontendMrToMerge->guiUrl,
-                ] + $mr),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestId: $frontendMrToMerge->id,
+                projectId: $frontendMrToMerge->projectId,
+                projectName: $frontendMrToMerge->projectName,
+                title: $frontendMrToMerge->title,
+                sourceBranchName: $frontendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString('develop'),
+                guiUrl: $frontendMrToMerge->guiUrl,
+            ),
+            $this->createCreateMergeRequestResponse(
+                mergeRequestId: $backendMrToMerge->id,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                guiUrl: $backendMrToMerge->guiUrl,
+            ),
+            $this->createCreateMergeRequestResponse(
+                mergeRequestId: $frontendMrToMerge->id,
+                projectId: $frontendMrToMerge->projectId,
+                projectName: $frontendMrToMerge->projectName,
+                title: $frontendMrToMerge->title,
+                sourceBranchName: $frontendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                guiUrl: $frontendMrToMerge->guiUrl,
+            ),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestId: $backendMrToMerge->id,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                guiUrl: $backendMrToMerge->guiUrl,
+            ),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestId: $frontendMrToMerge->id,
+                projectId: $frontendMrToMerge->projectId,
+                projectName: $frontendMrToMerge->projectName,
+                title: $frontendMrToMerge->title,
+                sourceBranchName: $frontendMrToMerge->sourceBranchName,
+                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                guiUrl: $frontendMrToMerge->guiUrl,
             ),
         ]);
 
@@ -364,6 +378,10 @@ class HotfixPublicationSagaTest extends KernelTestCase
             ),
             new Response(
                 status: 204,
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($versions),
             ),
         ]);
 
@@ -386,8 +404,14 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $expectedHotfixes = $this->mapMergeRequestsToMergeToMerged($createPublicationCommand->hotfixes);
         $expectedHotfixes = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
-            $expectedHotfixes,
-            Branch\Name::fromString('develop'),
+            issues: $expectedHotfixes,
+            targetBranchName: Branch\Name::fromString('master'),
+            newTargetBranchName: Branch\Name::fromString('develop'),
+        );
+        $expectedHotfixes = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
+            issues: $expectedHotfixes,
+            targetBranchName: Branch\Name::fromString('master'),
+            newTargetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
         );
         $expectedMrsToMerge = $expectedHotfixes->toArray()[0]->mergeRequestsToMerge->toArray();
 
@@ -397,7 +421,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(49, $dispatchedEvents);
+        $this->assertCount(55, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -758,6 +782,58 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[2]->details, $event->details);
+
+        $this->assertArrayHasKey(49, $dispatchedEvents);
+        $event = $dispatchedEvents[49]->event;
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusDevelopBranchSynchronized(), $event->status);
+        $this->assertObjectEquals(new StatusMergeRequestsIntoDevelopCreated(), $event->previousStatus);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(50, $dispatchedEvents);
+        $event = $dispatchedEvents[50]->event;
+        $this->assertInstanceOf(MergeRequestCreated::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($backendMrToMerge->title, $event->title);
+        $this->assertObjectEquals($backendMrToMerge->sourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals(Branch\Name::fromString((string) $latestReleaseVersionName), $event->targetBranchName);
+        $this->assertObjectEquals(new MergeRequest\Details\Status\StatusMergeable(), $event->details->status);
+
+        $this->assertArrayHasKey(51, $dispatchedEvents);
+        $event = $dispatchedEvents[51]->event;
+        $this->assertInstanceOf(MergeRequestCreated::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
+        $this->assertObjectEquals($frontendMrToMerge->sourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals(Branch\Name::fromString((string) $latestReleaseVersionName), $event->targetBranchName);
+        $this->assertObjectEquals(new MergeRequest\Details\Status\StatusMergeable(), $event->details->status);
+
+        $this->assertArrayHasKey(52, $dispatchedEvents);
+        $event = $dispatchedEvents[52]->event;
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusMergeRequestsIntoReleaseCreated(), $event->status);
+        $this->assertObjectEquals(new StatusDevelopBranchSynchronized(), $event->previousStatus);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(53, $dispatchedEvents);
+        $event = $dispatchedEvents[53]->event;
+        $this->assertInstanceOf(MergeRequestMerged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($expectedMrsToMerge[4]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[4]->title, $event->title);
+        $this->assertObjectEquals($expectedMrsToMerge[4]->sourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[4]->targetBranchName, $event->targetBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[4]->details, $event->details);
+
+        $this->assertArrayHasKey(54, $dispatchedEvents);
+        $event = $dispatchedEvents[54]->event;
+        $this->assertInstanceOf(MergeRequestMerged::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals($expectedMrsToMerge[5]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[5]->title, $event->title);
+        $this->assertObjectEquals($expectedMrsToMerge[5]->sourceBranchName, $event->sourceBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[5]->targetBranchName, $event->targetBranchName);
+        $this->assertObjectEquals($expectedMrsToMerge[5]->details, $event->details);
     }
 
     private function createPipelineResponse(
@@ -784,6 +860,82 @@ class HotfixPublicationSagaTest extends KernelTestCase
                 'committed_at' => $createdAt->format(DATE_RFC3339_EXTENDED),
                 'web_url' => "http://127.0.0.1:3000/$projectName/-/pipelines/{$pipeline['id']}",
             ] + $pipeline),
+        );
+    }
+
+    private function createMergeRequestResponse(
+        MergeRequest\MergeRequestId $mergeRequestId,
+        ContinuousIntegration\Project\ProjectId $projectId,
+        ContinuousIntegration\Project\Name $projectName,
+        MergeRequest\Title $title,
+        Branch\Name $sourceBranchName,
+        Branch\Name $targetBranchName,
+        MergeRequest\Status $status,
+        MergeRequest\Details\Status\Dictionary $detailedStatus,
+        UriInterface $guiUrl,
+    ): Response {
+        $mr = json_decode(
+            file_get_contents(__DIR__ . '/fixture/merge_request/response/merge_request.200.json'),
+            true,
+        );
+
+        return new Response(
+            status: 200,
+            body: json_encode([
+                'id' => $mergeRequestId->value(),
+                'project_id' => $projectId->value(),
+                'project_name' => (string) $projectName,
+                'title' => (string) $title,
+                'source_branch' => (string) $sourceBranchName,
+                'target_branch' => (string) $targetBranchName,
+                'status' => $status->value,
+                'detailed_merge_status' => $detailedStatus->value,
+                'web_url' => (string) $guiUrl,
+            ] + $mr),
+        );
+    }
+
+    private function createCreateMergeRequestResponse(
+        MergeRequest\MergeRequestId $mergeRequestId,
+        ContinuousIntegration\Project\ProjectId $projectId,
+        ContinuousIntegration\Project\Name $projectName,
+        MergeRequest\Title $title,
+        Branch\Name $sourceBranchName,
+        Branch\Name $targetBranchName,
+        UriInterface $guiUrl,
+    ): Response {
+        return $this->createMergeRequestResponse(
+            mergeRequestId: $mergeRequestId,
+            projectId: $projectId,
+            projectName: $projectName,
+            title: $title,
+            sourceBranchName: $sourceBranchName,
+            targetBranchName: $targetBranchName,
+            status: MergeRequest\Status::Open,
+            detailedStatus: MergeRequest\Details\Status\Dictionary::Mergeable,
+            guiUrl: $guiUrl,
+        );
+    }
+
+    private function createMergeMergeRequestResponse(
+        MergeRequest\MergeRequestId $mergeRequestId,
+        ContinuousIntegration\Project\ProjectId $projectId,
+        ContinuousIntegration\Project\Name $projectName,
+        MergeRequest\Title $title,
+        Branch\Name $sourceBranchName,
+        Branch\Name $targetBranchName,
+        UriInterface $guiUrl,
+    ): Response {
+        return $this->createMergeRequestResponse(
+            mergeRequestId: $mergeRequestId,
+            projectId: $projectId,
+            projectName: $projectName,
+            title: $title,
+            sourceBranchName: $sourceBranchName,
+            targetBranchName: $targetBranchName,
+            status: MergeRequest\Status::Merged,
+            detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
+            guiUrl: $guiUrl,
         );
     }
 }

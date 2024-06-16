@@ -18,7 +18,7 @@ trait MapMergeRequestsToMergeToMergedTrait
     {
         return new Issue\IssueList(...$issues->map(
             fn (Issue\Issue $issue): Issue\Issue => $issue->withMergeRequestsToMerge(
-                $this->mapMereRequestsToMerged($issue->mergeRequestsToMerge),
+                $this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge),
             ),
         ));
     }
@@ -26,23 +26,28 @@ trait MapMergeRequestsToMergeToMergedTrait
     public function addCopiesWithNewTargetBranchToMergeRequestsToMerge(
         Issue\IssueList $issues,
         Name $targetBranchName,
+        Name $newTargetBranchName,
     ): Issue\IssueList {
         return new Issue\IssueList(...$issues->map(
             fn (Issue\Issue $issue): Issue\Issue => $issue->withMergeRequestsToMerge(
-                $this->mapMereRequestsToMerged($issue->mergeRequestsToMerge)
-                    ->concat(new MergeRequestList(...$issue->mergeRequestsToMerge->map(
-                        fn (MergeRequest $mr): MergeRequest => new MergeRequest(
-                            id: $mr->id,
-                            title: $mr->title,
-                            projectId: $mr->projectId,
-                            projectName: $mr->projectName,
-                            sourceBranchName: $mr->sourceBranchName,
-                            targetBranchName: $targetBranchName,
-                            status: $mr->status,
-                            guiUrl: $mr->guiUrl,
-                            details: $mr->details,
-                        ),
-                    ))),
+                $this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge)
+                    ->concat(new MergeRequestList(...(function () use ($issue, $targetBranchName, $newTargetBranchName): iterable {
+                        foreach ($issue->mergeRequestsToMerge as $mr) {
+                            if ($mr->targetBranchName->equals($targetBranchName)) {
+                                yield new MergeRequest(
+                                    id: $mr->id,
+                                    title: $mr->title,
+                                    projectId: $mr->projectId,
+                                    projectName: $mr->projectName,
+                                    sourceBranchName: $mr->sourceBranchName,
+                                    targetBranchName: $newTargetBranchName,
+                                    status: $mr->status,
+                                    guiUrl: $mr->guiUrl,
+                                    details: $mr->details,
+                                );
+                            }
+                        }
+                    })())),
             ),
         ));
     }

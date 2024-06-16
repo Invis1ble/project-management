@@ -38,8 +38,6 @@ final readonly class StatusMergeRequestsIntoDevelopCreated extends AbstractStatu
                 }),
         );
 
-        return;
-
         $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
         $this->setPublicationStatus($context, new StatusDevelopBranchSynchronized());
     }

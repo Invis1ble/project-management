@@ -8,7 +8,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 
 trait MapMergeRequestsToMergedTrait
 {
-    public function mapMereRequestsToMerged(MergeRequest\MergeRequestList $mergeRequests): MergeRequest\MergeRequestList
+    public function mapMergeRequestsToMerged(MergeRequest\MergeRequestList $mergeRequests): MergeRequest\MergeRequestList
     {
         return new MergeRequest\MergeRequestList(...$mergeRequests->map(
             fn (MergeRequest\MergeRequest $mr): MergeRequest\MergeRequest => new MergeRequest\MergeRequest(
