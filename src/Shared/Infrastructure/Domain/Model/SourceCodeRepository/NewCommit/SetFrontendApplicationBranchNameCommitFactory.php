@@ -51,7 +51,7 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
                     content: Content::fromString($config),
                 ),
             ),
-            startBranchName: Name::fromString('develop'),
+            startBranchName: $startBranchName,
         );
     }
 }

@@ -58,6 +58,8 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
     ): void {
         $this->status->proceedToNext(
             mergeRequestManager: $mergeRequestManager,
@@ -67,6 +69,8 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             backendCiClient: $backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
             taskTracker: $taskTracker,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+            pipelineTickInterval: $pipelineTickInterval,
             context: $this,
         );
     }

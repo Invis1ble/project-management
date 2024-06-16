@@ -24,11 +24,15 @@ abstract readonly class StatusDeploymentPipelineAwaitable extends AbstractStatus
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         $pipeline = $frontendCiClient->awaitLatestPipeline(
             ref: $context->tagName(),
             createdAfter: $context->createdAt(),
+            maxAwaitingTime: $pipelineMaxAwaitingTime,
+            tickInterval: $pipelineTickInterval,
         );
 
         if (null === $pipeline) {

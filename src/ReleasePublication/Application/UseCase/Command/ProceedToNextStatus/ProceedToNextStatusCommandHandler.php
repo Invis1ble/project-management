@@ -23,6 +23,8 @@ final readonly class ProceedToNextStatusCommandHandler extends ReleasePublicatio
         private ContinuousIntegrationClientInterface $backendCiClient,
         private SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         private TaskTrackerInterface $taskTracker,
+        private \DateInterval $pipelineMaxAwaitingTime,
+        private \DateInterval $pipelineTickInterval,
     ) {
         parent::__construct($repository);
     }
@@ -39,6 +41,8 @@ final readonly class ProceedToNextStatusCommandHandler extends ReleasePublicatio
             backendCiClient: $this->backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $this->setFrontendApplicationBranchNameCommitFactory,
             taskTracker: $this->taskTracker,
+            pipelineMaxAwaitingTime: $this->pipelineMaxAwaitingTime,
+            pipelineTickInterval: $this->pipelineTickInterval,
         );
 
         $this->storeReleasePublication($releasePublication);

@@ -25,6 +25,8 @@ final readonly class StatusMergeRequestsIntoReleaseCreated extends AbstractStatu
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         $hotfixes = new IssueList(
@@ -37,7 +39,7 @@ final readonly class StatusMergeRequestsIntoReleaseCreated extends AbstractStatu
         );
 
         $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
-        $this->setPublicationStatus($context, new StatusMergeRequestsIntoDevelopMerged());
+        $this->setPublicationStatus($context, new StatusReleaseBranchSynchronized());
     }
 
     public function __toString(): string

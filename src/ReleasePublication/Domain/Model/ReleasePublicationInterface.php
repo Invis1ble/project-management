@@ -24,6 +24,8 @@ interface ReleasePublicationInterface extends AggregateRootInterface
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
     ): void;
 
     public function id(): ReleasePublicationId;

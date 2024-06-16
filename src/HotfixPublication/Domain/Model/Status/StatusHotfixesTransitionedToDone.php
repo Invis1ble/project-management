@@ -26,6 +26,8 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         $hasNewMergeRequestToMerge = false;
@@ -53,7 +55,7 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
             $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
             $next = new StatusMergeRequestsIntoDevelopCreated();
         } else {
-            $next = new StatusMergeRequestsIntoDevelopMerged();
+            $next = new StatusDevelopBranchSynchronized();
         }
 
         $this->setPublicationStatus($context, $next);

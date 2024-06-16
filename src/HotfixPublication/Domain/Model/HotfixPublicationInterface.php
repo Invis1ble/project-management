@@ -26,6 +26,8 @@ interface HotfixPublicationInterface extends AggregateRootInterface
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
     ): void;
 
     public function containsBackendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool;

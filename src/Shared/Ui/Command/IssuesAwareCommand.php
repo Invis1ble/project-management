@@ -226,7 +226,7 @@ abstract class IssuesAwareCommand extends Command
 
         $mergeRequests = $mergeRequests->filter(
             fn (MergeRequest $mr): bool => $this->io->confirm(
-                question: "Merge $mr->projectName: $mr->sourceBranchName -> $mr->targetBranchName | $mr->title",
+                question: "Merge $mr->projectName!$mr->id: $mr->sourceBranchName -> $mr->targetBranchName | $mr->title",
                 default: $onlyOneMergeRequest || $mr->sourceEquals($issue->canonicalBranchName()),
             ),
         );

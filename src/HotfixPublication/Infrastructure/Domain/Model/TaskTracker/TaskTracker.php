@@ -35,7 +35,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         Board\BoardId $sprintBoardId,
         int $sprintFieldId,
         private string $readyForPublishStatus = 'Ready for Publish',
-        private string $transitionToDoneName = 'Closed',
+        private string $transitionToDoneName = 'Close Issue',
         private array $supportedIssueTypes = ['Hotfix'],
     ) {
         parent::__construct(
@@ -63,8 +63,8 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
 
     public function transitionHotfixesToDone(Key ...$keys): void
     {
-        foreach ($this->readyForPublishHotfixes(...$keys) as $key) {
-            $transitions = $this->issueTransitions($key);
+        foreach ($this->readyForPublishHotfixes(...$keys) as $issue) {
+            $transitions = $this->issueTransitions($issue->key);
 
             foreach ($transitions as $transition) {
                 if ($this->transitionToDoneName === $transition['name']) {
@@ -78,7 +78,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
 
             $request = $this->requestFactory->createRequest(
                 'POST',
-                $this->uriFactory->createUri("/rest/api/3/issue/$key/transitions"),
+                $this->uriFactory->createUri("/rest/api/3/issue/$issue->key/transitions"),
             )
                 ->withHeader('Content-Type', 'application/json')
                 ->withBody($this->streamFactory->createStream(json_encode([
@@ -90,12 +90,12 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
                 ->getStatusCode();
 
             if (204 !== $statusCode) {
-                throw new \RuntimeException("Something went wrong during hotfix $key transition to Done");
+                throw new \RuntimeException("Something went wrong during hotfix $issue->key transition to Done");
             }
 
             $this->eventBus->dispatch(new HotfixTransitionedToDone(
                 projectKey: $this->projectKey,
-                key: $key,
+                key: $issue->key,
             ));
         }
     }

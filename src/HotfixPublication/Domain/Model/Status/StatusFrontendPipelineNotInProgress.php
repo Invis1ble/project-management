@@ -23,6 +23,8 @@ abstract readonly class StatusFrontendPipelineNotInProgress extends AbstractStat
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         throw new \RuntimeException('Not implemented yet');

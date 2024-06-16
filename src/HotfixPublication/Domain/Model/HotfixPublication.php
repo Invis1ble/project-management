@@ -16,6 +16,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewComm
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Psr\Clock\ClockInterface;
 
 class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicationInterface
 {
@@ -23,8 +24,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         private readonly HotfixPublicationId $id,
         private readonly Tag\VersionName $tagName,
         private readonly Tag\Message $tagMessage,
-        private readonly StatusInterface $status,
-        private readonly IssueList $hotfixes,
+        private StatusInterface $status,
+        private IssueList $hotfixes,
         private readonly \DateTimeImmutable $createdAt,
     ) {
     }
@@ -33,6 +34,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         Tag\VersionName $tagName,
         Tag\Message $tagMessage,
         IssueList $hotfixes,
+        ClockInterface $clock,
     ): self {
         if ($hotfixes->empty()) {
             throw new \InvalidArgumentException('No hotfixes provided');
@@ -44,7 +46,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             tagMessage: $tagMessage,
             status: new StatusCreated(),
             hotfixes: $hotfixes,
-            createdAt: new \DateTimeImmutable(),
+            createdAt: $clock->now(),
         );
 
         $hotfix->raiseDomainEvent(new HotfixPublicationCreated(
@@ -66,6 +68,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
     ): void {
         $this->status->proceedToNext(
             mergeRequestManager: $mergeRequestManager,
@@ -76,6 +80,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
             taskTracker: $taskTracker,
             projectResolver: $projectResolver,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+            pipelineTickInterval: $pipelineTickInterval,
             context: $this,
         );
     }
