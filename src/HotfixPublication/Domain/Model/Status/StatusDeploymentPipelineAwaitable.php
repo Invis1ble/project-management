@@ -53,6 +53,10 @@ abstract readonly class StatusDeploymentPipelineAwaitable extends AbstractStatus
             };
         }
 
+        if ($next->equals(new StatusDeploymentPipelineSuccess())) {
+            return;
+        }
+
         $this->setPublicationStatus($context, $next);
     }
 }

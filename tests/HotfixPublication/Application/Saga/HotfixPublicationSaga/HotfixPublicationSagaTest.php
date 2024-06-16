@@ -15,6 +15,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentJobInited;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsMerged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagCreated;
@@ -230,6 +231,42 @@ class HotfixPublicationSagaTest extends KernelTestCase
                     'created_at' => $tagCreatedAt->add(new \DateInterval('PT10M'))->format(DATE_RFC3339_EXTENDED),
                 ] + $playProductionJob),
             ),
+            $this->createPipelineResponse(
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                status: Status::WaitingForResource,
+                createdAt: $tagCreatedAt,
+            ),
+            $this->createPipelineResponse(
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                status: Status::Preparing,
+                createdAt: $tagCreatedAt,
+            ),
+            $this->createPipelineResponse(
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                status: Status::Pending,
+                createdAt: $tagCreatedAt,
+            ),
+            $this->createPipelineResponse(
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                status: Status::Running,
+                createdAt: $tagCreatedAt,
+            ),
+            $this->createPipelineResponse(
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                status: Status::Success,
+                createdAt: $tagCreatedAt,
+            ),
+            $this->createPipelineResponse(
+                projectId: $backendProjectId,
+                projectName: $backendProjectName,
+                status: Status::Success,
+                createdAt: $tagCreatedAt,
+            ),
         ]);
 
         $handlerStack = HandlerStack::create($mock);
@@ -258,7 +295,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(31, $dispatchedEvents);
+        $this->assertCount(41, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -484,6 +521,76 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Job\JobId::from($deployJob['id']), $event->jobId);
         $this->assertObjectEquals(Job\Name::fromString($deployJobName), $event->name);
+
+        $this->assertArrayHasKey(31, $dispatchedEvents);
+        $event = $dispatchedEvents[31]->event;
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusDeploymentJobInited(), $event->status);
+        $this->assertObjectEquals(new StatusTagPipelineSuccess(), $event->previousStatus);
+        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(32, $dispatchedEvents);
+        $event = $dispatchedEvents[32]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertNull($event->previousStatus);
+        $this->assertObjectEquals(Status::WaitingForResource, $event->status);
+
+        $this->assertArrayHasKey(33, $dispatchedEvents);
+        $event = $dispatchedEvents[33]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Status::WaitingForResource, $event->status);
+
+        $this->assertArrayHasKey(34, $dispatchedEvents);
+        $event = $dispatchedEvents[34]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(Status::WaitingForResource, $event->previousStatus);
+        $this->assertObjectEquals(Status::Preparing, $event->status);
+
+        $this->assertArrayHasKey(35, $dispatchedEvents);
+        $event = $dispatchedEvents[35]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Status::Preparing, $event->status);
+
+        $this->assertArrayHasKey(36, $dispatchedEvents);
+        $event = $dispatchedEvents[36]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(Status::Preparing, $event->previousStatus);
+        $this->assertObjectEquals(Status::Pending, $event->status);
+
+        $this->assertArrayHasKey(37, $dispatchedEvents);
+        $event = $dispatchedEvents[37]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Status::Pending, $event->status);
+
+        $this->assertArrayHasKey(38, $dispatchedEvents);
+        $event = $dispatchedEvents[38]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(Status::Pending, $event->previousStatus);
+        $this->assertObjectEquals(Status::Running, $event->status);
+
+        $this->assertArrayHasKey(39, $dispatchedEvents);
+        $event = $dispatchedEvents[39]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Status::Running, $event->status);
+
+        $this->assertArrayHasKey(40, $dispatchedEvents);
+        $event = $dispatchedEvents[40]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(Status::Running, $event->previousStatus);
+        $this->assertObjectEquals(Status::Success, $event->status);
     }
 
     private function createPipelineResponse(
