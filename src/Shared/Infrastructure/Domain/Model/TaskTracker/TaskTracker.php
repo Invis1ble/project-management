@@ -141,11 +141,12 @@ readonly class TaskTracker implements TaskTrackerInterface
                 id: (int) $issue['id'],
                 key: $issue['key'],
                 typeId: $issue['fields']['issuetype']['id'],
+                subtask: $issue['fields']['issuetype']['subtask'],
                 summary: $issue['fields']['summary'],
                 sprints: $issue['fields']["customfield_$this->sprintFieldId"] ?? [],
             );
 
-            if ($issue->inActiveSprintOnBoard($this->sprintBoardId)) {
+            if (!$issue->subtask && $issue->inActiveSprintOnBoard($this->sprintBoardId)) {
                 $issues = $issues->append($issue);
             }
         }

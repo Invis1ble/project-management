@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     eight_points_guzzle.symfony_log_formatter.pattern: '{method} {uri} {code} {res_headers} {res_body}'
+    invis1ble_project_management.jira.sprint_filed_id: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
+    invis1ble_project_management.jira.transition_to_done: 'Closed'
 
 services:
     # default configuration for services in *this* file
@@ -147,10 +149,14 @@ services:
     Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         arguments:
             $httpClient: '@eight_points_guzzle.client.jira'
-            $sprintFieldId: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
+            $sprintFieldId: '%invis1ble_project_management.jira.sprint_filed_id%'
     
     Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
+        arguments:
+            $readyForPublishStatus: 'Ready for Publish'
+            $transitionToDoneName: '%invis1ble_project_management.jira.transition_to_done%'
+            $supportedIssueTypes: ['Hotfix']
     
     Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker

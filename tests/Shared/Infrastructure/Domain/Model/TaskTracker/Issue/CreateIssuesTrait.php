@@ -59,6 +59,7 @@ trait CreateIssuesTrait
                 id: Issue\IssueId::from(1),
                 key: Issue\Key::fromString($key),
                 typeId: Issue\TypeId::fromString('3'),
+                subtask: false,
                 summary: Issue\Summary::fromString($summary),
                 sprints: new Sprint\SprintList(
                     new Sprint\Sprint(

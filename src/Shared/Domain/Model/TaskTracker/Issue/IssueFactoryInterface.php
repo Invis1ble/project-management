@@ -10,6 +10,7 @@ interface IssueFactoryInterface
         int $id,
         string $key,
         string $typeId,
+        bool $subtask,
         string $summary,
         array $sprints,
     ): Issue;

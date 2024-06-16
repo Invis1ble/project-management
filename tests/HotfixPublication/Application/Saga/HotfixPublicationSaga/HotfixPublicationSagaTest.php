@@ -13,9 +13,11 @@ use Invis1ble\Messenger\Event\TraceableEventBus;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\TaskTracker\HotfixTransitionedToDone;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentJobInited;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestsMerged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusTagCreated;
@@ -32,6 +34,9 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Projec
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\State;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\MapMergeRequestsToMergeToMergedTrait;
 use Psr\Http\Message\UriFactoryInterface;
@@ -94,6 +99,29 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $playProductionJob = file_get_contents(__DIR__ . '/fixture/job/response/play_job.200.json');
         $playProductionJob = json_decode($playProductionJob, true);
+
+        $issues = file_get_contents(__DIR__ . '/fixture/issue/response/issues.200.json');
+        $issues = json_decode($issues, true);
+
+        $sprintFieldId = $container->getParameter('invis1ble_project_management.jira.sprint_filed_id');
+
+        $issues['issues'][0]['key'] = (string) $hotfixesArray[0]->key;
+        $issues['issues'][0]['fields'] = [
+            'summary' => (string) $hotfixesArray[0]->summary,
+            "customfield_$sprintFieldId" => [
+                [
+                    'boardId' => $container->get(BoardId::class)->value(),
+                    'name' => 'June 2024 1-2',
+                    'state' => State::Active->value,
+                ],
+            ],
+        ] + $issues['issues'][0]['fields'];
+
+        $issueTransitions = file_get_contents(__DIR__ . '/fixture/issue/response/issue_transitions.200.json');
+        $issueTransitions = json_decode($issueTransitions, true);
+
+        $transitionToDone = $container->getParameter('invis1ble_project_management.jira.transition_to_done');
+        $issueTransitions['transitions'][0]['name'] = $transitionToDone;
 
         $now = new \DateTimeImmutable();
         $frontendPipelineCreatedAt = $now;
@@ -272,6 +300,23 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $handlerStack = HandlerStack::create($mock);
         $container->set('eight_points_guzzle.client.gitlab', new Client(['handler' => $handlerStack]));
 
+        $mock = new MockHandler([
+            new Response(
+                status: 200,
+                body: json_encode($issues),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($issueTransitions),
+            ),
+            new Response(
+                status: 204,
+            ),
+        ]);
+
+        $handlerStack = HandlerStack::create($mock);
+        $container->set('eight_points_guzzle.client.jira', new Client(['handler' => $handlerStack]));
+
         $createPublicationCommand = new CreateHotfixPublicationCommand(
             tagName: $tagName,
             tagMessage: $tagMessage,
@@ -295,7 +340,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(41, $dispatchedEvents);
+        $this->assertCount(43, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -591,6 +636,19 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals(Status::Running, $event->previousStatus);
         $this->assertObjectEquals(Status::Success, $event->status);
+
+        $this->assertArrayHasKey(41, $dispatchedEvents);
+        $event = $dispatchedEvents[41]->event;
+        $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusDeploymentPipelineSuccess(), $event->status);
+        $this->assertObjectEquals(new StatusDeploymentJobInited(), $event->previousStatus);
+        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+
+        $this->assertArrayHasKey(42, $dispatchedEvents);
+        $event = $dispatchedEvents[42]->event;
+        $this->assertInstanceOf(HotfixTransitionedToDone::class, $event);
+        $this->assertObjectEquals($container->get(Project\Key::class), $event->projectKey);
+        $this->assertObjectEquals($hotfixesArray[0]->key, $event->key);
     }
 
     private function createPipelineResponse(

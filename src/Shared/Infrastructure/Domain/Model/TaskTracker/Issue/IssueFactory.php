@@ -24,6 +24,7 @@ final readonly class IssueFactory implements IssueFactoryInterface
         int $id,
         string $key,
         string $typeId,
+        bool $subtask,
         string $summary,
         array $sprints,
     ): Issue {
@@ -31,6 +32,7 @@ final readonly class IssueFactory implements IssueFactoryInterface
             id: IssueId::from($id),
             key: Key::fromString($key),
             typeId: TypeId::fromString($typeId),
+            subtask: $subtask,
             summary: Summary::fromString($summary),
             sprints: new SprintList(
                 ...array_map(
