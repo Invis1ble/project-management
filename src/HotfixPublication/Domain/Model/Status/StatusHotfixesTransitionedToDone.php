@@ -55,8 +55,10 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
             $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
             $next = new StatusMergeRequestsIntoDevelopCreated();
         } else {
-            $next = new StatusMergeRequestsIntoDevelopMerged();
+            $next = new StatusDevelopBranchSynchronized();
         }
+
+        return;
 
         $this->setPublicationStatus($context, $next);
     }

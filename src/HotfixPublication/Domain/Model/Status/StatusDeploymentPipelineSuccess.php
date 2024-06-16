@@ -29,8 +29,6 @@ final readonly class StatusDeploymentPipelineSuccess extends AbstractStatus
     ): void {
         $taskTracker->transitionHotfixesToDone(...$context->hotfixes()->toKeys());
 
-        return;
-
         $this->setPublicationStatus($context, new StatusHotfixesTransitionedToDone());
     }
 
