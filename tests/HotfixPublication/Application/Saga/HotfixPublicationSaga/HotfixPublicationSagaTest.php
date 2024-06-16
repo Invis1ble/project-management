@@ -36,8 +36,8 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeli
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\State;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\MapMergeRequestsToMergeToMergedTrait;
@@ -364,7 +364,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
 
         $this->assertObjectEquals($createPublicationCommand->tagName, $publication->tagName());
         $this->assertObjectEquals($createPublicationCommand->tagMessage, $publication->tagMessage());
-//        $this->assertObjectEquals($expectedHotfixes, $publication->hotfixes());
+        // $this->assertObjectEquals($expectedHotfixes, $publication->hotfixes());
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
@@ -401,7 +401,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusMergeRequestsMerged(), $event->status);
         $this->assertObjectEquals(new StatusCreated(), $event->previousStatus);
-//        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
 
         $this->assertArrayHasKey(4, $dispatchedEvents);
         $event = $dispatchedEvents[4]->event;
@@ -486,7 +486,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusFrontendPipelineSuccess(), $event->status);
         $this->assertObjectEquals(new StatusMergeRequestsMerged(), $event->previousStatus);
-//        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
 
         $this->assertArrayHasKey(16, $dispatchedEvents);
         $event = $dispatchedEvents[16]->event;
@@ -500,7 +500,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusTagCreated(), $event->status);
         $this->assertObjectEquals(new StatusFrontendPipelineSuccess(), $event->previousStatus);
-//        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
 
         $this->assertArrayHasKey(18, $dispatchedEvents);
         $event = $dispatchedEvents[18]->event;
@@ -585,7 +585,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusTagPipelineSuccess(), $event->status);
         $this->assertObjectEquals(new StatusTagCreated(), $event->previousStatus);
-//        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
 
         $this->assertArrayHasKey(30, $dispatchedEvents);
         $event = $dispatchedEvents[30]->event;
@@ -600,7 +600,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusDeploymentJobInited(), $event->status);
         $this->assertObjectEquals(new StatusTagPipelineSuccess(), $event->previousStatus);
-//        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
 
         $this->assertArrayHasKey(32, $dispatchedEvents);
         $event = $dispatchedEvents[32]->event;
@@ -670,7 +670,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusDeploymentPipelineSuccess(), $event->status);
         $this->assertObjectEquals(new StatusDeploymentJobInited(), $event->previousStatus);
-//        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
 
         $this->assertArrayHasKey(42, $dispatchedEvents);
         $event = $dispatchedEvents[42]->event;
@@ -683,7 +683,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusHotfixesTransitionedToDone(), $event->status);
         $this->assertObjectEquals(new StatusDeploymentPipelineSuccess(), $event->previousStatus);
-//        $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
+        // $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
 
         $this->assertArrayHasKey(44, $dispatchedEvents);
         $event = $dispatchedEvents[44]->event;
