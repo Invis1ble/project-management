@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\Status;
 
-use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Context;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFactory;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
@@ -28,7 +27,7 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
 
         return StatusFactory::createStatus(
             name: Dictionary::from($name),
-            context: new Context($context),
+            context: $context,
         );
     }
 

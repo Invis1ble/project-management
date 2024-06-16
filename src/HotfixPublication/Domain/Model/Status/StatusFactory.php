@@ -6,7 +6,7 @@ namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status;
 
 final class StatusFactory
 {
-    public static function createStatus(Dictionary $name, Context $context): StatusInterface
+    public static function createStatus(Dictionary $name, ?array $context): StatusInterface
     {
         $statusFqcn = __NAMESPACE__ . "\Status$name->name";
 

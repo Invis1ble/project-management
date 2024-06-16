@@ -7,7 +7,6 @@ namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Do
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\StringType;
-use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Context;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusFactory;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInterface;
@@ -33,7 +32,7 @@ final class StatusType extends StringType
 
             return StatusFactory::createStatus(
                 name: Dictionary::from($name),
-                context: new Context($context),
+                context: $context,
             );
         } catch (\Throwable $e) {
             throw ConversionException::conversionFailed($value, self::NAME, $e);
