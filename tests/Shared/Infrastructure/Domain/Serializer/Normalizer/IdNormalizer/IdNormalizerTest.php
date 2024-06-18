@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer\Normalizer\IdNormalizer;
 
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer\SerializerAwareTestCase;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializerAwareTestCase;
 
 class IdNormalizerTest extends SerializerAwareTestCase
 {

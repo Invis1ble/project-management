@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MapMergeRequestsToMergedTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MapMergeRequestsToMergedTrait;
 
 trait MapMergeRequestsToMergeToMergedTrait
 {

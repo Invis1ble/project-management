@@ -6,8 +6,8 @@ namespace Invis1ble\ProjectManagement\Tests\HotfixPublication\Application\UseCas
 
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer\SerializationTestCase;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializationTestCase;
 use Psr\Http\Message\UriFactoryInterface;
 
 /**

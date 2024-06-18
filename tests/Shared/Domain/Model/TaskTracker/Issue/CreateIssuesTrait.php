@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue;
+namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint;
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\CreateMergeRequestsTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\CreateMergeRequestsTrait;
 use Psr\Http\Message\UriFactoryInterface;
 
 trait CreateIssuesTrait

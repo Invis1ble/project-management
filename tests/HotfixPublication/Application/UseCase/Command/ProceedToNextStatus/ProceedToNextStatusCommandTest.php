@@ -7,12 +7,12 @@ namespace Invis1ble\ProjectManagement\Tests\HotfixPublication\Application\UseCas
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer\SerializationTestCase;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializationTestCase;
 
 /**
  * @extends SerializationTestCase<ProceedToNextStatusCommand>
  */
-class ProceedToNextStatusTest extends SerializationTestCase
+class ProceedToNextStatusCommandTest extends SerializationTestCase
 {
     protected function createObject(): ProceedToNextStatusCommand
     {

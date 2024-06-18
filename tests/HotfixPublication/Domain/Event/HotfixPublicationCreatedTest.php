@@ -8,8 +8,8 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
-use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer\SerializationTestCase;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializationTestCase;
 use Psr\Http\Message\UriFactoryInterface;
 
 /**

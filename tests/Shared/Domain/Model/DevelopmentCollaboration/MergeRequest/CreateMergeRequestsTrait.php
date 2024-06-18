@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest;
+namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;

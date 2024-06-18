@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer;
+namespace Invis1ble\ProjectManagement\Tests\Shared\Domain;
 
 /**
  * @template T
