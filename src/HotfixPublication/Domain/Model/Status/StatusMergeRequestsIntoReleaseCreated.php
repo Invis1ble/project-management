@@ -9,6 +9,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskT
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
@@ -23,8 +24,11 @@ final readonly class StatusMergeRequestsIntoReleaseCreated extends AbstractStatu
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
+        UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         $hotfixes = new IssueList(
@@ -37,7 +41,7 @@ final readonly class StatusMergeRequestsIntoReleaseCreated extends AbstractStatu
         );
 
         $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
-        $this->setPublicationStatus($context, new StatusMergeRequestsIntoDevelopMerged());
+        $this->setPublicationStatus($context, new StatusReleaseBranchSynchronized());
     }
 
     public function __toString(): string

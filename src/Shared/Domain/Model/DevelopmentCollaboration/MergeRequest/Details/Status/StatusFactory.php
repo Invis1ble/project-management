@@ -8,7 +8,7 @@ final class StatusFactory
 {
     public static function createStatus(Dictionary $status): StatusInterface
     {
-        $statusFqcn = "Status$status->name";
+        $statusFqcn = __NAMESPACE__ . "\Status$status->name";
 
         return new $statusFqcn();
     }

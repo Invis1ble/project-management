@@ -14,13 +14,13 @@ final readonly class HotfixPublicationStatusChanged extends AbstractHotfixPublic
         HotfixPublicationId $id,
         StatusInterface $status,
         public StatusInterface $previousStatus,
-        IssueList $readyToMergeTasks,
+        IssueList $hotfixes,
         \DateTimeImmutable $createdAt,
     ) {
         parent::__construct(
             $id,
             $status,
-            $readyToMergeTasks,
+            $hotfixes,
             $createdAt,
         );
     }

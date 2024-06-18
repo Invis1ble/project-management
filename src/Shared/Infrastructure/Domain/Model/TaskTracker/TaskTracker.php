@@ -38,6 +38,7 @@ readonly class TaskTracker implements TaskTrackerInterface
 
     public function latestRelease(): ?Version\Version
     {
+        // {@link} https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-project-versions/#api-rest-api-3-project-projectidorkey-version-get
         $request = $this->requestFactory->createRequest(
             'GET',
             $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
@@ -50,7 +51,7 @@ readonly class TaskTracker implements TaskTrackerInterface
             ->getBody()
             ->getContents();
 
-        $releases = json_decode($content, true)['values'];
+        $versions = json_decode($content, true)['values'];
 
         $heap = new class() extends \SplMaxHeap {
             /**
@@ -64,7 +65,7 @@ readonly class TaskTracker implements TaskTrackerInterface
             }
         };
 
-        foreach ($releases as $release) {
+        foreach ($versions as $release) {
             try {
                 Name::fromString($release['name']);
             } catch (\InvalidArgumentException) {
@@ -141,11 +142,12 @@ readonly class TaskTracker implements TaskTrackerInterface
                 id: (int) $issue['id'],
                 key: $issue['key'],
                 typeId: $issue['fields']['issuetype']['id'],
+                subtask: $issue['fields']['issuetype']['subtask'],
                 summary: $issue['fields']['summary'],
                 sprints: $issue['fields']["customfield_$this->sprintFieldId"] ?? [],
             );
 
-            if ($issue->inActiveSprintOnBoard($this->sprintBoardId)) {
+            if (!$issue->subtask && $issue->inActiveSprintOnBoard($this->sprintBoardId)) {
                 $issues = $issues->append($issue);
             }
         }
@@ -187,7 +189,7 @@ readonly class TaskTracker implements TaskTrackerInterface
                 foreach ($data['detail'] as $detail) {
                     foreach ($detail['pullRequests'] ?? [] as $pullRequest) {
                         yield $this->mergeRequestFactory->createMergeRequest(
-                            id: (int) explode('!', (string) $pullRequest['id'])[1],
+                            id: (int) explode('!', (string) $pullRequest['id'], 3)[1],
                             title: $pullRequest['name'],
                             projectId: (int) $pullRequest['repositoryId'],
                             projectName: $pullRequest['repositoryName'],
@@ -195,6 +197,7 @@ readonly class TaskTracker implements TaskTrackerInterface
                             targetBranchName: $pullRequest['destination']['branch'],
                             status: $pullRequest['status'],
                             guiUrl: $pullRequest['url'],
+                            detailedMergeStatus: null,
                         );
                     }
                 }

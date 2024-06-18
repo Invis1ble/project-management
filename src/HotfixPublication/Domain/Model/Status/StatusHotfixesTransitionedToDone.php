@@ -9,6 +9,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskT
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
@@ -24,8 +25,11 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
+        UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
         $hasNewMergeRequestToMerge = false;
@@ -53,7 +57,7 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
             $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
             $next = new StatusMergeRequestsIntoDevelopCreated();
         } else {
-            $next = new StatusMergeRequestsIntoDevelopMerged();
+            $next = new StatusDevelopBranchSynchronized();
         }
 
         $this->setPublicationStatus($context, $next);

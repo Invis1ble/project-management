@@ -40,6 +40,7 @@ final class IssueListType extends JsonType
                     'id' => $issue->id->value(),
                     'key' => (string) $issue->key,
                     'type_id' => (string) $issue->typeId,
+                    'subtask' => $issue->subtask,
                     'summary' => (string) $issue->summary,
                     'sprints' => array_map(
                         fn (Sprint $sprint): array => [
@@ -74,6 +75,7 @@ final class IssueListType extends JsonType
                     id: IssueId::from($issue['id']),
                     key: Key::fromString($issue['key']),
                     typeId: TypeId::fromString($issue['type_id']),
+                    subtask: $issue['subtask'],
                     summary: Summary::fromString($issue['summary']),
                     sprints: new SprintList(...array_map(fn (array $sprint): Sprint => new Sprint(
                         boardId: BoardId::from($sprint['board_id']),

@@ -22,16 +22,49 @@ final class StatusType extends StringType
         }
 
         try {
-            return StatusFactory::createStatus(Dictionary::from($value));
+            if (is_string($value)) {
+                $name = $value;
+                $context = null;
+            } else {
+                $name = $value['name'];
+                $context = $value['context'] ?? null;
+            }
+
+            return StatusFactory::createStatus(
+                name: Dictionary::from($name),
+                context: $context,
+            );
         } catch (\Throwable $e) {
             throw ConversionException::conversionFailed($value, self::NAME, $e);
         }
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): string
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): array|string
     {
-        if ($value instanceof StatusInterface || (is_string($value) && null !== Dictionary::tryFrom($value))) {
-            return (string) $value;
+        if ($value instanceof StatusInterface) {
+            $context = $value->context()
+                ->toArray();
+
+            if (null === $context) {
+                return (string) $value;
+            }
+
+            return json_encode([
+                'name' => (string) $value,
+                'context' => $context,
+            ]);
+        }
+
+        if (is_string($value)) {
+            if (null !== Dictionary::tryFrom($value)) {
+                return (string) $value;
+            }
+
+            $value = json_decode($value, true);
+        }
+
+        if (is_array($value) && isset($value['name'])) {
+            return $value;
         }
 
         throw ConversionException::conversionFailed($value, self::NAME);

@@ -33,6 +33,8 @@ jobs:
       -
         name: Start services
         run: docker compose --verbose up --wait --no-build
+        env:
+          XDEBUG_MODE: coverage
       -
         name: Check HTTP reachability
         run: curl -v --fail-with-body http://localhost

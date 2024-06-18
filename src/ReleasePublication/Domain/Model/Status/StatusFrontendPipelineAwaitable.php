@@ -22,11 +22,15 @@ abstract readonly class StatusFrontendPipelineAwaitable extends AbstractStatus
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
         $pipeline = $frontendCiClient->awaitLatestPipeline(
             ref: $context->branchName(),
             createdAfter: $context->createdAt(),
+            maxAwaitingTime: $pipelineMaxAwaitingTime,
+            tickInterval: $pipelineTickInterval,
         );
 
         if (null === $pipeline) {

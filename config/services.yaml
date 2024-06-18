@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     eight_points_guzzle.symfony_log_formatter.pattern: '{method} {uri} {code} {res_headers} {res_body}'
+    invis1ble_project_management.jira.sprint_filed_id: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
+    invis1ble_project_management.jira.transition_to_done: 'Closed'
 
 services:
     # default configuration for services in *this* file
@@ -12,17 +14,19 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            Psr\Http\Message\UriInterface $jiraUrl: '@release_management.jira_url'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $backendProjectId: '@release_management.gitlab_project.backend'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $frontendProjectId: '@release_management.gitlab_project.frontend'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $backendSourceCodeRepository: '@release_management.gitlab_backend_client'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $frontendSourceCodeRepository: '@release_management.gitlab_frontend_client'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface $frontendCiClient: '@release_management.gitlab_frontend_client'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface $backendCiClient: '@release_management.gitlab_backend_client'
+            Psr\Http\Message\UriInterface $jiraUrl: '@invis1ble_project_management.jira_url'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $backendProjectId: '@invis1ble_project_management.gitlab_project.backend'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $frontendProjectId: '@invis1ble_project_management.gitlab_project.frontend'
+            DateInterval $pipelineMaxAwaitingTime: '@invis1ble_project_management.pipeline_max_awaiting_time'
+            DateInterval $pipelineTickInterval: '@invis1ble_project_management.pipeline_tick_interval'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $backendSourceCodeRepository: '@invis1ble_project_management.gitlab_backend_client'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $frontendSourceCodeRepository: '@invis1ble_project_management.gitlab_frontend_client'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface $frontendCiClient: '@invis1ble_project_management.gitlab_frontend_client'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface $backendCiClient: '@invis1ble_project_management.gitlab_backend_client'
     _instanceof:
         # services whose classes are instances of CustomInterface will be tagged automatically
         Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface:
-            tags: ['release_management.development_collaboration.merge_request_manager']
+            tags: ['invis1ble_project_management.development_collaboration.merge_request_manager']
 
 
 
@@ -32,6 +36,12 @@ services:
         class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
         tags:
             - { name: serializer.normalizer, priority: -930 }
+
+    serializer.normalizer.datetime:
+        class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+        arguments:
+            $defaultContext:
+                datetime_format: 'Y-m-d H:i:s.u'
 
     invis1ble_project_management.normalizer.string:
         class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\StringNormalizer
@@ -88,17 +98,17 @@ services:
     
     
     
-    release_management.jira_url:
+    invis1ble_project_management.jira_url:
         class: Psr\Http\Message\UriInterface
         factory: ['@Psr\Http\Message\UriFactoryInterface', 'createUri']
         arguments: ['%env(JIRA_URL)%']
     
-    release_management.gitlab_project.backend:
+    invis1ble_project_management.gitlab_project.backend:
         class: Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId
         arguments:
             $value: '%env(GITLAB_BACKEND_PROJECT_ID)%'
 
-    release_management.gitlab_project.frontend:
+    invis1ble_project_management.gitlab_project.frontend:
         class: Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId
         arguments:
             $value: '%env(GITLAB_FRONTEND_PROJECT_ID)%'
@@ -110,36 +120,63 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId:
         arguments:
             $value: '%env(JIRA_SPRINT_BOARD_ID)%'
+    
+    invis1ble_project_management.pipeline_max_awaiting_time:
+        class: DateInterval
+        arguments:
+            $duration: '%env(PIPELINE_MAX_AWAITING_TIME)%'
+    
+    invis1ble_project_management.pipeline_tick_interval:
+        class: DateInterval
+        arguments:
+            $duration: '%env(PIPELINE_TICK_INTERVAL)%'
 
 
 
     
-    release_management.gitlab_backend_client:
+    invis1ble_project_management.gitlab_backend_client:
         class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Gitlab\GitlabClient
         arguments:
             $httpClient: '@eight_points_guzzle.client.gitlab'
-            $projectId: '@release_management.gitlab_project.backend'
+            $projectId: '@invis1ble_project_management.gitlab_project.backend'
     
-    release_management.gitlab_frontend_client:
+    invis1ble_project_management.gitlab_frontend_client:
         class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Gitlab\GitlabClient
         arguments:
             $httpClient: '@eight_points_guzzle.client.gitlab'
-            $projectId: '@release_management.gitlab_project.frontend'
+            $projectId: '@invis1ble_project_management.gitlab_project.frontend'
     
     Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         arguments:
             $httpClient: '@eight_points_guzzle.client.jira'
-            $sprintFieldId: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
+            $sprintFieldId: '%invis1ble_project_management.jira.sprint_filed_id%'
     
     Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
+        arguments:
+            $readyForPublishStatus: 'Ready for Publish'
+            $transitionToDoneName: '%invis1ble_project_management.jira.transition_to_done%'
+            $supportedIssueTypes: ['Hotfix']
     
     Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
     
     Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerStack:
         arguments:
-            - !tagged_iterator release_management.development_collaboration.merge_request_manager
+            - !tagged_iterator invis1ble_project_management.development_collaboration.merge_request_manager
+    
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory:
+        arguments: ['%env(EXTRA_DEPLOY_BRANCH_NAME)%']
+    
+    invis1ble_project_management.extra_deploy_branch_name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name
+        factory: ['@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory', 'createExtraDeployBranchName']
+    
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactory:
+        bind:
+            Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId: '@invis1ble_project_management.gitlab_project.backend'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name: '@invis1ble_project_management.extra_deploy_branch_name'
+
 
 
 
@@ -152,6 +189,7 @@ services:
     
     
     
+    Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Project\ProjectResolver'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactory'
@@ -168,6 +206,7 @@ services:
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\ReleasePublicationFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Sprint\SprintFactory'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository\ReleasePublicationRepository'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker'

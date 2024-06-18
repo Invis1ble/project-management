@@ -1,5 +1,5 @@
 Project Management
-===============================
+==================
 
 ![CI Status](https://github.com/Invis1ble/project-management/actions/workflows/ci.yml/badge.svg?event=push)
 [![codecov](https://codecov.io/gh/Invis1ble/project-management/graph/badge.svg?token=296M82SE17)](https://codecov.io/gh/Invis1ble/project-management)

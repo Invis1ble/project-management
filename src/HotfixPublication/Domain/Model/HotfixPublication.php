@@ -12,10 +12,12 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractAggregateRoot;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Psr\Clock\ClockInterface;
 
 class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicationInterface
 {
@@ -23,8 +25,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         private readonly HotfixPublicationId $id,
         private readonly Tag\VersionName $tagName,
         private readonly Tag\Message $tagMessage,
-        private readonly StatusInterface $status,
-        private readonly IssueList $hotfixes,
+        private StatusInterface $status,
+        private IssueList $hotfixes,
         private readonly \DateTimeImmutable $createdAt,
     ) {
     }
@@ -33,6 +35,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         Tag\VersionName $tagName,
         Tag\Message $tagMessage,
         IssueList $hotfixes,
+        ClockInterface $clock,
     ): self {
         if ($hotfixes->empty()) {
             throw new \InvalidArgumentException('No hotfixes provided');
@@ -44,7 +47,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             tagMessage: $tagMessage,
             status: new StatusCreated(),
             hotfixes: $hotfixes,
-            createdAt: new \DateTimeImmutable(),
+            createdAt: $clock->now(),
         );
 
         $hotfix->raiseDomainEvent(new HotfixPublicationCreated(
@@ -64,8 +67,11 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
+        UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
     ): void {
         $this->status->proceedToNext(
             mergeRequestManager: $mergeRequestManager,
@@ -74,8 +80,11 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             frontendCiClient: $frontendCiClient,
             backendCiClient: $backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
+            updateExtraDeployBranchMergeRequestFactory: $updateExtraDeployBranchMergeRequestFactory,
             taskTracker: $taskTracker,
             projectResolver: $projectResolver,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+            pipelineTickInterval: $pipelineTickInterval,
             context: $this,
         );
     }

@@ -21,6 +21,8 @@ final readonly class StatusBackendBranchCreated extends AbstractStatus
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
         $taskTracker->renameReleaseCandidate($context->branchName());

@@ -10,6 +10,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublic
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
@@ -23,8 +24,11 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
         private ContinuousIntegrationClientInterface $frontendCiClient,
         private ContinuousIntegrationClientInterface $backendCiClient,
         private SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
+        private UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
         private TaskTrackerInterface $taskTracker,
         private ProjectResolverInterface $projectResolver,
+        private \DateInterval $pipelineMaxAwaitingTime,
+        private \DateInterval $pipelineTickInterval,
     ) {
         parent::__construct($repository);
     }
@@ -40,8 +44,11 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
             frontendCiClient: $this->frontendCiClient,
             backendCiClient: $this->backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $this->setFrontendApplicationBranchNameCommitFactory,
+            updateExtraDeployBranchMergeRequestFactory: $this->updateExtraDeployBranchMergeRequestFactory,
             taskTracker: $this->taskTracker,
             projectResolver: $this->projectResolver,
+            pipelineMaxAwaitingTime: $this->pipelineMaxAwaitingTime,
+            pipelineTickInterval: $this->pipelineTickInterval,
         );
 
         $this->storeHotfixPublication($hotfixPublication);

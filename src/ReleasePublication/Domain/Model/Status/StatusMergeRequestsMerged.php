@@ -22,6 +22,8 @@ final readonly class StatusMergeRequestsMerged extends AbstractStatus
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         TaskTrackerInterface $taskTracker,
+        \DateInterval $pipelineMaxAwaitingTime,
+        \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
         $frontendSourceCodeRepository->createBranch($context->branchName(), Name::fromString('develop'));
