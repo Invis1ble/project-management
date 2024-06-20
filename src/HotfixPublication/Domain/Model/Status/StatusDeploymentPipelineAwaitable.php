@@ -30,7 +30,7 @@ abstract readonly class StatusDeploymentPipelineAwaitable extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
-        $pipeline = $frontendCiClient->awaitLatestPipeline(
+        $pipeline = $backendCiClient->awaitLatestPipeline(
             ref: $context->tagName(),
             createdAfter: $context->createdAt(),
             maxAwaitingTime: $pipelineMaxAwaitingTime,
