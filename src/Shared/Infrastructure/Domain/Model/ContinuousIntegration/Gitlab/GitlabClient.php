@@ -451,7 +451,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $request = $this->requestFactory->createRequest(
             'PUT',
-            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId/merge"),
         );
 
         $content = $this->httpClient->sendRequest($request)
