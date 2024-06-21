@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use GuzzleRetry\GuzzleRetryMiddleware;
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Event\TraceableEventBus;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
@@ -180,6 +181,12 @@ CONFIG;
                 targetBranchName: $frontendMrToMerge->targetBranchName,
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
+            new Response(
+                status: 403,
+                body: json_encode([
+                    'message' => '403 Forbidden',
+                ]),
+            ),
             $this->createPipelineResponse(
                 projectId: $frontendProjectId,
                 projectName: $frontendProjectName,
@@ -227,6 +234,12 @@ CONFIG;
                     'message' => (string) $tagMessage,
                     'created_at' => $tagCreatedAt->format(DATE_RFC3339_EXTENDED),
                 ] + $tag),
+            ),
+            new Response(
+                status: 403,
+                body: json_encode([
+                    'message' => '403 Forbidden',
+                ]),
             ),
             $this->createPipelineResponse(
                 projectId: $backendProjectId,
@@ -282,6 +295,12 @@ CONFIG;
                     'ref' => $tag['commit']['id'],
                     'created_at' => $tagCreatedAt->add(new \DateInterval('PT10M'))->format(DATE_RFC3339_EXTENDED),
                 ] + $playProductionJob),
+            ),
+            new Response(
+                status: 403,
+                body: json_encode([
+                    'message' => '403 Forbidden',
+                ]),
             ),
             $this->createPipelineResponse(
                 projectId: $backendProjectId,
@@ -417,10 +436,14 @@ CONFIG;
                 targetBranchName: $updateExtraDeployBranchMrTargetBranchName,
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
+            new \RuntimeException('Empty response stack'),
         ]);
 
-        $handlerStack = HandlerStack::create($mock);
-        $container->set('eight_points_guzzle.client.gitlab', new Client(['handler' => $handlerStack]));
+        /** @var Client $httpClient */
+        $httpClient = $container->get('eight_points_guzzle.client.gitlab');
+        /** @var HandlerStack $handlerStack */
+        $handlerStack = $httpClient->getConfig('handler');
+        $handlerStack->setHandler($mock);
 
         $mock = new MockHandler([
             new Response(
@@ -473,6 +496,7 @@ CONFIG;
         $this->assertObjectEquals($createPublicationCommand->tagName, $publication->tagName());
         $this->assertObjectEquals($createPublicationCommand->tagMessage, $publication->tagMessage());
         $this->assertObjectEquals($expectedHotfixes, $publication->hotfixes());
+        $this->assertObjectEquals(new StatusDone(), $publication->status());
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 

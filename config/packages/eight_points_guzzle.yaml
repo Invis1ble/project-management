@@ -11,6 +11,9 @@ eight_points_guzzle:
 #                debug: '%kernel.debug%'
                 headers:
                     Authorization: 'Bearer %env(GITLAB_ACCESS_TOKEN)%'
+            plugin:
+                retry:
+                    retry_on_status: [403, 429, 503]
         jira:
             base_url: '%env(JIRA_URL)%'
             options:
@@ -18,3 +21,5 @@ eight_points_guzzle:
                 auth:
                     - '%env(JIRA_USERNAME)%'
                     - '%env(JIRA_ACCESS_TOKEN)%'
+            plugin:
+                retry: ~

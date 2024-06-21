@@ -22,6 +22,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.1",
         "eightpoints/guzzle-bundle": "^8.5",
+        "eugenganshorn/guzzle-bundle-retry-plugin": "dev-patch-1",
         "invis1ble/messenger-bundle": "^6.0",
         "invis1ble/serializer-extension-bundle": "^1.0",
         "phpdocumentor/reflection-docblock": "^5.4",
@@ -53,6 +54,12 @@
         "symfony/stopwatch": "7.0.*",
         "symfony/web-profiler-bundle": "7.0.*"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/BafS/GuzzleBundleRetryPlugin"
+        }
+    ],
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
