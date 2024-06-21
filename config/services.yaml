@@ -6,7 +6,7 @@
 parameters:
     eight_points_guzzle.symfony_log_formatter.pattern: '{method} {uri} {code} {res_headers} {res_body}'
     invis1ble_project_management.jira.sprint_filed_id: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
-    invis1ble_project_management.jira.transition_to_done: 'Closed'
+    invis1ble_project_management.jira.hotfix_transition_to_done: '%env(JIRA_HOTFIX_TRANSITION_TO_DONE_NAME)%'
 
 services:
     # default configuration for services in *this* file
@@ -155,7 +155,7 @@ services:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
         arguments:
             $readyForPublishStatus: 'Ready for Publish'
-            $transitionToDoneName: '%invis1ble_project_management.jira.transition_to_done%'
+            $transitionToDoneName: '%invis1ble_project_management.jira.hotfix_transition_to_done%'
             $supportedIssueTypes: ['Hotfix']
     
     Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
