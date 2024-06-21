@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details;
 
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\Dictionary;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface;
 
 final readonly class DetailsFactory implements DetailsFactoryInterface
@@ -16,7 +17,7 @@ final readonly class DetailsFactory implements DetailsFactoryInterface
         string $status,
     ): Details {
         return new Details(
-            status: $this->statusFactory->createStatus($status),
+            status: $this->statusFactory->createStatus(Dictionary::from($status)),
         );
     }
 }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status;
 
-final readonly class StatusChecking extends AbstractMayBeMergeableStatus
+abstract readonly class AbstractMayBeMergeableStatus extends AbstractStatus
 {
-    public function __toString(): string
+    public function mayBeMergeable(): bool
     {
-        return Dictionary::Checking->value;
+        return true;
     }
 }

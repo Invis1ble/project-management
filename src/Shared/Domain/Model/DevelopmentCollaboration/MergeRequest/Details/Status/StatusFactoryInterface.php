@@ -6,5 +6,5 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 
 interface StatusFactoryInterface
 {
-    public function createStatus(string $status): StatusInterface;
+    public function createStatus(Dictionary $name): StatusInterface;
 }

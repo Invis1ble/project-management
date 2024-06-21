@@ -6,6 +6,8 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 
 enum Dictionary: string
 {
+    case ApprovalSyncing = 'approvals_syncing';
+
     case BlockedStatus = 'blocked_status';
 
     case Checking = 'checking';
@@ -35,4 +37,6 @@ enum Dictionary: string
     case Conflict = 'conflict';
 
     case RequestedChanges = 'requested_changes';
+
+    case Preparing = 'preparing';
 }

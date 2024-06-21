@@ -130,7 +130,7 @@ class HotfixPublicationSagaTest extends KernelTestCase
         $issueTransitions = file_get_contents(__DIR__ . '/fixture/issue/response/issue_transitions.200.json');
         $issueTransitions = json_decode($issueTransitions, true);
 
-        $transitionToDone = $container->getParameter('invis1ble_project_management.jira.transition_to_done');
+        $transitionToDone = $container->getParameter('invis1ble_project_management.jira.hotfix_transition_to_done');
         $issueTransitions['transitions'][0]['name'] = $transitionToDone;
 
         $versions = file_get_contents(__DIR__ . '/fixture/version/response/version.200.json');
