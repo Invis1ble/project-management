@@ -8,7 +8,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use GuzzleRetry\GuzzleRetryMiddleware;
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Event\TraceableEventBus;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
