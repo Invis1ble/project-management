@@ -84,10 +84,10 @@ readonly class TaskTracker implements TaskTrackerInterface
         return $this->versionFactory->createVersion(
             id: $release['id'],
             name: $release['name'],
-            description: $release['description'],
+            description: $release['description'] ?? null,
             archived: $release['archived'],
             released: $release['released'],
-            releaseDate: $release['releaseDate'],
+            releaseDate: $release['releaseDate'] ?? null,
         );
     }
 
