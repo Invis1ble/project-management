@@ -39,4 +39,6 @@ enum Dictionary: string
     case RequestedChanges = 'requested_changes';
 
     case Preparing = 'preparing';
+
+    case CommitsStatus = 'commits_status';
 }

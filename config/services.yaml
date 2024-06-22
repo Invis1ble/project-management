@@ -19,6 +19,8 @@ services:
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $frontendProjectId: '@invis1ble_project_management.gitlab_project.frontend'
             DateInterval $pipelineMaxAwaitingTime: '@invis1ble_project_management.pipeline_max_awaiting_time'
             DateInterval $pipelineTickInterval: '@invis1ble_project_management.pipeline_tick_interval'
+            DateInterval $mergeRequestMaxAwaitingTime: '@invis1ble_project_management.merge_request_max_awaiting_time'
+            DateInterval $mergeRequestTickInterval: '@invis1ble_project_management.merge_request_tick_interval'
             Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $backendSourceCodeRepository: '@invis1ble_project_management.gitlab_backend_client'
             Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $frontendSourceCodeRepository: '@invis1ble_project_management.gitlab_frontend_client'
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface $frontendCiClient: '@invis1ble_project_management.gitlab_frontend_client'
@@ -130,6 +132,16 @@ services:
         class: DateInterval
         arguments:
             $duration: '%env(PIPELINE_TICK_INTERVAL)%'
+    
+    invis1ble_project_management.merge_request_max_awaiting_time:
+        class: DateInterval
+        arguments:
+            $duration: '%env(MERGE_REQUEST_MAX_AWAITING_TIME)%'
+    
+    invis1ble_project_management.merge_request_tick_interval:
+        class: DateInterval
+        arguments:
+            $duration: '%env(MERGE_REQUEST_TICK_INTERVAL)%'
 
 
 

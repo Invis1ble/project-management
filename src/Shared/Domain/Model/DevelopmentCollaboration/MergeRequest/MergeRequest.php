@@ -10,7 +10,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Psr\Http\Message\UriInterface;
 
-final readonly class MergeRequest
+final readonly class MergeRequest implements \Stringable
 {
     public function __construct(
         public MergeRequestIid $iid,
@@ -109,6 +109,24 @@ final readonly class MergeRequest
         return $this->sourceBranchName->relevant($branchName);
     }
 
+    public function mayBeMergeable(): bool
+    {
+        if (null === $this->details) {
+            throw new \RuntimeException("Merge request $this details not set");
+        }
+
+        return $this->details->mayBeMergeable();
+    }
+
+    public function mergeable(): bool
+    {
+        if (null === $this->details) {
+            throw new \RuntimeException("Merge request $this details not set");
+        }
+
+        return $this->details->mergeable();
+    }
+
     public function equals(self $other): bool
     {
         return $this->iid->equals($other->iid)
@@ -121,5 +139,10 @@ final readonly class MergeRequest
             && (string) $this->guiUrl === (string) $other->guiUrl
             && $this->details?->equals($other->details)
         ;
+    }
+
+    public function __toString(): string
+    {
+        return "$this->projectName!$this->iid";
     }
 }
