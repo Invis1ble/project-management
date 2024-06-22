@@ -7,13 +7,13 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 interface MergeRequestFactoryInterface
 {
     public function createMergeRequest(
-        int $id,
+        int $iid,
         string $title,
         int $projectId,
         string $projectName,
         string $sourceBranchName,
         string $targetBranchName,
-        string $status,
+        ?string $status,
         string $guiUrl,
         ?string $detailedMergeStatus,
     ): MergeRequest;

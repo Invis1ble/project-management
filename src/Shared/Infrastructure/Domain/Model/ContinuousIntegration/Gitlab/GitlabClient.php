@@ -9,8 +9,11 @@ use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\Jo
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStuck;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestStatusChanged;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestStuck;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Branch\BranchCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Commit\CommitCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag\TagCreated;
@@ -51,6 +54,8 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         private MergeRequest\Details\DetailsFactoryInterface $detailsFactory,
         private EventBusInterface $eventBus,
         private ProjectId $projectId,
+        private ?\DateInterval $mergeRequestMaxAwaitingTime = new \DateInterval('PT1M'),
+        private ?\DateInterval $mergeRequestTickInterval = new \DateInterval('PT10S'),
     ) {
     }
 
@@ -72,8 +77,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             $tickInterval = new \DateInterval('PT10S');
         }
 
-        $now = new \DateTimeImmutable();
-        $tickIntervalInSeconds = $now->add($tickInterval)->getTimestamp() - $now->getTimestamp();
+        $tickIntervalInSeconds = $this->intervalToSeconds($tickInterval);
         $previousStatus = null;
 
         while (new \DateTimeImmutable() <= $untilTime) {
@@ -433,10 +437,13 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $this->eventBus->dispatch(new MergeRequestCreated(
             projectId: $mergeRequest->projectId,
-            mergeRequestId: $mergeRequest->id,
+            projectName: $mergeRequest->projectName,
+            mergeRequestIid: $mergeRequest->iid,
             title: $mergeRequest->title,
             sourceBranchName: $mergeRequest->sourceBranchName,
             targetBranchName: $mergeRequest->targetBranchName,
+            status: $mergeRequest->status,
+            guiUrl: $mergeRequest->guiUrl,
             details: $mergeRequest->details,
         ));
 
@@ -445,13 +452,92 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
     public function mergeMergeRequest(
         ProjectId $projectId,
-        MergeRequest\MergeRequestId $mergeRequestId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
     ): MergeRequest\MergeRequest {
         $this->assertSupportsProject($projectId);
 
+        $untilTime = (new \DateTimeImmutable())->add($this->mergeRequestMaxAwaitingTime);
+        $tickIntervalInSeconds = $this->intervalToSeconds($this->mergeRequestTickInterval);
+        $previousStatus = null;
+        $previousTaskTrackerStatus = null;
+
+        while (new \DateTimeImmutable() <= $untilTime) {
+            $mergeRequest = $this->mergeRequest(
+                projectId: $projectId,
+                mergeRequestIid: $mergeRequestIid,
+            );
+
+            if (null !== $previousStatus && !$mergeRequest->details->status->equals($previousStatus)) {
+                $this->eventBus->dispatch(new MergeRequestStatusChanged(
+                    projectId: $mergeRequest->projectId,
+                    projectName: $mergeRequest->projectName,
+                    mergeRequestIid: $mergeRequest->iid,
+                    title: $mergeRequest->title,
+                    sourceBranchName: $mergeRequest->sourceBranchName,
+                    targetBranchName: $mergeRequest->targetBranchName,
+                    previousStatus: $previousTaskTrackerStatus,
+                    status: $mergeRequest->status,
+                    guiUrl: $mergeRequest->guiUrl,
+                    previousDetails: $mergeRequest->details->withStatus($previousStatus),
+                    details: $mergeRequest->details,
+                    tickInterval: $this->mergeRequestTickInterval,
+                    maxAwaitingTime: $this->mergeRequestMaxAwaitingTime,
+                ));
+            }
+
+            if (!$mergeRequest->mayBeMergeable()) {
+                throw new \RuntimeException(
+                    "Merge request $mergeRequest with status {$mergeRequest->details?->status} may not be mergeable",
+                );
+            }
+
+            if ($mergeRequest->mergeable()) {
+                break;
+            }
+
+            $this->eventBus->dispatch(new MergeRequestAwaitingTick(
+                projectId: $mergeRequest->projectId,
+                projectName: $mergeRequest->projectName,
+                mergeRequestIid: $mergeRequest->iid,
+                title: $mergeRequest->title,
+                sourceBranchName: $mergeRequest->sourceBranchName,
+                targetBranchName: $mergeRequest->targetBranchName,
+                status: $mergeRequest->status,
+                guiUrl: $mergeRequest->guiUrl,
+                details: $mergeRequest->details,
+                tickInterval: $this->mergeRequestTickInterval,
+                maxAwaitingTime: $this->mergeRequestMaxAwaitingTime,
+            ));
+
+            sleep($tickIntervalInSeconds);
+
+            $previousStatus = $mergeRequest->details->status;
+            $previousTaskTrackerStatus = $mergeRequest->status;
+        }
+
+        if (!$mergeRequest->mergeable()) {
+            $this->eventBus->dispatch(new MergeRequestStuck(
+                projectId: $mergeRequest->projectId,
+                projectName: $mergeRequest->projectName,
+                mergeRequestIid: $mergeRequest->iid,
+                title: $mergeRequest->title,
+                sourceBranchName: $mergeRequest->sourceBranchName,
+                targetBranchName: $mergeRequest->targetBranchName,
+                status: $mergeRequest->status,
+                guiUrl: $mergeRequest->guiUrl,
+                details: $mergeRequest->details,
+                tickInterval: $this->mergeRequestTickInterval,
+                maxAwaitingTime: $this->mergeRequestMaxAwaitingTime,
+            ));
+
+            throw new \RuntimeException(
+                "Merge request $mergeRequest with status {$mergeRequest->details?->status} is not mergeable",
+            );
+        }
+
         $request = $this->requestFactory->createRequest(
             'PUT',
-            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestIid/merge"),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -464,10 +550,13 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $this->eventBus->dispatch(new MergeRequestMerged(
             projectId: $mergeRequest->projectId,
-            mergeRequestId: $mergeRequest->id,
+            projectName: $mergeRequest->projectName,
+            mergeRequestIid: $mergeRequest->iid,
             title: $mergeRequest->title,
             sourceBranchName: $mergeRequest->sourceBranchName,
             targetBranchName: $mergeRequest->targetBranchName,
+            status: $mergeRequest->status,
+            guiUrl: $mergeRequest->guiUrl,
             details: $mergeRequest->details,
         ));
 
@@ -479,15 +568,35 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         return $this->projectId->equals($projectId);
     }
 
+    public function mergeRequest(
+        ProjectId $projectId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
+    ): MergeRequest\MergeRequest {
+        $this->assertSupportsProject($projectId);
+
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestIid"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return $this->createMergeRequestObject($data, null);
+    }
+
     public function details(
         ProjectId $projectId,
-        MergeRequest\MergeRequestId $mergeRequestId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
     ): MergeRequest\Details\Details {
         $this->assertSupportsProject($projectId);
 
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestIid"),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -508,16 +617,16 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         }
     }
 
-    private function createMergeRequestObject(array $data, MergeRequest\Status $status): MergeRequest\MergeRequest
+    private function createMergeRequestObject(array $data, ?MergeRequest\Status $status): MergeRequest\MergeRequest
     {
         return $this->mergeRequestFactory->createMergeRequest(
-            id: $data['id'],
+            iid: $data['iid'],
             title: $data['title'],
             projectId: $data['project_id'],
             projectName: explode('!', (string) $data['references']['full'], 2)[0],
             sourceBranchName: $data['source_branch'],
             targetBranchName: $data['target_branch'],
-            status: $status->value,
+            status: $status?->value,
             guiUrl: $data['web_url'],
             detailedMergeStatus: $data['detailed_merge_status'],
         );
@@ -551,5 +660,12 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             committedAt: $data['committed_at'],
             guiUrl: $data['web_url'],
         );
+    }
+
+    private function intervalToSeconds(\DateInterval $interval): int
+    {
+        $now = new \DateTimeImmutable();
+
+        return $now->add($interval)->getTimestamp() - $now->getTimestamp();
     }
 }

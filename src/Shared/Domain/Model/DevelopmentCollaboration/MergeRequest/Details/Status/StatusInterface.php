@@ -6,6 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
 
 interface StatusInterface extends \Stringable
 {
@@ -17,6 +18,8 @@ interface StatusInterface extends \Stringable
         MergeRequestManagerInterface $mergeRequestManager,
         MergeRequest $context,
     ): MergeRequest;
+
+    public function toTaskTrackerStatus(): Status;
 
     public function equals(self $other): bool;
 }

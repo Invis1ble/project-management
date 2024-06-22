@@ -6,6 +6,6 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractId;
 
-final readonly class MergeRequestId extends AbstractId
+final readonly class MergeRequestIid extends AbstractId
 {
 }

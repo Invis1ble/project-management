@@ -8,7 +8,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Exception\UnsupportedProjectExcept
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestIid;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
@@ -45,29 +45,26 @@ final readonly class MergeRequestManagerStack implements MergeRequestManagerInte
         Branch\Name $sourceBranchName,
         Branch\Name $targetBranchName,
     ): MergeRequest {
-        foreach ($this->mergeRequestManagers as $manager) {
-            if ($manager->supports($projectId)) {
-                return $manager->createMergeRequest(
-                    projectId: $projectId,
-                    title: $title,
-                    sourceBranchName: $sourceBranchName,
-                    targetBranchName: $targetBranchName,
-                );
-            }
-        }
-
-        throw new UnsupportedProjectException($projectId);
+        return $this->delegate(
+            projectId: $projectId,
+            callback: fn (MergeRequestManagerInterface $manager): MergeRequest => $manager->createMergeRequest(
+                projectId: $projectId,
+                title: $title,
+                sourceBranchName: $sourceBranchName,
+                targetBranchName: $targetBranchName,
+            ),
+        );
     }
 
-    public function mergeMergeRequest(ProjectId $projectId, MergeRequestId $mergeRequestId): MergeRequest
+    public function mergeMergeRequest(ProjectId $projectId, MergeRequestIid $mergeRequestIid): MergeRequest
     {
-        foreach ($this->mergeRequestManagers as $manager) {
-            if ($manager->supports($projectId)) {
-                return $manager->mergeMergeRequest($projectId, $mergeRequestId);
-            }
-        }
-
-        throw new UnsupportedProjectException($projectId);
+        return $this->delegate(
+            projectId: $projectId,
+            callback: fn (MergeRequestManagerInterface $manager): MergeRequest => $manager->mergeMergeRequest(
+                projectId: $projectId,
+                mergeRequestIid: $mergeRequestIid,
+            ),
+        );
     }
 
     public function supports(ProjectId $projectId): bool
@@ -81,11 +78,35 @@ final readonly class MergeRequestManagerStack implements MergeRequestManagerInte
         return false;
     }
 
-    public function details(ProjectId $projectId, MergeRequestId $mergeRequestId): Details
+    public function mergeRequest(
+        ProjectId $projectId,
+        MergeRequestIid $mergeRequestIid,
+    ): MergeRequest {
+        return $this->delegate(
+            projectId: $projectId,
+            callback: fn (MergeRequestManagerInterface $manager): MergeRequest => $manager->mergeRequest(
+                projectId: $projectId,
+                mergeRequestIid: $mergeRequestIid,
+            ),
+        );
+    }
+
+    public function details(ProjectId $projectId, MergeRequestIid $mergeRequestIid): Details
+    {
+        return $this->delegate(
+            projectId: $projectId,
+            callback: fn (MergeRequestManagerInterface $manager): Details => $manager->details(
+                projectId: $projectId,
+                mergeRequestIid: $mergeRequestIid,
+            ),
+        );
+    }
+
+    private function delegate(ProjectId $projectId, callable $callback): mixed
     {
         foreach ($this->mergeRequestManagers as $manager) {
             if ($manager->supports($projectId)) {
-                return $manager->details($projectId, $mergeRequestId);
+                return $callback($manager, $projectId);
             }
         }
 

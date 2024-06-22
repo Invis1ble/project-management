@@ -23,8 +23,15 @@ final class StatusType extends StringType
 
         try {
             if (is_string($value)) {
-                $name = $value;
-                $context = null;
+                if (null === Dictionary::tryFrom($value)) {
+                    [
+                        'name' => $name,
+                        'context' => $context,
+                    ] = json_decode($value, true);
+                } else {
+                    $name = $value;
+                    $context = null;
+                }
             } else {
                 $name = $value['name'];
                 $context = $value['context'] ?? null;
@@ -57,7 +64,7 @@ final class StatusType extends StringType
 
         if (is_string($value)) {
             if (null !== Dictionary::tryFrom($value)) {
-                return (string) $value;
+                return $value;
             }
 
             $value = json_decode($value, true);

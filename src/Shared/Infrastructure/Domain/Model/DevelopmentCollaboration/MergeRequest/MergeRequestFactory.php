@@ -8,7 +8,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Projec
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestIid;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Title;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
@@ -23,26 +23,38 @@ final readonly class MergeRequestFactory implements MergeRequestFactoryInterface
     }
 
     public function createMergeRequest(
-        int $id,
+        int $iid,
         string $title,
         int $projectId,
         string $projectName,
         string $sourceBranchName,
         string $targetBranchName,
-        string $status,
+        ?string $status,
         string $guiUrl,
         ?string $detailedMergeStatus,
     ): MergeRequest {
+        if (null === $detailedMergeStatus) {
+            $details = null;
+        } else {
+            $details = $this->detailsFactory->createDetails($detailedMergeStatus);
+        }
+
+        if (null === $status) {
+            $status = $details?->status->toTaskTrackerStatus();
+        } else {
+            $status = Status::from($status);
+        }
+
         return new MergeRequest(
-            id: MergeRequestId::from($id),
+            iid: MergeRequestIid::from($iid),
             title: Title::fromString($title),
             projectId: Project\ProjectId::from($projectId),
             projectName: Project\Name::fromString($projectName),
             sourceBranchName: Branch\Name::fromString($sourceBranchName),
             targetBranchName: Branch\Name::fromString($targetBranchName),
-            status: Status::from($status),
+            status: $status,
             guiUrl: $this->uriFactory->createUri($guiUrl),
-            details: null === $detailedMergeStatus ? null : $this->detailsFactory->createDetails($detailedMergeStatus),
+            details: $details,
         );
     }
 }

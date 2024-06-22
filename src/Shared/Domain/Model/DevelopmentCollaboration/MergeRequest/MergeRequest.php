@@ -10,10 +10,10 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Psr\Http\Message\UriInterface;
 
-final readonly class MergeRequest
+final readonly class MergeRequest implements \Stringable
 {
     public function __construct(
-        public MergeRequestId $id,
+        public MergeRequestIid $iid,
         public Title $title,
         public Project\ProjectId $projectId,
         public Project\Name $projectName,
@@ -32,7 +32,7 @@ final readonly class MergeRequest
         }
 
         if (null === $this->details) {
-            throw new \RuntimeException("Merge request $this->id details not set");
+            throw new \RuntimeException("Merge request $this->iid details not set");
         }
 
         return $this->details->merge($mergeRequestManager, $this);
@@ -48,7 +48,7 @@ final readonly class MergeRequest
         }
 
         if (null === $this->details) {
-            throw new \RuntimeException("Merge request $this->id details not set");
+            throw new \RuntimeException("Merge request $this->iid details not set");
         }
 
         return $mergeRequestManager->createMergeRequest(
@@ -62,7 +62,7 @@ final readonly class MergeRequest
     public function withDetails(Details $details): self
     {
         return new self(
-            $this->id,
+            $this->iid,
             $this->title,
             $this->projectId,
             $this->projectName,
@@ -109,9 +109,27 @@ final readonly class MergeRequest
         return $this->sourceBranchName->relevant($branchName);
     }
 
+    public function mayBeMergeable(): bool
+    {
+        if (null === $this->details) {
+            throw new \RuntimeException("Merge request $this details not set");
+        }
+
+        return $this->details->mayBeMergeable();
+    }
+
+    public function mergeable(): bool
+    {
+        if (null === $this->details) {
+            throw new \RuntimeException("Merge request $this details not set");
+        }
+
+        return $this->details->mergeable();
+    }
+
     public function equals(self $other): bool
     {
-        return $this->id->equals($other->id)
+        return $this->iid->equals($other->iid)
             && $this->title->equals($other->title)
             && $this->projectId->equals($other->projectId)
             && $this->projectName->equals($other->projectName)
@@ -121,5 +139,10 @@ final readonly class MergeRequest
             && (string) $this->guiUrl === (string) $other->guiUrl
             && $this->details?->equals($other->details)
         ;
+    }
+
+    public function __toString(): string
+    {
+        return "$this->projectName!$this->iid";
     }
 }

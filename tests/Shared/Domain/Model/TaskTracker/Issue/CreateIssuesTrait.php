@@ -22,7 +22,7 @@ trait CreateIssuesTrait
         int $frontendProjectId = 2,
         string $projectName = 'my-group/my-project',
         string $summary = 'Fix terrible bug',
-        int $mergeRequestId = 4,
+        int $mergeRequestIid = 4,
         string $mergeRequestTargetBranchName = 'master',
         MergeRequest\Status $jiraStatus = MergeRequest\Status::Open,
         MergeRequest\Details\Status\Dictionary $gitlabStatus = MergeRequest\Details\Status\Dictionary::Mergeable,
@@ -43,7 +43,7 @@ trait CreateIssuesTrait
 
         $mergeRequestsToMerge = $this->createMergeRequests(
             uriFactory: $uriFactory,
-            id: $mergeRequestId,
+            id: $mergeRequestIid,
             backendProjectId: $backendProjectId,
             frontendProjectId: $frontendProjectId,
             projectName: $projectName,

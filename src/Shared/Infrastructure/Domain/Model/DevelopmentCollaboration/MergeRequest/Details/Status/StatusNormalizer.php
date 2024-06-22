@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status;
 
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\Dictionary;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusInterface;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\AbstractValueObjectNormalizer;
@@ -20,7 +21,7 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
         ?string $format = null,
         array $context = [],
     ): StatusInterface {
-        return $this->statusFactory->createStatus($data);
+        return $this->statusFactory->createStatus(Dictionary::from($data));
     }
 
     public function normalize(
