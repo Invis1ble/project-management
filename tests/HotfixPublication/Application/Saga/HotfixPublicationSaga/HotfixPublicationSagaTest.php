@@ -151,7 +151,7 @@ Deploy_react:
         _default: "v-1-0-0"
 CONFIG;
 
-        $updateExtraDeployBranchMrId = MergeRequest\MergeRequestId::from(12345);
+        $updateExtraDeployBranchMrId = MergeRequest\MergeRequestIid::from(12345);
         $updateExtraDeployBranchMrTitle = MergeRequest\Title::fromString('Update from develop');
         $updateExtraDeployBranchMrSourceBranchName = Branch\Name::fromString('develop');
         $updateExtraDeployBranchMrTargetBranchName = $container->get('invis1ble_project_management.extra_deploy_branch_name');
@@ -163,7 +163,7 @@ CONFIG;
 
         $mock = new MockHandler([
             $this->createMergeMergeRequestResponse(
-                mergeRequestId: $backendMrToMerge->id,
+                mergeRequestIid: $backendMrToMerge->iid,
                 projectId: $backendMrToMerge->projectId,
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
@@ -172,7 +172,7 @@ CONFIG;
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeMergeRequestResponse(
-                mergeRequestId: $frontendMrToMerge->id,
+                mergeRequestIid: $frontendMrToMerge->iid,
                 projectId: $frontendMrToMerge->projectId,
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
@@ -332,7 +332,7 @@ CONFIG;
                 createdAt: $tagCreatedAt,
             ),
             $this->createCreateMergeRequestResponse(
-                mergeRequestId: $backendMrToMerge->id,
+                mergeRequestIid: $backendMrToMerge->iid,
                 projectId: $backendMrToMerge->projectId,
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
@@ -341,7 +341,7 @@ CONFIG;
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createCreateMergeRequestResponse(
-                mergeRequestId: $frontendMrToMerge->id,
+                mergeRequestIid: $frontendMrToMerge->iid,
                 projectId: $frontendMrToMerge->projectId,
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
@@ -350,7 +350,7 @@ CONFIG;
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
             $this->createMergeMergeRequestResponse(
-                mergeRequestId: $backendMrToMerge->id,
+                mergeRequestIid: $backendMrToMerge->iid,
                 projectId: $backendMrToMerge->projectId,
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
@@ -359,7 +359,7 @@ CONFIG;
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeMergeRequestResponse(
-                mergeRequestId: $frontendMrToMerge->id,
+                mergeRequestIid: $frontendMrToMerge->iid,
                 projectId: $frontendMrToMerge->projectId,
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
@@ -368,7 +368,7 @@ CONFIG;
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
             $this->createCreateMergeRequestResponse(
-                mergeRequestId: $backendMrToMerge->id,
+                mergeRequestIid: $backendMrToMerge->iid,
                 projectId: $backendMrToMerge->projectId,
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
@@ -377,7 +377,7 @@ CONFIG;
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createCreateMergeRequestResponse(
-                mergeRequestId: $frontendMrToMerge->id,
+                mergeRequestIid: $frontendMrToMerge->iid,
                 projectId: $frontendMrToMerge->projectId,
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
@@ -386,7 +386,7 @@ CONFIG;
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
             $this->createMergeMergeRequestResponse(
-                mergeRequestId: $backendMrToMerge->id,
+                mergeRequestIid: $backendMrToMerge->iid,
                 projectId: $backendMrToMerge->projectId,
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
@@ -395,7 +395,7 @@ CONFIG;
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeMergeRequestResponse(
-                mergeRequestId: $frontendMrToMerge->id,
+                mergeRequestIid: $frontendMrToMerge->iid,
                 projectId: $frontendMrToMerge->projectId,
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
@@ -418,7 +418,7 @@ CONFIG;
                 ] + $commit),
             ),
             $this->createCreateMergeRequestResponse(
-                mergeRequestId: $updateExtraDeployBranchMrId,
+                mergeRequestIid: $updateExtraDeployBranchMrId,
                 projectId: $backendProjectId,
                 projectName: $backendProjectName,
                 title: $updateExtraDeployBranchMrTitle,
@@ -427,7 +427,7 @@ CONFIG;
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeMergeRequestResponse(
-                mergeRequestId: $updateExtraDeployBranchMrId,
+                mergeRequestIid: $updateExtraDeployBranchMrId,
                 projectId: $backendProjectId,
                 projectName: $backendProjectName,
                 title: $updateExtraDeployBranchMrTitle,
@@ -511,7 +511,7 @@ CONFIG;
         $event = $dispatchedEvents[1]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($expectedMrsToMerge[0]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[0]->iid, $event->mergeRequestIid);
         $this->assertObjectEquals($expectedMrsToMerge[0]->title, $event->title);
         $this->assertObjectEquals($expectedMrsToMerge[0]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[0]->targetBranchName, $event->targetBranchName);
@@ -521,7 +521,7 @@ CONFIG;
         $event = $dispatchedEvents[2]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($expectedMrsToMerge[1]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[1]->iid, $event->mergeRequestIid);
         $this->assertObjectEquals($expectedMrsToMerge[1]->title, $event->title);
         $this->assertObjectEquals($expectedMrsToMerge[1]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[1]->targetBranchName, $event->targetBranchName);
@@ -837,7 +837,7 @@ CONFIG;
         $event = $dispatchedEvents[47]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($expectedMrsToMerge[2]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->iid, $event->mergeRequestIid);
         $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
         $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
@@ -847,7 +847,7 @@ CONFIG;
         $event = $dispatchedEvents[48]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($expectedMrsToMerge[2]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[2]->iid, $event->mergeRequestIid);
         $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
         $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
@@ -887,7 +887,7 @@ CONFIG;
         $event = $dispatchedEvents[53]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($expectedMrsToMerge[4]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[4]->iid, $event->mergeRequestIid);
         $this->assertObjectEquals($expectedMrsToMerge[4]->title, $event->title);
         $this->assertObjectEquals($expectedMrsToMerge[4]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[4]->targetBranchName, $event->targetBranchName);
@@ -897,7 +897,7 @@ CONFIG;
         $event = $dispatchedEvents[54]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($expectedMrsToMerge[5]->id, $event->mergeRequestId);
+        $this->assertObjectEquals($expectedMrsToMerge[5]->iid, $event->mergeRequestIid);
         $this->assertObjectEquals($expectedMrsToMerge[5]->title, $event->title);
         $this->assertObjectEquals($expectedMrsToMerge[5]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[5]->targetBranchName, $event->targetBranchName);
@@ -942,7 +942,7 @@ CONFIG;
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusUpdateExtraDeployBranchMergeRequestCreated([
             'project_id' => $backendProjectId->value(),
-            'merge_request_id' => $updateExtraDeployBranchMrId->value(),
+            'merge_request_iid' => $updateExtraDeployBranchMrId->value(),
         ]), $event->status);
         $this->assertObjectEquals(new StatusFrontendApplicationBranchSet(), $event->previousStatus);
         $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
@@ -951,7 +951,7 @@ CONFIG;
         $event = $dispatchedEvents[60]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($updateExtraDeployBranchMrId, $event->mergeRequestId);
+        $this->assertObjectEquals($updateExtraDeployBranchMrId, $event->mergeRequestIid);
         $this->assertObjectEquals($updateExtraDeployBranchMrTitle, $event->title);
         $this->assertObjectEquals($updateExtraDeployBranchMrSourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($updateExtraDeployBranchMrTargetBranchName, $event->targetBranchName);
@@ -963,7 +963,7 @@ CONFIG;
         $this->assertObjectEquals(new StatusDone(), $event->status);
         $this->assertObjectEquals(new StatusUpdateExtraDeployBranchMergeRequestCreated([
             'project_id' => $backendProjectId->value(),
-            'merge_request_id' => $updateExtraDeployBranchMrId->value(),
+            'merge_request_iid' => $updateExtraDeployBranchMrId->value(),
         ]), $event->previousStatus);
         $this->assertObjectEquals($expectedHotfixes, $event->hotfixes);
     }
@@ -996,7 +996,7 @@ CONFIG;
     }
 
     private function createMergeRequestResponse(
-        MergeRequest\MergeRequestId $mergeRequestId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
         ContinuousIntegration\Project\ProjectId $projectId,
         ContinuousIntegration\Project\Name $projectName,
         MergeRequest\Title $title,
@@ -1014,7 +1014,7 @@ CONFIG;
         return new Response(
             status: 200,
             body: json_encode([
-                'id' => $mergeRequestId->value(),
+                'id' => $mergeRequestIid->value(),
                 'project_id' => $projectId->value(),
                 'project_name' => (string) $projectName,
                 'title' => (string) $title,
@@ -1028,7 +1028,7 @@ CONFIG;
     }
 
     private function createCreateMergeRequestResponse(
-        MergeRequest\MergeRequestId $mergeRequestId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
         ContinuousIntegration\Project\ProjectId $projectId,
         ContinuousIntegration\Project\Name $projectName,
         MergeRequest\Title $title,
@@ -1037,7 +1037,7 @@ CONFIG;
         UriInterface $guiUrl,
     ): Response {
         return $this->createMergeRequestResponse(
-            mergeRequestId: $mergeRequestId,
+            mergeRequestIid: $mergeRequestIid,
             projectId: $projectId,
             projectName: $projectName,
             title: $title,
@@ -1050,7 +1050,7 @@ CONFIG;
     }
 
     private function createMergeMergeRequestResponse(
-        MergeRequest\MergeRequestId $mergeRequestId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
         ContinuousIntegration\Project\ProjectId $projectId,
         ContinuousIntegration\Project\Name $projectName,
         MergeRequest\Title $title,
@@ -1059,7 +1059,7 @@ CONFIG;
         UriInterface $guiUrl,
     ): Response {
         return $this->createMergeRequestResponse(
-            mergeRequestId: $mergeRequestId,
+            mergeRequestIid: $mergeRequestIid,
             projectId: $projectId,
             projectName: $projectName,
             title: $title,

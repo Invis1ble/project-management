@@ -13,7 +13,7 @@ use Psr\Http\Message\UriInterface;
 final readonly class MergeRequest
 {
     public function __construct(
-        public MergeRequestId $id,
+        public MergeRequestIid $iid,
         public Title $title,
         public Project\ProjectId $projectId,
         public Project\Name $projectName,
@@ -32,7 +32,7 @@ final readonly class MergeRequest
         }
 
         if (null === $this->details) {
-            throw new \RuntimeException("Merge request $this->id details not set");
+            throw new \RuntimeException("Merge request $this->iid details not set");
         }
 
         return $this->details->merge($mergeRequestManager, $this);
@@ -48,7 +48,7 @@ final readonly class MergeRequest
         }
 
         if (null === $this->details) {
-            throw new \RuntimeException("Merge request $this->id details not set");
+            throw new \RuntimeException("Merge request $this->iid details not set");
         }
 
         return $mergeRequestManager->createMergeRequest(
@@ -62,7 +62,7 @@ final readonly class MergeRequest
     public function withDetails(Details $details): self
     {
         return new self(
-            $this->id,
+            $this->iid,
             $this->title,
             $this->projectId,
             $this->projectName,
@@ -111,7 +111,7 @@ final readonly class MergeRequest
 
     public function equals(self $other): bool
     {
-        return $this->id->equals($other->id)
+        return $this->iid->equals($other->iid)
             && $this->title->equals($other->title)
             && $this->projectId->equals($other->projectId)
             && $this->projectName->equals($other->projectName)

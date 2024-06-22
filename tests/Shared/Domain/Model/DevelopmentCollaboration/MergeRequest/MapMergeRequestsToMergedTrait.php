@@ -12,7 +12,7 @@ trait MapMergeRequestsToMergedTrait
     {
         return new MergeRequest\MergeRequestList(...$mergeRequests->map(
             fn (MergeRequest\MergeRequest $mr): MergeRequest\MergeRequest => new MergeRequest\MergeRequest(
-                id: $mr->id,
+                iid: $mr->iid,
                 title: $mr->title,
                 projectId: $mr->projectId,
                 projectName: $mr->projectName,

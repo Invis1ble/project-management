@@ -35,7 +35,7 @@ trait MapMergeRequestsToMergeToMergedTrait
                         foreach ($issue->mergeRequestsToMerge as $mr) {
                             if ($mr->targetBranchName->equals($targetBranchName)) {
                                 yield new MergeRequest(
-                                    id: $mr->id,
+                                    iid: $mr->iid,
                                     title: $mr->title,
                                     projectId: $mr->projectId,
                                     projectName: $mr->projectName,

@@ -6,6 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
 
 abstract readonly class AbstractStatus implements StatusInterface
 {
@@ -15,7 +16,7 @@ abstract readonly class AbstractStatus implements StatusInterface
     ): MergeRequest {
         return $mergeRequestManager->mergeMergeRequest(
             projectId: $context->projectId,
-            mergeRequestId: $context->id,
+            mergeRequestIid: $context->iid,
         );
     }
 
@@ -27,6 +28,15 @@ abstract readonly class AbstractStatus implements StatusInterface
     public function mergeable(): bool
     {
         return false;
+    }
+
+    public function toTaskTrackerStatus(): Status
+    {
+        if ($this->mayBeMergeable()) {
+            return Status::Open;
+        }
+
+        return Status::Declined;
     }
 
     public function equals(StatusInterface $other): bool

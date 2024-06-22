@@ -36,7 +36,7 @@ final readonly class StatusFrontendApplicationBranchSet extends AbstractStatus
         } else {
             $next = new StatusUpdateExtraDeployBranchMergeRequestCreated([
                 'project_id' => $mergeRequest->projectId->value(),
-                'merge_request_id' => $mergeRequest->id->value(),
+                'merge_request_iid' => $mergeRequest->iid->value(),
             ]);
         }
 

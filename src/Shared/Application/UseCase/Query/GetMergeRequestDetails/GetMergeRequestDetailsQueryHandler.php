@@ -16,6 +16,6 @@ final readonly class GetMergeRequestDetailsQueryHandler implements QueryHandlerI
 
     public function __invoke(GetMergeRequestDetailsQuery $query): Details
     {
-        return $this->mergeRequestManager->details($query->projectId, $query->mergeRequestId);
+        return $this->mergeRequestManager->details($query->projectId, $query->mergeRequestIid);
     }
 }

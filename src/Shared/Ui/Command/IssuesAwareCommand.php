@@ -166,18 +166,18 @@ abstract class IssuesAwareCommand extends Command
 
     private function mergeRequestDetails(MergeRequest $mergeRequest): Details
     {
-        $this->phase("Fetching Details for $mergeRequest->projectName!$mergeRequest->id...");
+        $this->phase("Fetching Details for $mergeRequest->projectName!$mergeRequest->iid...");
 
         while (true) {
             /** @var Details $details */
-            $details = $this->queryBus->ask(new GetMergeRequestDetailsQuery($mergeRequest->projectId, $mergeRequest->id));
+            $details = $this->queryBus->ask(new GetMergeRequestDetailsQuery($mergeRequest->projectId, $mergeRequest->iid));
 
             if ($details->mergeable()) {
                 break;
             }
 
             $this->io->warning([
-                "Merge request $mergeRequest->projectName!$mergeRequest->id is not mergeable.",
+                "Merge request $mergeRequest->projectName!$mergeRequest->iid is not mergeable.",
                 "Merge request status: $details->status",
                 $mergeRequest->guiUrl,
             ]);
@@ -226,7 +226,7 @@ abstract class IssuesAwareCommand extends Command
 
         $mergeRequests = $mergeRequests->filter(
             fn (MergeRequest $mr): bool => $this->io->confirm(
-                question: "Merge $mr->projectName!$mr->id: $mr->sourceBranchName -> $mr->targetBranchName | $mr->title",
+                question: "Merge $mr->projectName!$mr->iid: $mr->sourceBranchName -> $mr->targetBranchName | $mr->title",
                 default: $onlyOneMergeRequest || $mr->sourceEquals($issue->canonicalBranchName()),
             ),
         );

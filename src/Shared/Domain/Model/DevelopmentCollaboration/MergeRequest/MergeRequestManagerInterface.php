@@ -19,13 +19,18 @@ interface MergeRequestManagerInterface
 
     public function mergeMergeRequest(
         ProjectId $projectId,
-        MergeRequestId $mergeRequestId,
+        MergeRequestIid $mergeRequestIid,
     ): MergeRequest;
 
     public function supports(ProjectId $projectId): bool;
 
+    public function mergeRequest(
+        ProjectId $projectId,
+        MergeRequestIid $mergeRequestIid,
+    ): MergeRequest;
+
     public function details(
         ProjectId $projectId,
-        MergeRequestId $mergeRequestId,
+        MergeRequestIid $mergeRequestIid,
     ): Details;
 }

@@ -433,7 +433,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $this->eventBus->dispatch(new MergeRequestCreated(
             projectId: $mergeRequest->projectId,
-            mergeRequestId: $mergeRequest->id,
+            mergeRequestIid: $mergeRequest->iid,
             title: $mergeRequest->title,
             sourceBranchName: $mergeRequest->sourceBranchName,
             targetBranchName: $mergeRequest->targetBranchName,
@@ -445,13 +445,13 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
     public function mergeMergeRequest(
         ProjectId $projectId,
-        MergeRequest\MergeRequestId $mergeRequestId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
     ): MergeRequest\MergeRequest {
         $this->assertSupportsProject($projectId);
 
         $request = $this->requestFactory->createRequest(
             'PUT',
-            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId/merge"),
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestIid/merge"),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -464,7 +464,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $this->eventBus->dispatch(new MergeRequestMerged(
             projectId: $mergeRequest->projectId,
-            mergeRequestId: $mergeRequest->id,
+            mergeRequestIid: $mergeRequest->iid,
             title: $mergeRequest->title,
             sourceBranchName: $mergeRequest->sourceBranchName,
             targetBranchName: $mergeRequest->targetBranchName,
@@ -479,15 +479,35 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         return $this->projectId->equals($projectId);
     }
 
+    public function mergeRequest(
+        ProjectId $projectId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
+    ): MergeRequest\MergeRequest {
+        $this->assertSupportsProject($projectId);
+
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestIid"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return $this->createMergeRequestObject($data, null);
+    }
+
     public function details(
         ProjectId $projectId,
-        MergeRequest\MergeRequestId $mergeRequestId,
+        MergeRequest\MergeRequestIid $mergeRequestIid,
     ): MergeRequest\Details\Details {
         $this->assertSupportsProject($projectId);
 
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestId"),
+            $this->uriFactory->createUri("/api/v4/projects/$projectId/merge_requests/$mergeRequestIid"),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -508,16 +528,16 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         }
     }
 
-    private function createMergeRequestObject(array $data, MergeRequest\Status $status): MergeRequest\MergeRequest
+    private function createMergeRequestObject(array $data, ?MergeRequest\Status $status): MergeRequest\MergeRequest
     {
         return $this->mergeRequestFactory->createMergeRequest(
-            id: $data['id'],
+            iid: $data['iid'],
             title: $data['title'],
             projectId: $data['project_id'],
             projectName: explode('!', (string) $data['references']['full'], 2)[0],
             sourceBranchName: $data['source_branch'],
             targetBranchName: $data['target_branch'],
-            status: $status->value,
+            status: $status?->value,
             guiUrl: $data['web_url'],
             detailedMergeStatus: $data['detailed_merge_status'],
         );

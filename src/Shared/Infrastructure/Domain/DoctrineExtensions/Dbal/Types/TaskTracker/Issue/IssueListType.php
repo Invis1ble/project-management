@@ -117,7 +117,7 @@ final class IssueListType extends JsonType
                     }
 
                     return new MergeRequest\MergeRequest(
-                        id: MergeRequest\MergeRequestId::from($mr['id']),
+                        iid: MergeRequest\MergeRequestIid::from($mr['id']),
                         title: MergeRequest\Title::fromString($mr['name']),
                         projectId: Project\ProjectId::from($mr['project_id']),
                         projectName: Project\Name::fromString($mr['project_name']),
@@ -150,7 +150,7 @@ final class IssueListType extends JsonType
                 }
 
                 return [
-                    'id' => $mr->id->value(),
+                    'id' => $mr->iid->value(),
                     'name' => (string) $mr->title,
                     'project_id' => $mr->projectId->value(),
                     'project_name' => (string) $mr->projectName,

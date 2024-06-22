@@ -9,7 +9,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskT
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestIid;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
@@ -35,7 +35,7 @@ final readonly class StatusUpdateExtraDeployBranchMergeRequestCreated extends Ab
 
         $mergeRequestManager->mergeMergeRequest(
             projectId: ProjectId::from($statusContext['project_id']),
-            mergeRequestId: MergeRequestId::from($statusContext['merge_request_id']),
+            mergeRequestIid: MergeRequestIid::from($statusContext['merge_request_iid']),
         );
 
         $this->setPublicationStatus($context, new StatusDone());

@@ -23,31 +23,31 @@ trait CreateMergeRequestsTrait
         MergeRequest\Status $jiraStatus = MergeRequest\Status::Open,
         MergeRequest\Details\Status\Dictionary $gitlabStatus = MergeRequest\Details\Status\Dictionary::Mergeable,
     ): MergeRequest\MergeRequestList {
-        $mergeRequestId = MergeRequest\MergeRequestId::from($id);
+        $mergeRequestIid = MergeRequest\MergeRequestIid::from($id);
 
         return new MergeRequest\MergeRequestList(
             new MergeRequest\MergeRequest(
-                id: $mergeRequestId,
+                iid: $mergeRequestIid,
                 title: MergeRequest\Title::fromString($title),
                 projectId: Project\ProjectId::from($backendProjectId),
                 projectName: Project\Name::fromString($projectName),
                 sourceBranchName: Branch\Name::fromString($sourceBranchName),
                 targetBranchName: Branch\Name::fromString($targetBranchName),
                 status: $jiraStatus,
-                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestId"),
+                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestIid"),
                 details: new MergeRequest\Details\Details(
                     status: MergeRequest\Details\Status\StatusFactory::createStatus($gitlabStatus),
                 ),
             ),
             new MergeRequest\MergeRequest(
-                id: $mergeRequestId,
+                iid: $mergeRequestIid,
                 title: MergeRequest\Title::fromString($title),
                 projectId: Project\ProjectId::from($frontendProjectId),
                 projectName: Project\Name::fromString($projectName),
                 sourceBranchName: Branch\Name::fromString($sourceBranchName),
                 targetBranchName: Branch\Name::fromString($targetBranchName),
                 status: $jiraStatus,
-                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestId"),
+                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestIid"),
                 details: new MergeRequest\Details\Details(
                     status: MergeRequest\Details\Status\StatusFactory::createStatus($gitlabStatus),
                 ),
