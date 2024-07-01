@@ -46,7 +46,7 @@ final readonly class Name extends BasicName
     {
         parent::validate($value);
 
-        if (!preg_match('/^v(?:-[0-9]){3}$/', $value)) {
+        if (!preg_match('/^v(?:-[0-9]+){3}$/', $value)) {
             throw new \InvalidArgumentException("Invalid release branch name format: $value");
         }
     }

@@ -9,6 +9,7 @@ use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint\GetReadyForPublishHotfixesInActiveSprintQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Tag;
@@ -65,12 +66,15 @@ final class PublishHotfixCommand extends IssuesAwareCommand
 
         $tagName = $this->newTagName();
         $tagMessage = $this->newTagMessage($hotfixes);
-        $hotfixes = $this->enrichIssuesWithMergeRequests($hotfixes);
+        $hotfixes = $this->enrichIssuesWithMergeRequests(
+            issues: $hotfixes,
+            targetBranchName: Branch\Name::fromString('master'),
+        );
 
         $this->io->section('Summary');
 
         $this->caption('New tag to create');
-        $this->io->block((string) $tagName);
+        $this->io->text("<fg=bright-magenta;bg=black;options=bold> $tagName </>");
 
         $this->caption('New tag message');
         $this->io->block((string) $tagMessage);

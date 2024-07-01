@@ -7,7 +7,8 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\PrepareRelea
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
@@ -16,25 +17,27 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(name: 'pm:release:prepare', description: 'Prepares a new release')]
 final class PrepareReleaseCommand extends IssuesAwareCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
+        parent::execute($input, $output);
 
         $this->io->title('Preparing new release');
 
         $newReleaseBranchName = $this->newReleaseBranchName();
         $tasks = $this->readyToMergeTasks();
-        $tasks = $this->enrichIssuesWithMergeRequests($tasks);
+        $tasks = $this->enrichIssuesWithMergeRequests(
+            issues: $tasks,
+            targetBranchName: BasicBranchName::fromString('develop'),
+        );
 
         $this->io->section('Summary');
 
         $this->caption('New release branch name');
-        $this->io->block((string) $newReleaseBranchName);
+        $this->io->text("<fg=bright-magenta;bg=black;options=bold> $newReleaseBranchName </>");
 
         $this->caption('Ready to Merge tasks in the active sprint');
         $this->listIssues($tasks);
@@ -54,6 +57,10 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
             $this->listMergeRequests($tasks->mergeRequestsToMerge());
         }
 
+        if ($input->getOption('dry-run')) {
+            return Command::SUCCESS;
+        }
+
         $confirmed = $this->io->confirm('OK', false);
 
         if (!$confirmed) {
@@ -68,7 +75,7 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
         return Command::SUCCESS;
     }
 
-    private function newReleaseBranchName(): Name
+    private function newReleaseBranchName(): Branch\Name
     {
         $this->phase('Fetching latest release...');
 
@@ -83,15 +90,15 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
             throw new \UnexpectedValueException("Latest release $release->name not released yet");
         }
 
-        $latestReleaseBranchName = Name::fromString((string) $release->name);
+        $latestReleaseBranchName = Branch\Name::fromString((string) $release->name);
 
         $this->caption("Latest release branch name: $latestReleaseBranchName");
 
         return $this->io->ask(
             question: 'New release branch name',
             default: (string) $latestReleaseBranchName->bumpVersion(),
-            validator: function (string $branchName) use ($latestReleaseBranchName): Name {
-                $branchName = Name::fromString($branchName);
+            validator: function (string $branchName) use ($latestReleaseBranchName): Branch\Name {
+                $branchName = Branch\Name::fromString($branchName);
 
                 if (!$branchName->versionNewerThan($latestReleaseBranchName)) {
                     throw new \InvalidArgumentException("Provided version must be greater than latest release $latestReleaseBranchName version");
