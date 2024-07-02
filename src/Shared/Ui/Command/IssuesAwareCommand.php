@@ -100,7 +100,7 @@ abstract class IssuesAwareCommand extends Command
                 $fg = match ($mr->status) {
                     Status::Merged => 'green',
                     Status::Declined => 'gray',
-                    Status::Open => 'bright-cyan',
+                    Status::Open => 'cyan',
                 };
 
                 return "<bg=$fg;fg=black;options=bold> {$mr->status->value} </> $mr->guiUrl <options=bold>$mr->sourceBranchName -> $mr->targetBranchName</> | $mr->title";
