@@ -10,7 +10,7 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class ReleasePublicationId extends AbstractUuid
 {
-    public static function generate(Name $branchName): self
+    public static function fromBranchName(Name $branchName): self
     {
         return new self(Uuid::v5(
             namespace: Uuid::fromString(Uuid::NAMESPACE_OID),
