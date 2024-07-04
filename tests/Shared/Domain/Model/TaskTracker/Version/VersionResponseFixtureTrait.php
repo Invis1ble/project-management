@@ -9,14 +9,15 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 trait VersionResponseFixtureTrait
 {
     public function versionResponseFixture(
-        Version\Name $latestVersionName,
+        Version\Name $versionName,
+        bool $released,
     ): array {
-        $versions = file_get_contents(__DIR__ . '/fixture/response/version.200.json');
-        $versions = json_decode($versions, true);
+        $version = file_get_contents(__DIR__ . '/fixture/response/version.200.json');
+        $version = json_decode($version, true);
 
-        $versions['values'][0]['name'] = (string) $latestVersionName;
-        $versions['values'][0]['released'] = false;
+        $version['name'] = (string) $versionName;
+        $version['released'] = $released;
 
-        return $versions;
+        return $version;
     }
 }

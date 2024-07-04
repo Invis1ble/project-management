@@ -20,7 +20,7 @@ use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\Crea
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\IssuesResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\IssueTransitionsResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\MapMergeRequestsToMergeToMergedTrait;
-use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Version\VersionResponseFixtureTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Version\VersionsResponseFixtureTrait;
 use Psr\Http\Message\UriInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
@@ -39,7 +39,7 @@ abstract class PublicationTestCase extends KernelTestCase
     use PipelineJobsResponseFixtureTrait;
     use PipelineResponseFixtureTrait;
     use PlayJobResponseFixtureTrait;
-    use VersionResponseFixtureTrait;
+    use VersionsResponseFixtureTrait;
 
     protected function createPipelineResponse(
         Project\ProjectId $projectId,

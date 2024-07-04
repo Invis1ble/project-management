@@ -13,26 +13,40 @@ use Invis1ble\Messenger\Event\TraceableEventBus;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationStatusChanged;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch as ReleaseBranch;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendBranchCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusMergeRequestsMerged;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusReleaseCandidateCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusReleaseCandidateRenamed;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Branch\BranchCreated;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Commit\CommitCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Invis1ble\ProjectManagement\Tests\Shared\Application\Saga\PublicationTestCase;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\SourceCodeRepository\Branch\BranchResponseFixtureTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Project\ProjectResponseFixtureTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Version\VersionResponseFixtureTrait;
 use Psr\Http\Message\UriFactoryInterface;
 
 class ReleasePreparationSagaTest extends PublicationTestCase
 {
     use BranchResponseFixtureTrait;
+    use VersionResponseFixtureTrait;
+    use ProjectResponseFixtureTrait;
 
     public function testReleasePreparation(): void
     {
@@ -65,11 +79,11 @@ class ReleasePreparationSagaTest extends PublicationTestCase
         $frontendProjectId = $frontendMrToMerge->projectId;
         $frontendProjectName = $frontendMrToMerge->projectName;
 
-        $branchName = ReleaseBranch\Name::fromString('v-1-0-0');
-
         $now = new \DateTimeImmutable();
         $frontendPipelineCreatedAt = $now;
+        $setFrontendApplicationBranchNameCommitCreatedAt = $now->add(new \DateInterval('PT15M'));
 
+        $branchName = ReleaseBranch\Name::fromString('v-1-0-0');
         $latestReleaseVersionName = Version\Name::fromString('v-1-0-0');
 
         $mock = new MockHandler([
@@ -161,6 +175,23 @@ class ReleasePreparationSagaTest extends PublicationTestCase
                 status: Pipeline\Status::Success,
                 createdAt: $frontendPipelineCreatedAt,
             ),
+            new Response(
+                status: 200,
+                body: json_encode($this->fileResponseFixture(
+                    content: Content::fromString(<<<CONFIG
+Deploy_react:
+    host:
+        _default: "develop"
+CONFIG),
+                )),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($this->createCommitResponseFixture(
+                    message: Commit\Message::fromString("Change frontend application branch name to $branchName"),
+                    createdAt: $setFrontendApplicationBranchNameCommitCreatedAt,
+                )),
+            ),
         ]);
 
         /** @var Client $httpClient */
@@ -168,6 +199,36 @@ class ReleasePreparationSagaTest extends PublicationTestCase
         /** @var HandlerStack $handlerStack */
         $handlerStack = $httpClient->getConfig('handler');
         $handlerStack->setHandler($mock);
+
+        $mock = new MockHandler([
+            new Response(
+                status: 200,
+                body: json_encode($this->versionsResponseFixture(
+                    latestVersionName: Version\Name::fromString('Release Candidate'),
+                )),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($this->versionResponseFixture(
+                    versionName: $latestReleaseVersionName,
+                    released: false,
+                )),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($this->projectResponseFixture()),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($this->versionResponseFixture(
+                    versionName: Version\Name::fromString('Release Candidate'),
+                    released: false,
+                )),
+            ),
+        ]);
+
+        $handlerStack = HandlerStack::create($mock);
+        $container->set('eight_points_guzzle.client.jira', new Client(['handler' => $handlerStack]));
 
         $createReleasePublicationCommand = new CreateReleasePublicationCommand(
             branchName: $branchName,
@@ -177,6 +238,10 @@ class ReleasePreparationSagaTest extends PublicationTestCase
         static::mockTime($now->sub(new \DateInterval('PT1M')));
 
         $commandBus->dispatch($createReleasePublicationCommand);
+
+        $publication = $releasePublicationRepository->get(
+            ReleasePublicationId::fromBranchName($createReleasePublicationCommand->branchName),
+        );
 
         $expectedTasks = $this->mapMergeRequestsToMergeToMerged($createReleasePublicationCommand->readyToMergeTasks);
         $expectedTasks = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
@@ -191,9 +256,13 @@ class ReleasePreparationSagaTest extends PublicationTestCase
         );
         $expectedMrsToMerge = $expectedTasks->toArray()[0]->mergeRequestsToMerge->toArray();
 
+        $this->assertObjectEquals($branchName, $publication->branchName());
+        $this->assertObjectEquals($expectedTasks, $publication->readyToMergeTasks());
+        $this->assertObjectEquals(new StatusReleaseCandidateCreated(), $publication->status());
+
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(17, $dispatchedEvents);
+        $this->assertCount(24, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -316,5 +385,55 @@ class ReleasePreparationSagaTest extends PublicationTestCase
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Pipeline\Status::Running, $event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Success, $event->status);
+
+        $this->assertArrayHasKey(17, $dispatchedEvents);
+        $event = $dispatchedEvents[17]->event;
+        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusFrontendPipelineSuccess(), $event->status);
+        $this->assertObjectEquals(new StatusFrontendBranchCreated(), $event->previousStatus);
+
+        $this->assertArrayHasKey(18, $dispatchedEvents);
+        $event = $dispatchedEvents[18]->event;
+        $this->assertInstanceOf(CommitCreated::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($branchName, $event->branchName);
+        $this->assertObjectEquals(Branch\Name::fromString('develop'), $event->startBranchName);
+        $this->assertObjectEquals(
+            Commit\Message::fromString("Change frontend application branch name to $branchName"),
+            $event->message,
+        );
+
+        $this->assertArrayHasKey(19, $dispatchedEvents);
+        $event = $dispatchedEvents[19]->event;
+        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusBackendBranchCreated(), $event->status);
+        $this->assertObjectEquals(new StatusFrontendPipelineSuccess(), $event->previousStatus);
+
+        $this->assertArrayHasKey(20, $dispatchedEvents);
+        $event = $dispatchedEvents[20]->event;
+        $this->assertInstanceOf(ReleaseCandidateRenamed::class, $event);
+        $this->assertObjectEquals($latestReleaseVersionName, $event->name);
+        $this->assertObjectEquals(Version\Name::fromString('Release Candidate'), $event->previousName);
+        $this->assertFalse($event->released);
+        $this->assertFalse($event->archived);
+
+        $this->assertArrayHasKey(21, $dispatchedEvents);
+        $event = $dispatchedEvents[21]->event;
+        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusReleaseCandidateRenamed(), $event->status);
+        $this->assertObjectEquals(new StatusBackendBranchCreated(), $event->previousStatus);
+
+        $this->assertArrayHasKey(22, $dispatchedEvents);
+        $event = $dispatchedEvents[22]->event;
+        $this->assertInstanceOf(ReleaseCandidateCreated::class, $event);
+        $this->assertObjectEquals(Version\Name::fromString('Release Candidate'), $event->name);
+        $this->assertFalse($event->released);
+        $this->assertFalse($event->archived);
+
+        $this->assertArrayHasKey(23, $dispatchedEvents);
+        $event = $dispatchedEvents[23]->event;
+        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusReleaseCandidateCreated(), $event->status);
+        $this->assertObjectEquals(new StatusReleaseCandidateRenamed(), $event->previousStatus);
     }
 }

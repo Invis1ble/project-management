@@ -477,6 +477,7 @@ CONFIG),
             new Response(
                 status: 200,
                 body: json_encode($this->createCommitResponseFixture(
+                    message: Commit\Message::fromString('Change frontend application branch name to develop'),
                     createdAt: $setFrontendApplicationBranchNameCommitCreatedAt,
                 )),
             ),
@@ -549,7 +550,7 @@ CONFIG),
             ),
             new Response(
                 status: 200,
-                body: json_encode($this->versionResponseFixture(
+                body: json_encode($this->versionsResponseFixture(
                     latestVersionName: $latestReleaseVersionName,
                 )),
             ),
@@ -587,7 +588,6 @@ CONFIG),
 
         $this->assertObjectEquals($createPublicationCommand->tagName, $publication->tagName());
         $this->assertObjectEquals($createPublicationCommand->tagMessage, $publication->tagMessage());
-
         $this->assertObjectEquals($expectedHotfixes, $publication->hotfixes());
         $this->assertObjectEquals(new StatusDone(), $publication->status());
 

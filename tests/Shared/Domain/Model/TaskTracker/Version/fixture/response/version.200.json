@@ -1,38 +1,12 @@
 {
-  "isLast": false,
-  "maxResults": 2,
-  "nextPage": "https://your-domain.atlassian.net/rest/api/3/project/PR/version?startAt=2&maxResults=2",
-  "self": "https://your-domain.atlassian.net/rest/api/3/project/PR/version?startAt=0&maxResults=2",
-  "startAt": 0,
-  "total": 7,
-  "values": [
-    {
-      "archived": false,
-      "description": "An excellent version",
-      "id": "10000",
-      "name": "New Version 1",
-      "overdue": true,
-      "projectId": 10000,
-      "releaseDate": "2010-07-06",
-      "released": true,
-      "self": "https://your-domain.atlassian.net/rest/api/3/version/10000",
-      "userReleaseDate": "6/Jul/2010"
-    },
-    {
-      "archived": false,
-      "description": "Minor Bugfix version",
-      "id": "10010",
-      "issuesStatusForFixVersion": {
-        "done": 100,
-        "inProgress": 20,
-        "toDo": 10,
-        "unmapped": 0
-      },
-      "name": "Next Version",
-      "overdue": false,
-      "projectId": 10000,
-      "released": false,
-      "self": "https://your-domain.atlassian.net/rest/api/3/version/10010"
-    }
-  ]
+  "archived": false,
+  "description": "An excellent version",
+  "id": "10000",
+  "name": "New Version 1",
+  "project": "PXA",
+  "projectId": 10000,
+  "releaseDate": "2010-07-06",
+  "released": true,
+  "self": "https://your-domain.atlassian.net/rest/api/3/version/10000",
+  "userReleaseDate": "6/Jul/2010"
 }
