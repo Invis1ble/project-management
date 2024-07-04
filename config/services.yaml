@@ -65,6 +65,10 @@ services:
         tags:
             - { name: serializer.normalizer, priority: 10 }
 
+    Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\Status\StatusNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 990 }
+
     Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\Status\StatusNormalizer:
         tags:
             - { name: serializer.normalizer, priority: 990 }

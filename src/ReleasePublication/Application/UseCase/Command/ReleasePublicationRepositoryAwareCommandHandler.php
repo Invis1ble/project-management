@@ -11,7 +11,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePubl
 
 abstract readonly class ReleasePublicationRepositoryAwareCommandHandler implements CommandHandlerInterface
 {
-    public function __construct(private ReleasePublicationRepositoryInterface $repository)
+    public function __construct(protected ReleasePublicationRepositoryInterface $repository)
     {
     }
 
