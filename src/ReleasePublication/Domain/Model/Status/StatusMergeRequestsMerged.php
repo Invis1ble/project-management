@@ -26,7 +26,10 @@ final readonly class StatusMergeRequestsMerged extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $frontendSourceCodeRepository->createBranch($context->branchName(), Name::fromString('develop'));
+        $frontendSourceCodeRepository->createBranch(
+            name: $context->branchName(),
+            ref: Name::fromString('develop'),
+        );
 
         $this->setPublicationStatus($context, new StatusFrontendBranchCreated());
     }

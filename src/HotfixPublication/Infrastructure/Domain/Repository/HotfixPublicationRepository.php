@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Repository;
 
-use Doctrine\ORM\Query;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
@@ -30,7 +30,7 @@ final class HotfixPublicationRepository extends EventDispatchingRepository imple
             ->where('p.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)
+            ->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR)
         ;
 
         return null !== $result;

@@ -69,10 +69,10 @@ abstract class IssuesAwareCommand extends Command
         )));
     }
 
-    protected function enrichIssuesWithMergeRequests(IssueList $issues): IssueList
+    protected function enrichIssuesWithMergeRequests(IssueList $issues, BasicBranchName $targetBranchName): IssueList
     {
         return new IssueList(
-            ...$issues->map(function (Issue $issue): Issue {
+            ...$issues->map(function (Issue $issue) use ($targetBranchName): Issue {
                 $mergeRequests = $this->issueMergeRequests($issue);
 
                 $issue = $issue->withMergeRequests($mergeRequests);
@@ -85,7 +85,7 @@ abstract class IssuesAwareCommand extends Command
 
                 $mergeRequests = $this->issueMergeRequestsToMerge(
                     issue: $issue,
-                    targetBranchName: BasicBranchName::fromString('master'),
+                    targetBranchName: $targetBranchName,
                 );
 
                 return $issue->withMergeRequestsToMerge($mergeRequests);
@@ -100,10 +100,10 @@ abstract class IssuesAwareCommand extends Command
                 $fg = match ($mr->status) {
                     Status::Merged => 'green',
                     Status::Declined => 'gray',
-                    Status::Open => 'bright-cyan',
+                    Status::Open => 'cyan',
                 };
 
-                return "<fg=$fg>[{$mr->status->value}]</> $mr->guiUrl $mr->sourceBranchName -> $mr->targetBranchName | $mr->title";
+                return "<bg=$fg;fg=black;options=bold> {$mr->status->value} </> $mr->guiUrl <options=bold>$mr->sourceBranchName -> $mr->targetBranchName</> | $mr->title";
             },
         )));
     }

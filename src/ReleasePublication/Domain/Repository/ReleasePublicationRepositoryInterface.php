@@ -10,6 +10,8 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicati
 
 interface ReleasePublicationRepositoryInterface
 {
+    public function contains(ReleasePublicationId $id): bool;
+
     /**
      * @throws ReleasePublicationNotFoundException
      */

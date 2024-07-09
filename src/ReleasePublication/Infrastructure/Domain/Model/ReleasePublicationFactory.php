@@ -9,9 +9,14 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicati
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Psr\Clock\ClockInterface;
 
 final readonly class ReleasePublicationFactory implements ReleasePublicationFactoryInterface
 {
+    public function __construct(private ClockInterface $clock)
+    {
+    }
+
     public function createReleasePublication(
         Name $branchName,
         IssueList $readyToMergeTasks,
@@ -19,6 +24,7 @@ final readonly class ReleasePublicationFactory implements ReleasePublicationFact
         return ReleasePublication::create(
             $branchName,
             $readyToMergeTasks,
+            $this->clock,
         );
     }
 }

@@ -15,14 +15,15 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Psr\Clock\ClockInterface;
 
 class ReleasePublication extends AbstractAggregateRoot implements ReleasePublicationInterface
 {
     public function __construct(
         private readonly ReleasePublicationId $id,
         private readonly Name $branchName,
-        private readonly StatusInterface $status,
-        private readonly IssueList $readyToMergeTasks,
+        private StatusInterface $status,
+        private IssueList $readyToMergeTasks,
         private readonly \DateTimeImmutable $createdAt,
     ) {
     }
@@ -30,13 +31,14 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
     public static function create(
         Name $branchName,
         IssueList $readyToMergeTasks,
+        ClockInterface $clock,
     ): self {
         $release = new self(
-            id: ReleasePublicationId::generate($branchName),
+            id: ReleasePublicationId::fromBranchName($branchName),
             branchName: $branchName,
             status: new StatusCreated(),
             readyToMergeTasks: $readyToMergeTasks,
-            createdAt: new \DateTimeImmutable(),
+            createdAt: $clock->now(),
         );
 
         $release->raiseDomainEvent(new ReleasePublicationCreated(

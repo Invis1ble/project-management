@@ -27,7 +27,7 @@ final readonly class StatusReleaseCandidateRenamed extends AbstractStatus
     ): void {
         $taskTracker->createReleaseCandidate();
 
-        $this->setPublicationStatus($context, new StatusReleaseCandidateRenamed());
+        $this->setPublicationStatus($context, new StatusReleaseCandidateCreated());
     }
 
     public function __toString(): string
