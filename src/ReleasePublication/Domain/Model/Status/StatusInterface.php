@@ -29,4 +29,6 @@ interface StatusInterface extends \Stringable
     public function equals(self $status): bool;
 
     public function prepared(): bool;
+
+    public function context(): Context;
 }

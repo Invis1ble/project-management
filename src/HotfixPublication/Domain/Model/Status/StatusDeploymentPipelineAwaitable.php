@@ -37,21 +37,24 @@ abstract readonly class StatusDeploymentPipelineAwaitable extends AbstractStatus
             tickInterval: $pipelineTickInterval,
         );
 
+        $statusContext = $this->context->toArray();
+        $statusContext['pipeline_id'] = $pipeline->id;
+
         if (null === $pipeline) {
             $next = new StatusDeploymentPipelineStuck();
         } else {
             $next = match ($pipeline->status) {
-                Status::Created => new StatusDeploymentPipelineCreated(),
-                Status::WaitingForResource => new StatusDeploymentPipelineWaitingForResource(),
-                Status::Preparing => new StatusDeploymentPipelinePreparing(),
-                Status::Pending => new StatusDeploymentPipelinePending(),
-                Status::Running => new StatusDeploymentPipelineRunning(),
-                Status::Success => new StatusDeploymentPipelineSuccess(),
-                Status::Failed => new StatusDeploymentPipelineFailed(),
-                Status::Canceled => new StatusDeploymentPipelineCanceled(),
-                Status::Skipped => new StatusDeploymentPipelineSkipped(),
-                Status::Manual => new StatusDeploymentPipelineManual(),
-                Status::Scheduled => new StatusDeploymentPipelineScheduled(),
+                Status::Created => new StatusDeploymentPipelineCreated($statusContext),
+                Status::WaitingForResource => new StatusDeploymentPipelineWaitingForResource($statusContext),
+                Status::Preparing => new StatusDeploymentPipelinePreparing($statusContext),
+                Status::Pending => new StatusDeploymentPipelinePending($statusContext),
+                Status::Running => new StatusDeploymentPipelineRunning($statusContext),
+                Status::Success => new StatusDeploymentPipelineSuccess($statusContext),
+                Status::Failed => new StatusDeploymentPipelineFailed($statusContext),
+                Status::Canceled => new StatusDeploymentPipelineCanceled($statusContext),
+                Status::Skipped => new StatusDeploymentPipelineSkipped($statusContext),
+                Status::Manual => new StatusDeploymentPipelineManual($statusContext),
+                Status::Scheduled => new StatusDeploymentPipelineScheduled($statusContext),
             };
         }
 

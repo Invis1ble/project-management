@@ -6,6 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Pipeline;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
 
@@ -21,6 +22,8 @@ interface ContinuousIntegrationClientInterface
         ?\DateInterval $maxAwaitingTime = null,
         ?\DateInterval $tickInterval = null,
     ): ?Pipeline;
+
+    public function retryPipeline(PipelineId $pipelineId): ?Pipeline;
 
     public function deployOnProduction(VersionName $tagName): Job;
 }
