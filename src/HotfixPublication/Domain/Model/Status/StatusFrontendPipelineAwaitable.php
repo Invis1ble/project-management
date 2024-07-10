@@ -40,7 +40,7 @@ abstract readonly class StatusFrontendPipelineAwaitable extends AbstractStatus
             );
 
             $statusContext = $this->context->toArray();
-            $statusContext['pipeline_id'] = $pipeline->id;
+            $statusContext['pipeline_id'] = $pipeline->id->value();
 
             if (null === $pipeline) {
                 $next = new StatusFrontendPipelineStuck();

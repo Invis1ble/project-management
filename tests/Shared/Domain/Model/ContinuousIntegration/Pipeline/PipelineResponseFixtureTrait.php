@@ -10,6 +10,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Projec
 trait PipelineResponseFixtureTrait
 {
     public function pipelineResponseFixture(
+        Pipeline\PipelineId $pipelineId,
         Project\ProjectId $projectId,
         Project\Name $projectName,
         Pipeline\Status $status,
@@ -19,7 +20,7 @@ trait PipelineResponseFixtureTrait
         $pipeline = json_decode($pipeline, true);
 
         return [
-            'id' => 123,
+            'id' => $pipelineId->value(),
             'project_id' => $projectId->value(),
             'status' => $status->value,
             'created_at' => $createdAt->format(DATE_RFC3339_EXTENDED),

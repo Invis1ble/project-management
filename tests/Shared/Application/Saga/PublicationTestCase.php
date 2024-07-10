@@ -42,6 +42,7 @@ abstract class PublicationTestCase extends KernelTestCase
     use VersionsResponseFixtureTrait;
 
     protected function createPipelineResponse(
+        Pipeline\PipelineId $pipelineId,
         Project\ProjectId $projectId,
         Project\Name $projectName,
         Pipeline\Status $status,
@@ -50,6 +51,7 @@ abstract class PublicationTestCase extends KernelTestCase
         return new Response(
             status: 200,
             body: json_encode($this->pipelineResponseFixture(
+                pipelineId: $pipelineId,
                 projectId: $projectId,
                 projectName: $projectName,
                 status: $status,
