@@ -23,17 +23,15 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
     ) {
     }
 
-    public function createSetFrontendApplicationBranchNameCommit(
-        Name $targetBranchName,
-        ?Name $startBranchName = null,
-    ): ?NewCommit {
+    public function createSetFrontendApplicationBranchNameCommit(Name $branchName): ?NewCommit
+    {
         $configFilePath = FilePath::fromString('.helm/values.yaml');
 
         $file = $this->backendSourceCodeRepository->file(Name::fromString('develop'), $configFilePath);
 
         $config = preg_replace(
             pattern: '/(Deploy_react:\s*host:\s*_default:\s*)"[^"]+"/',
-            replacement: "\$1\"$targetBranchName\"",
+            replacement: "\$1\"$branchName\"",
             subject: (string) $file->content,
         );
 
@@ -43,15 +41,14 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
 
         return new NewCommit(
             projectId: $this->backendProjectId,
-            branchName: $targetBranchName,
-            message: Message::fromString("Change frontend application branch name to $targetBranchName"),
+            branchName: $branchName,
+            message: Message::fromString("Change frontend application branch name to $branchName"),
             actions: new ActionList(
                 new ActionUpdate(
                     filePath: $configFilePath,
                     content: Content::fromString($config),
                 ),
             ),
-            startBranchName: $startBranchName,
         );
     }
 }

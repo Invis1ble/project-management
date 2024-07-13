@@ -19,6 +19,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicati
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch as ReleaseBranch;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendApplicationBranchSet;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineFailed;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelinePending;
@@ -215,6 +216,16 @@ class ReleasePreparationSagaTest extends PublicationTestCase
             ),
             new Response(
                 status: 200,
+                body: json_encode($this->branchResponseFixture(
+                    name: $branchName,
+                )),
+            ),
+            new Response(
+                status: 400,
+                body: json_encode(['message' => 'You can only create or edit files when you are on a branch']),
+            ),
+            new Response(
+                status: 200,
                 body: json_encode($this->fileResponseFixture(
                     content: Content::fromString(<<<CONFIG
 Deploy_react:
@@ -300,7 +311,7 @@ CONFIG),
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(31, $dispatchedEvents);
+        $this->assertCount(33, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -503,14 +514,9 @@ CONFIG),
 
         $this->assertArrayHasKey(25, $dispatchedEvents);
         $event = $dispatchedEvents[25]->event;
-        $this->assertInstanceOf(CommitCreated::class, $event);
+        $this->assertInstanceOf(BranchCreated::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($branchName, $event->branchName);
-        $this->assertObjectEquals(Branch\Name::fromString('develop'), $event->startBranchName);
-        $this->assertObjectEquals(
-            Commit\Message::fromString("Change frontend application branch name to $branchName"),
-            $event->message,
-        );
+        $this->assertObjectEquals(Branch\Name::fromString((string) $branchName), $event->name);
 
         $this->assertArrayHasKey(26, $dispatchedEvents);
         $event = $dispatchedEvents[26]->event;
@@ -526,27 +532,44 @@ CONFIG),
 
         $this->assertArrayHasKey(27, $dispatchedEvents);
         $event = $dispatchedEvents[27]->event;
+        $this->assertInstanceOf(CommitCreated::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($branchName, $event->branchName);
+        $this->assertNull($event->startBranchName);
+        $this->assertObjectEquals(
+            Commit\Message::fromString("Change frontend application branch name to $branchName"),
+            $event->message,
+        );
+
+        $this->assertArrayHasKey(28, $dispatchedEvents);
+        $event = $dispatchedEvents[28]->event;
+        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
+        $this->assertObjectEquals(new StatusFrontendApplicationBranchSet(), $event->status);
+        $this->assertObjectEquals(new StatusBackendBranchCreated(), $event->previousStatus);
+
+        $this->assertArrayHasKey(29, $dispatchedEvents);
+        $event = $dispatchedEvents[29]->event;
         $this->assertInstanceOf(ReleaseCandidateRenamed::class, $event);
         $this->assertObjectEquals($latestReleaseVersionName, $event->name);
         $this->assertObjectEquals(Version\Name::fromString('Release Candidate'), $event->previousName);
         $this->assertFalse($event->released);
         $this->assertFalse($event->archived);
 
-        $this->assertArrayHasKey(28, $dispatchedEvents);
-        $event = $dispatchedEvents[28]->event;
+        $this->assertArrayHasKey(30, $dispatchedEvents);
+        $event = $dispatchedEvents[30]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusReleaseCandidateRenamed(), $event->status);
-        $this->assertObjectEquals(new StatusBackendBranchCreated(), $event->previousStatus);
+        $this->assertObjectEquals(new StatusFrontendApplicationBranchSet(), $event->previousStatus);
 
-        $this->assertArrayHasKey(29, $dispatchedEvents);
-        $event = $dispatchedEvents[29]->event;
+        $this->assertArrayHasKey(31, $dispatchedEvents);
+        $event = $dispatchedEvents[31]->event;
         $this->assertInstanceOf(ReleaseCandidateCreated::class, $event);
         $this->assertObjectEquals(Version\Name::fromString('Release Candidate'), $event->name);
         $this->assertFalse($event->released);
         $this->assertFalse($event->archived);
 
-        $this->assertArrayHasKey(30, $dispatchedEvents);
-        $event = $dispatchedEvents[30]->event;
+        $this->assertArrayHasKey(32, $dispatchedEvents);
+        $event = $dispatchedEvents[32]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusReleaseCandidateCreated(), $event->status);
         $this->assertObjectEquals(new StatusReleaseCandidateRenamed(), $event->previousStatus);

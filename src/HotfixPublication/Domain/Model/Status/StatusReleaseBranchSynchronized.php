@@ -31,7 +31,7 @@ final readonly class StatusReleaseBranchSynchronized extends AbstractStatus
         HotfixPublicationInterface $context,
     ): void {
         $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
-            targetBranchName: Name::fromString('develop'),
+            branchName: Name::fromString('develop'),
         );
 
         $newCommit?->commit($backendSourceCodeRepository);

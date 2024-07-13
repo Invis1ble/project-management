@@ -11,7 +11,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
-final readonly class StatusBackendBranchCreated extends AbstractStatus
+final readonly class StatusFrontendApplicationBranchSet extends AbstractStatus
 {
     public function proceedToNext(
         MergeRequestManagerInterface $mergeRequestManager,
@@ -25,17 +25,13 @@ final readonly class StatusBackendBranchCreated extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
-            branchName: $context->branchName(),
-        );
+        $taskTracker->renameReleaseCandidate($context->branchName());
 
-        $newCommit?->commit($backendSourceCodeRepository);
-
-        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSet());
+        $this->setPublicationStatus($context, new StatusReleaseCandidateRenamed());
     }
 
     public function __toString(): string
     {
-        return Dictionary::BackendBranchCreated->value;
+        return Dictionary::FrontendApplicationBranchSet->value;
     }
 }

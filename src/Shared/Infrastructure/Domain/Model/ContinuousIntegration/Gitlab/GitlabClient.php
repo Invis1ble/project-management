@@ -307,17 +307,12 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         Branch\Name $branchName,
         Commit\Message $message,
         NewCommit\Action\ActionList $actions,
-        ?Branch\Name $startBranchName = null,
     ): Commit\Commit {
         $data = [
             'branch' => (string) $branchName,
             'commit_message' => (string) $message,
             'actions' => iterator_to_array($actions->map(fn (NewCommit\Action\AbstractAction $action): array => $action->toArray())),
         ];
-
-        if (null !== $startBranchName) {
-            $data['start_branch_name'] = (string) $startBranchName;
-        }
 
         $request = $this->requestFactory->createRequest(
             'POST',
@@ -342,7 +337,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         $this->eventBus->dispatch(new CommitCreated(
             projectId: $this->projectId,
             branchName: $branchName,
-            startBranchName: $startBranchName,
+            startBranchName: null,
             commitId: $commit->id,
             message: $commit->message,
             guiUrl: $this->uriFactory->createUri($data['web_url']),
