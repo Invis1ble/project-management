@@ -25,9 +25,13 @@ final readonly class StatusBackendBranchCreated extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $taskTracker->renameReleaseCandidate($context->branchName());
+        $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
+            branchName: $context->branchName(),
+        );
 
-        $this->setPublicationStatus($context, new StatusReleaseCandidateRenamed());
+        $newCommit?->commit($backendSourceCodeRepository);
+
+        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSet());
     }
 
     public function __toString(): string

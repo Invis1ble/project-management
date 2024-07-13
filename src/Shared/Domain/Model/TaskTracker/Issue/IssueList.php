@@ -37,7 +37,9 @@ final readonly class IssueList extends AbstractList
         $mergeRequests = new MergeRequestList();
 
         foreach ($this->elements as $element) {
-            $mergeRequests = $mergeRequests->concat($element->mergeRequestsToMerge);
+            if (null !== $element->mergeRequestsToMerge) {
+                $mergeRequests = $mergeRequests->concat($element->mergeRequestsToMerge);
+            }
         }
 
         return $mergeRequests;

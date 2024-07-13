@@ -37,21 +37,24 @@ abstract readonly class StatusTagPipelineAwaitable extends AbstractStatus
             tickInterval: $pipelineTickInterval,
         );
 
+        $statusContext = $this->context->toArray();
+        $statusContext['pipeline_id'] = $pipeline->id->value();
+
         if (null === $pipeline) {
-            $next = new StatusTagPipelineStuck();
+            $next = new StatusTagPipelineStuck($statusContext);
         } else {
             $next = match ($pipeline->status) {
-                Status::Created => new StatusTagPipelineCreated(),
-                Status::WaitingForResource => new StatusTagPipelineWaitingForResource(),
-                Status::Preparing => new StatusTagPipelinePreparing(),
-                Status::Pending => new StatusTagPipelinePending(),
-                Status::Running => new StatusTagPipelineRunning(),
-                Status::Success => new StatusTagPipelineSuccess(),
-                Status::Failed => new StatusTagPipelineFailed(),
-                Status::Canceled => new StatusTagPipelineCanceled(),
-                Status::Skipped => new StatusTagPipelineSkipped(),
-                Status::Manual => new StatusTagPipelineManual(),
-                Status::Scheduled => new StatusTagPipelineScheduled(),
+                Status::Created => new StatusTagPipelineCreated($statusContext),
+                Status::WaitingForResource => new StatusTagPipelineWaitingForResource($statusContext),
+                Status::Preparing => new StatusTagPipelinePreparing($statusContext),
+                Status::Pending => new StatusTagPipelinePending($statusContext),
+                Status::Running => new StatusTagPipelineRunning($statusContext),
+                Status::Success => new StatusTagPipelineSuccess($statusContext),
+                Status::Failed => new StatusTagPipelineFailed($statusContext),
+                Status::Canceled => new StatusTagPipelineCanceled($statusContext),
+                Status::Skipped => new StatusTagPipelineSkipped($statusContext),
+                Status::Manual => new StatusTagPipelineManual($statusContext),
+                Status::Scheduled => new StatusTagPipelineScheduled($statusContext),
             };
         }
 

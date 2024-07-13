@@ -12,6 +12,8 @@ enum Dictionary: string
 
     case BackendBranchCreated = 'backend_branch_created';
 
+    case FrontendApplicationBranchSet = 'frontend_application_branch_set';
+
     case FrontendBranchCreated = 'frontend_branch_created';
 
     case FrontendPipelineCreated = 'frontend_pipeline_created';

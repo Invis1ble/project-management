@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
@@ -20,6 +21,19 @@ final class ReleasePublicationRepository extends EventDispatchingRepository impl
         EventBusInterface $eventBus,
     ) {
         parent::__construct($registry, ReleasePublication::class, $eventBus);
+    }
+
+    public function contains(ReleasePublicationId $id): bool
+    {
+        $result = $this->createQueryBuilder('p')
+            ->select('1')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR)
+        ;
+
+        return null !== $result;
     }
 
     public function get(ReleasePublicationId $id): ReleasePublicationInterface

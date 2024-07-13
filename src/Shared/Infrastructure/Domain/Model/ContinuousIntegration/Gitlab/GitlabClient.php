@@ -22,6 +22,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Exception\UnsupportedProjectExcept
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
@@ -120,6 +121,34 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         ));
 
         return $pipeline ?? null;
+    }
+
+    public function retryPipeline(PipelineId $pipelineId): ?Pipeline\Pipeline
+    {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/pipelines/$pipelineId/retry"),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return $this->pipelineFactory->createPipeline(
+            projectId: $data['project_id'],
+            ref: $data['ref'],
+            id: $data['id'],
+            sha: $data['sha'],
+            status: $data['status'],
+            createdAt: $data['created_at'],
+            updatedAt: $data['updated_at'],
+            startedAt: $data['started_at'],
+            finishedAt: $data['finished_at'],
+            committedAt: $data['committed_at'],
+            guiUrl: $data['web_url'],
+        );
     }
 
     public function deployOnProduction(VersionName $tagName): Job\Job
@@ -278,17 +307,12 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         Branch\Name $branchName,
         Commit\Message $message,
         NewCommit\Action\ActionList $actions,
-        ?Branch\Name $startBranchName = null,
     ): Commit\Commit {
         $data = [
             'branch' => (string) $branchName,
             'commit_message' => (string) $message,
             'actions' => iterator_to_array($actions->map(fn (NewCommit\Action\AbstractAction $action): array => $action->toArray())),
         ];
-
-        if (null !== $startBranchName) {
-            $data['start_branch_name'] = (string) $startBranchName;
-        }
 
         $request = $this->requestFactory->createRequest(
             'POST',
@@ -313,7 +337,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         $this->eventBus->dispatch(new CommitCreated(
             projectId: $this->projectId,
             branchName: $branchName,
-            startBranchName: $startBranchName,
+            startBranchName: null,
             commitId: $commit->id,
             message: $commit->message,
             guiUrl: $this->uriFactory->createUri($data['web_url']),

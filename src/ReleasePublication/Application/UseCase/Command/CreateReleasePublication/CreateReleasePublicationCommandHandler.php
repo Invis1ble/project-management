@@ -6,6 +6,7 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Com
 
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\ReleasePublicationRepositoryAwareCommandHandler;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
 
 final readonly class CreateReleasePublicationCommandHandler extends ReleasePublicationRepositoryAwareCommandHandler
@@ -19,6 +20,10 @@ final readonly class CreateReleasePublicationCommandHandler extends ReleasePubli
 
     public function __invoke(CreateReleasePublicationCommand $command): void
     {
+        if ($this->repository->contains(ReleasePublicationId::fromBranchName($command->branchName))) {
+            return;
+        }
+
         $releasePublication = $this->factory->createReleasePublication(
             $command->branchName,
             $command->readyToMergeTasks,

@@ -33,21 +33,24 @@ abstract readonly class StatusFrontendPipelineAwaitable extends AbstractStatus
             tickInterval: $pipelineTickInterval,
         );
 
+        $statusContext = $this->context->toArray();
+        $statusContext['pipeline_id'] = $pipeline->id->value();
+
         if (null === $pipeline) {
-            $next = new StatusFrontendPipelineStuck();
+            $next = new StatusFrontendPipelineStuck($statusContext);
         } else {
             $next = match ($pipeline->status) {
-                Status::Created => new StatusFrontendPipelineCreated(),
-                Status::WaitingForResource => new StatusFrontendPipelineWaitingForResource(),
-                Status::Preparing => new StatusFrontendPipelinePreparing(),
-                Status::Pending => new StatusFrontendPipelinePending(),
-                Status::Running => new StatusFrontendPipelineRunning(),
-                Status::Success => new StatusFrontendPipelineSuccess(),
-                Status::Failed => new StatusFrontendPipelineFailed(),
-                Status::Canceled => new StatusFrontendPipelineCanceled(),
-                Status::Skipped => new StatusFrontendPipelineSkipped(),
-                Status::Manual => new StatusFrontendPipelineManual(),
-                Status::Scheduled => new StatusFrontendPipelineScheduled(),
+                Status::Created => new StatusFrontendPipelineCreated($statusContext),
+                Status::WaitingForResource => new StatusFrontendPipelineWaitingForResource($statusContext),
+                Status::Preparing => new StatusFrontendPipelinePreparing($statusContext),
+                Status::Pending => new StatusFrontendPipelinePending($statusContext),
+                Status::Running => new StatusFrontendPipelineRunning($statusContext),
+                Status::Success => new StatusFrontendPipelineSuccess($statusContext),
+                Status::Failed => new StatusFrontendPipelineFailed($statusContext),
+                Status::Canceled => new StatusFrontendPipelineCanceled($statusContext),
+                Status::Skipped => new StatusFrontendPipelineSkipped($statusContext),
+                Status::Manual => new StatusFrontendPipelineManual($statusContext),
+                Status::Scheduled => new StatusFrontendPipelineScheduled($statusContext),
             };
         }
 

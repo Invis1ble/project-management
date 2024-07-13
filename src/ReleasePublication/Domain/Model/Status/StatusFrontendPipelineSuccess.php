@@ -26,12 +26,10 @@ final readonly class StatusFrontendPipelineSuccess extends StatusFrontendPipelin
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
-            targetBranchName: $context->branchName(),
-            startBranchName: Name::fromString('develop'),
+        $backendSourceCodeRepository->createBranch(
+            name: $context->branchName(),
+            ref: Name::fromString('develop'),
         );
-
-        $newCommit?->commit($backendSourceCodeRepository);
 
         $this->setPublicationStatus($context, new StatusBackendBranchCreated());
     }

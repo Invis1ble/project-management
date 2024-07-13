@@ -26,5 +26,9 @@ interface StatusInterface extends \Stringable
         ReleasePublicationInterface $context,
     ): void;
 
+    public function equals(self $status): bool;
+
     public function prepared(): bool;
+
+    public function context(): Context;
 }

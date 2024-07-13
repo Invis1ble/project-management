@@ -26,7 +26,6 @@ interface SourceCodeRepositoryInterface
         Branch\Name $branchName,
         Commit\Message $message,
         NewCommit\Action\ActionList $actions,
-        ?Branch\Name $startBranchName = null,
     ): Commit\Commit;
 
     /**

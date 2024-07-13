@@ -10,6 +10,25 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicati
 
 abstract readonly class AbstractStatus implements StatusInterface
 {
+    protected Context $context;
+
+    public function __construct(?array $context = null)
+    {
+        $this->context = new Context($context);
+    }
+
+    public function equals(StatusInterface $status): bool
+    {
+        return static::class === $status::class
+            && $this->context->equals($status->context)
+        ;
+    }
+
+    public function context(): Context
+    {
+        return $this->context;
+    }
+
     public function prepared(): bool
     {
         return false;
