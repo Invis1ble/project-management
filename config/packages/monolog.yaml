@@ -6,9 +6,12 @@ when@dev:
     monolog:
         handlers:
             main:
-                type: stream
-                path: "%kernel.logs_dir%/%kernel.environment%.log"
+                type: rotating_file
+                path: '%kernel.logs_dir%/%kernel.environment%.log'
                 level: debug
+                # max number of log files to keep
+                # defaults to zero, which means infinite files
+                max_files: 50
                 channels: ["!event"]
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration
