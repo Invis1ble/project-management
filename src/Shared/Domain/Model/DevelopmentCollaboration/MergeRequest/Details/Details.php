@@ -19,10 +19,6 @@ final readonly class Details
         MergeRequestManagerInterface $mergeRequestManager,
         MergeRequest $context,
     ): MergeRequest {
-        if (!$this->mayBeMergeable()) {
-            throw new \RuntimeException("Merge request $context with status $this->status may not be mergeable");
-        }
-
         return $this->status->merge($mergeRequestManager, $context);
     }
 
