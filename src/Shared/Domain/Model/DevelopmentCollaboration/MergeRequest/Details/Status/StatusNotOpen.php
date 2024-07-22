@@ -6,7 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
 
-final readonly class StatusNotOpen extends AbstractStatus
+final readonly class StatusNotOpen extends AbstractMayBeMergeableStatus
 {
     public function toTaskTrackerStatus(): Status
     {
