@@ -7,19 +7,20 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
 final readonly class StatusReleaseCandidateRenamed extends AbstractStatus
 {
     public function proceedToNext(
-        MergeRequestManagerInterface $mergeRequestManager,
+        MergeRequest\MergeRequestManagerInterface $mergeRequestManager,
         SourceCodeRepositoryInterface $frontendSourceCodeRepository,
         SourceCodeRepositoryInterface $backendSourceCodeRepository,
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
+        MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,

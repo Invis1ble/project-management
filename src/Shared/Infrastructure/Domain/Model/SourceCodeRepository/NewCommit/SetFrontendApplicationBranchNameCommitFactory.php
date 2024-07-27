@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\NewCommit;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\Message;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action\ActionUpdate;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\NewCommit;
@@ -23,11 +22,11 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
     ) {
     }
 
-    public function createSetFrontendApplicationBranchNameCommit(Name $branchName): ?NewCommit
+    public function createSetFrontendApplicationBranchNameCommit(Branch\Name $branchName): ?NewCommit
     {
-        $configFilePath = FilePath::fromString('.helm/values.yaml');
+        $configFilePath = File\FilePath::fromString('.helm/values.yaml');
 
-        $file = $this->backendSourceCodeRepository->file(Name::fromString('develop'), $configFilePath);
+        $file = $this->backendSourceCodeRepository->file(Branch\Name::fromString('develop'), $configFilePath);
 
         $config = preg_replace(
             pattern: '/(Deploy_react:\s*host:\s*_default:\s*)"[^"]+"/',
@@ -42,11 +41,11 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
         return new NewCommit(
             projectId: $this->backendProjectId,
             branchName: $branchName,
-            message: Message::fromString("Change frontend application branch name to $branchName"),
+            message: Commit\Message::fromString("Change frontend application branch name to $branchName"),
             actions: new ActionList(
                 new ActionUpdate(
                     filePath: $configFilePath,
-                    content: Content::fromString($config),
+                    content: File\Content::fromString($config),
                 ),
             ),
         );

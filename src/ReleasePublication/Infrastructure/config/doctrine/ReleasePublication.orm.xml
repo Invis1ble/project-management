@@ -12,6 +12,8 @@
 
         <field name="branchName" type="release_branch_name" length="24" />
         <field name="status" type="release_publication_status" length="64" />
+        <field name="tagName" type="tag_version_name" nullable="true" />
+        <field name="tagMessage" type="tag_message" nullable="true" />
         <field name="readyToMergeTasks" type="issue_list" />
         <field name="createdAt" type="utc_datetime_microseconds_immutable" />
     </entity>

@@ -17,14 +17,14 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\Rele
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch as ReleaseBranch;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendBranchCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendReleaseBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusCreated;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendApplicationBranchSet;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendBranchCreated;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineFailed;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelinePending;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendPipelineSuccess;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusMergeRequestsMerged;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendApplicationBranchSetToRelease;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendReleaseBranchCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendReleaseBranchPipelineFailed;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendReleaseBranchPipelinePending;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendReleaseBranchPipelineSuccess;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusMergeRequestsIntoDevelopmentBranchMerged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusReleaseCandidateCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusReleaseCandidateRenamed;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
@@ -437,7 +437,7 @@ CONFIG),
         $this->assertArrayHasKey(9, $dispatchedEvents);
         $event = $dispatchedEvents[9]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusMergeRequestsMerged(), $event->status);
+        $this->assertObjectEquals(new StatusMergeRequestsIntoDevelopmentBranchMerged(), $event->status);
         $this->assertObjectEquals(new StatusCreated(), $event->previousStatus);
 
         $this->assertArrayHasKey(10, $dispatchedEvents);
@@ -449,8 +449,8 @@ CONFIG),
         $this->assertArrayHasKey(11, $dispatchedEvents);
         $event = $dispatchedEvents[11]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusFrontendBranchCreated(), $event->status);
-        $this->assertObjectEquals(new StatusMergeRequestsMerged(), $event->previousStatus);
+        $this->assertObjectEquals(new StatusFrontendReleaseBranchCreated(), $event->status);
+        $this->assertObjectEquals(new StatusMergeRequestsIntoDevelopmentBranchMerged(), $event->previousStatus);
 
         $this->assertArrayHasKey(12, $dispatchedEvents);
         $event = $dispatchedEvents[12]->event;
@@ -534,23 +534,23 @@ CONFIG),
         $event = $dispatchedEvents[23]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
         $this->assertObjectEquals(
-            expected: new StatusFrontendPipelineFailed(['pipeline_id' => $frontendPipelineId->value()]),
+            expected: new StatusFrontendReleaseBranchPipelineFailed(['pipeline_id' => $frontendPipelineId->value()]),
             actual: $event->status,
         );
-        $this->assertObjectEquals(new StatusFrontendBranchCreated(), $event->previousStatus);
+        $this->assertObjectEquals(new StatusFrontendReleaseBranchCreated(), $event->previousStatus);
 
         $this->assertArrayHasKey(24, $dispatchedEvents);
         $event = $dispatchedEvents[24]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
         $this->assertObjectEquals(
-            expected: new StatusFrontendPipelinePending([
+            expected: new StatusFrontendReleaseBranchPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
             actual: $event->status,
         );
         $this->assertObjectEquals(
-            expected: new StatusFrontendPipelineFailed(['pipeline_id' => $frontendPipelineId->value()]),
+            expected: new StatusFrontendReleaseBranchPipelineFailed(['pipeline_id' => $frontendPipelineId->value()]),
             actual: $event->previousStatus,
         );
 
@@ -593,14 +593,14 @@ CONFIG),
         $event = $dispatchedEvents[30]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
         $this->assertObjectEquals(
-            expected: new StatusFrontendPipelineSuccess([
+            expected: new StatusFrontendReleaseBranchPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
             actual: $event->status,
         );
         $this->assertObjectEquals(
-            expected: new StatusFrontendPipelinePending([
+            expected: new StatusFrontendReleaseBranchPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
@@ -616,9 +616,9 @@ CONFIG),
         $this->assertArrayHasKey(32, $dispatchedEvents);
         $event = $dispatchedEvents[32]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusBackendBranchCreated(), $event->status);
+        $this->assertObjectEquals(new StatusBackendReleaseBranchCreated(), $event->status);
         $this->assertObjectEquals(
-            expected: new StatusFrontendPipelineSuccess([
+            expected: new StatusFrontendReleaseBranchPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
@@ -639,8 +639,8 @@ CONFIG),
         $this->assertArrayHasKey(34, $dispatchedEvents);
         $event = $dispatchedEvents[34]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusFrontendApplicationBranchSet(), $event->status);
-        $this->assertObjectEquals(new StatusBackendBranchCreated(), $event->previousStatus);
+        $this->assertObjectEquals(new StatusFrontendApplicationBranchSetToRelease(), $event->status);
+        $this->assertObjectEquals(new StatusBackendReleaseBranchCreated(), $event->previousStatus);
 
         $this->assertArrayHasKey(35, $dispatchedEvents);
         $event = $dispatchedEvents[35]->event;
@@ -654,7 +654,7 @@ CONFIG),
         $event = $dispatchedEvents[36]->event;
         $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
         $this->assertObjectEquals(new StatusReleaseCandidateRenamed(), $event->status);
-        $this->assertObjectEquals(new StatusFrontendApplicationBranchSet(), $event->previousStatus);
+        $this->assertObjectEquals(new StatusFrontendApplicationBranchSetToRelease(), $event->previousStatus);
 
         $this->assertArrayHasKey(37, $dispatchedEvents);
         $event = $dispatchedEvents[37]->event;

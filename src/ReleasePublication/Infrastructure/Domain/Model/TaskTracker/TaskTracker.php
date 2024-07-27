@@ -7,7 +7,8 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\M
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseReleased;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
@@ -52,7 +53,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         );
     }
 
-    public function renameReleaseCandidate(Name $branchName): Version\Version
+    public function renameReleaseCandidate(Branch\Name $branchName): Version\Version
     {
         $request = $this->requestFactory->createRequest(
             'GET',
@@ -146,6 +147,61 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         );
 
         $this->eventBus->dispatch(new ReleaseCandidateCreated(
+            id: $version->id,
+            name: $version->name,
+            description: $version->description,
+            archived: $version->archived,
+            released: $version->released,
+            releaseDate: $version->releaseDate,
+        ));
+
+        return $version;
+    }
+
+    public function releaseVersion(Branch\Name $branchName): Version\Version
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
+                'query' => (string) $branchName,
+                'orderBy' => '-name',
+                'status' => 'unreleased',
+                'maxResults' => 1,
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $release = json_decode($content, true)['values'][0];
+
+        $request = $this->requestFactory->createRequest(
+            'PUT',
+            $this->uriFactory->createUri("/rest/api/3/version/{$release['id']}"),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode([
+                'release' => true,
+                'releaseDate' => date('Y-m-d'),
+            ])));
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $release = json_decode($content, true);
+
+        $version = new Version\Version(
+            Version\VersionId::fromString($release['id']),
+            Version\Name::fromString($release['name']),
+            isset($release['description']) ? Version\Description::fromString($release['description']) : null,
+            $release['archived'],
+            $release['released'],
+            isset($release['releaseDate']) ? new \DateTimeImmutable($release['releaseDate']) : null,
+        );
+
+        $this->eventBus->dispatch(new ReleaseReleased(
             id: $version->id,
             name: $version->name,
             description: $version->description,
