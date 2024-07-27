@@ -9,6 +9,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\Task
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
@@ -22,6 +23,7 @@ final readonly class ProceedToNextStatusCommandHandler extends ReleasePublicatio
         private ContinuousIntegrationClientInterface $frontendCiClient,
         private ContinuousIntegrationClientInterface $backendCiClient,
         private SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
+        private UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
         private TaskTrackerInterface $taskTracker,
         private \DateInterval $pipelineMaxAwaitingTime,
         private \DateInterval $pipelineTickInterval,
@@ -40,6 +42,7 @@ final readonly class ProceedToNextStatusCommandHandler extends ReleasePublicatio
             frontendCiClient: $this->frontendCiClient,
             backendCiClient: $this->backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $this->setFrontendApplicationBranchNameCommitFactory,
+            updateExtraDeployBranchMergeRequestFactory: $this->updateExtraDeployBranchMergeRequestFactory,
             taskTracker: $this->taskTracker,
             pipelineMaxAwaitingTime: $this->pipelineMaxAwaitingTime,
             pipelineTickInterval: $this->pipelineTickInterval,
