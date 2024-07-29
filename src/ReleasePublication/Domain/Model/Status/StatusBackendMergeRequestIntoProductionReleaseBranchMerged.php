@@ -27,6 +27,8 @@ final readonly class StatusBackendMergeRequestIntoProductionReleaseBranchMerged 
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
+        return;
+
         $backendSourceCodeRepository->createTag(
             name: $context->tagName(),
             ref: Branch\Name::fromString('master'),

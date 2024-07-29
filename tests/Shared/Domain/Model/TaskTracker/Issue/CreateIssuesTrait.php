@@ -30,7 +30,7 @@ trait CreateIssuesTrait
     ): Issue\IssueList {
         $mergeRequests = $this->createMergeRequests(
             uriFactory: $uriFactory,
-            id: 45,
+            iid: 45,
             backendProjectId: $backendProjectId,
             frontendProjectId: $frontendProjectId,
             projectName: $projectName,
@@ -43,7 +43,7 @@ trait CreateIssuesTrait
 
         $mergeRequestsToMerge = $this->createMergeRequests(
             uriFactory: $uriFactory,
-            id: $mergeRequestIid,
+            iid: $mergeRequestIid,
             backendProjectId: $backendProjectId,
             frontendProjectId: $frontendProjectId,
             projectName: $projectName,
