@@ -1035,21 +1035,6 @@ class ReleasePublicationSagaTest extends PublicationTestCase
             actual: $event->status,
         );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         $this->assertArrayHasKey(55, $dispatchedEvents);
         $event = $dispatchedEvents[55]->event;
         $this->assertInstanceOf(JobRan::class, $event);
