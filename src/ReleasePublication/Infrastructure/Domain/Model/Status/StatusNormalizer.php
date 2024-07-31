@@ -18,7 +18,7 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
         array $context = [],
     ): StatusInterface {
         return StatusFactory::createStatus(
-            status: Dictionary::from($data),
+            name: Dictionary::from($data),
         );
     }
 
