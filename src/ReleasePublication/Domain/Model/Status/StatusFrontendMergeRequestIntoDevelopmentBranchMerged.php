@@ -27,6 +27,8 @@ final readonly class StatusFrontendMergeRequestIntoDevelopmentBranchMerged exten
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
+        return;
+
         $release = $taskTracker->latestRelease();
 
         if (null === $release || $release->released) {

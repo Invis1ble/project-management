@@ -87,28 +87,6 @@ abstract class PublicationTestCase extends KernelTestCase
         );
     }
 
-    protected function createCreateMergeRequestResponse(
-        MergeRequest\MergeRequestIid $mergeRequestIid,
-        Project\ProjectId $projectId,
-        Project\Name $projectName,
-        MergeRequest\Title $title,
-        Branch\Name $sourceBranchName,
-        Branch\Name $targetBranchName,
-        UriInterface $guiUrl,
-    ): Response {
-        return $this->createMergeRequestResponse(
-            mergeRequestIid: $mergeRequestIid,
-            projectId: $projectId,
-            projectName: $projectName,
-            title: $title,
-            sourceBranchName: $sourceBranchName,
-            targetBranchName: $targetBranchName,
-            status: MergeRequest\Status::Open,
-            detailedStatus: MergeRequest\Details\Status\Dictionary::Mergeable,
-            guiUrl: $guiUrl,
-        );
-    }
-
     protected function createMergeMergeRequestResponse(
         MergeRequest\MergeRequestIid $mergeRequestIid,
         Project\ProjectId $projectId,

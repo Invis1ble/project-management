@@ -27,8 +27,6 @@ final readonly class StatusVersionReleased extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        return;
-
         $releaseBranchName = $context->branchName();
         $developmentBranchName = Branch\Name::fromString('develop');
 
