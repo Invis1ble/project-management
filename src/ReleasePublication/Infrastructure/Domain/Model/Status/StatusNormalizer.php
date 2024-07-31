@@ -17,8 +17,17 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
         ?string $format = null,
         array $context = [],
     ): StatusInterface {
+        if (is_string($data)) {
+            $name = $data;
+            $context = null;
+        } else {
+            $name = $data['name'];
+            $context = $data['context'] ?? null;
+        }
+
         return StatusFactory::createStatus(
-            name: Dictionary::from($data),
+            name: Dictionary::from($name),
+            context: $context,
         );
     }
 
@@ -26,8 +35,18 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
         mixed $object,
         ?string $format = null,
         array $context = [],
-    ): string {
-        return (string) $object;
+    ): array|string {
+        $context = $object->context()
+            ->toArray();
+
+        if (null === $context) {
+            return (string) $object;
+        }
+
+        return [
+            'name' => (string) $object,
+            'context' => $context,
+        ];
     }
 
     protected function getSupportedType(): string
