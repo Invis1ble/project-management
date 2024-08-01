@@ -22,8 +22,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Exception\UnsupportedProjectExcept
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
@@ -54,7 +53,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         private MergeRequest\MergeRequestFactoryInterface $mergeRequestFactory,
         private MergeRequest\Details\DetailsFactoryInterface $detailsFactory,
         private EventBusInterface $eventBus,
-        private ProjectId $projectId,
+        private Project\ProjectId $projectId,
         private ?\DateInterval $mergeRequestMaxAwaitingTime = new \DateInterval('PT1M'),
         private ?\DateInterval $mergeRequestTickInterval = new \DateInterval('PT10S'),
     ) {
@@ -123,7 +122,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         return $pipeline ?? null;
     }
 
-    public function retryPipeline(PipelineId $pipelineId): ?Pipeline\Pipeline
+    public function retryPipeline(Pipeline\PipelineId $pipelineId): ?Pipeline\Pipeline
     {
         $request = $this->requestFactory->createRequest(
             'POST',
@@ -432,7 +431,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
     }
 
     public function createMergeRequest(
-        ProjectId $projectId,
+        Project\ProjectId $projectId,
         MergeRequest\Title $title,
         Branch\Name $sourceBranchName,
         Branch\Name $targetBranchName,
@@ -475,7 +474,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
     }
 
     public function mergeMergeRequest(
-        ProjectId $projectId,
+        Project\ProjectId $projectId,
         MergeRequest\MergeRequestIid $mergeRequestIid,
     ): MergeRequest\MergeRequest {
         $this->assertSupportsProject($projectId);
@@ -587,13 +586,13 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         return $mergeRequest;
     }
 
-    public function supports(ProjectId $projectId): bool
+    public function supports(Project\ProjectId $projectId): bool
     {
         return $this->projectId->equals($projectId);
     }
 
     public function mergeRequest(
-        ProjectId $projectId,
+        Project\ProjectId $projectId,
         MergeRequest\MergeRequestIid $mergeRequestIid,
     ): MergeRequest\MergeRequest {
         $this->assertSupportsProject($projectId);
@@ -613,7 +612,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
     }
 
     public function details(
-        ProjectId $projectId,
+        Project\ProjectId $projectId,
         MergeRequest\MergeRequestIid $mergeRequestIid,
     ): MergeRequest\Details\Details {
         $this->assertSupportsProject($projectId);
@@ -634,7 +633,12 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         );
     }
 
-    private function assertSupportsProject(ProjectId $projectId): void
+    public function projectId(): Project\ProjectId
+    {
+        return $this->projectId;
+    }
+
+    private function assertSupportsProject(Project\ProjectId $projectId): void
     {
         if (!$this->supports($projectId)) {
             throw new UnsupportedProjectException($projectId);

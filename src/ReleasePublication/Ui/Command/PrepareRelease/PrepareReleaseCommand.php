@@ -25,7 +25,7 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
     {
         parent::execute($input, $output);
 
-        $this->io->title('Preparing new release');
+        $this->io->title('Preparing a new release');
 
         $newReleaseBranchName = $this->newReleaseBranchName();
         $tasks = $this->readyToMergeTasks();

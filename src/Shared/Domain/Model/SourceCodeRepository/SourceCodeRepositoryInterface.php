@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository;
 
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 
 interface SourceCodeRepositoryInterface
 {
@@ -14,7 +14,7 @@ interface SourceCodeRepositoryInterface
     ): Branch\Branch;
 
     /**
-     * @return Tag\Tag<VersionName>
+     * @return Tag\Tag<Tag\VersionName>
      */
     public function createTag(
         Tag\Name $name,
@@ -29,7 +29,7 @@ interface SourceCodeRepositoryInterface
     ): Commit\Commit;
 
     /**
-     * @return ?Tag\Tag<VersionName>
+     * @return ?Tag\Tag<Tag\VersionName>
      */
     public function latestTagToday(): ?Tag\Tag;
 
@@ -37,4 +37,6 @@ interface SourceCodeRepositoryInterface
         Branch\Name $branchName,
         File\FilePath $filePath,
     ): File\File;
+
+    public function projectId(): Project\ProjectId;
 }

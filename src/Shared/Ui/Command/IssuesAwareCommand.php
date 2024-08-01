@@ -7,6 +7,7 @@ namespace Invis1ble\ProjectManagement\Shared\Ui\Command;
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
+use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
@@ -14,6 +15,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
@@ -106,6 +108,50 @@ abstract class IssuesAwareCommand extends Command
                 return "<bg=$fg;fg=black;options=bold> {$mr->status->value} </> $mr->guiUrl <options=bold>$mr->sourceBranchName -> $mr->targetBranchName</> | $mr->title";
             },
         )));
+    }
+
+    protected function newTagName(): Tag\VersionName
+    {
+        $this->phase('Calculating new tag today...');
+
+        /** @var ?Tag\Tag<Tag\VersionName> $latestTagToday */
+        $latestTagToday = $this->queryBus->ask(new GetLatestTagTodayQuery());
+
+        $this->caption('Latest tag today');
+
+        if (null === $latestTagToday) {
+            $this->io->block('No tags today');
+        } else {
+            $this->io->block((string) $latestTagToday->name);
+        }
+
+        $this->caption('New calculated tag');
+
+        if (null === $latestTagToday) {
+            $tagName = Tag\VersionName::create();
+        } else {
+            $tagName = Tag\VersionName::fromRef($latestTagToday->name)->bumpVersion();
+        }
+
+        $this->io->block((string) $tagName);
+
+        return $this->io->ask(
+            question: 'New tag',
+            default: (string) $tagName,
+            validator: function (string $answer) use ($latestTagToday): Tag\VersionName {
+                $tagName = Tag\VersionName::fromString($answer);
+
+                if (null === $latestTagToday) {
+                    return $tagName;
+                }
+
+                if (!$tagName->versionNewerThan(Tag\VersionName::fromRef($latestTagToday->name))) {
+                    throw new \InvalidArgumentException("Provided version must be greater than latest tag $latestTagToday->name version");
+                }
+
+                return $tagName;
+            },
+        );
     }
 
     protected function caption(string $text): void

@@ -9,11 +9,8 @@ use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint\GetReadyForPublishHotfixesInActiveSprintQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Tag;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
@@ -108,50 +105,6 @@ final class PublishHotfixCommand extends IssuesAwareCommand
         ));
 
         return Command::SUCCESS;
-    }
-
-    private function newTagName(): VersionName
-    {
-        $this->phase('Calculating new tag today...');
-
-        /** @var ?Tag<VersionName> $latestTagToday */
-        $latestTagToday = $this->queryBus->ask(new GetLatestTagTodayQuery());
-
-        $this->caption('Latest tag today');
-
-        if (null === $latestTagToday) {
-            $this->io->block('No tags today');
-        } else {
-            $this->io->block((string) $latestTagToday->name);
-        }
-
-        $this->caption('New calculated tag');
-
-        if (null === $latestTagToday) {
-            $tagName = VersionName::create();
-        } else {
-            $tagName = VersionName::fromRef($latestTagToday->name)->bumpVersion();
-        }
-
-        $this->io->block((string) $tagName);
-
-        return $this->io->ask(
-            question: 'New tag',
-            default: (string) $tagName,
-            validator: function (string $answer) use ($latestTagToday): VersionName {
-                $tagName = VersionName::fromString($answer);
-
-                if (null === $latestTagToday) {
-                    return $tagName;
-                }
-
-                if (!$tagName->versionNewerThan(VersionName::fromRef($latestTagToday->name))) {
-                    throw new \InvalidArgumentException("Provided version must be greater than latest tag $latestTagToday->name version");
-                }
-
-                return $tagName;
-            },
-        );
     }
 
     private function newTagMessage(IssueList $hotfixes): Message
