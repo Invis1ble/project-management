@@ -634,7 +634,7 @@ CONFIG),
             new Response(
                 status: 200,
                 body: json_encode($this->createCommitResponseFixture(
-                    message: Commit\Message::fromString('Change frontend application branch name to develop'),
+                    message: Commit\Message::fromString("Change frontend application branch name to $developmentBranchName"),
                     createdAt: $setFrontendApplicationBranchNameCommitCreatedAt,
                 )),
             ),

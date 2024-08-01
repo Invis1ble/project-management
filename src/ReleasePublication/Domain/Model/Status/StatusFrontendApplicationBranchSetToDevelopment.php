@@ -27,6 +27,8 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
+        return;
+
         $mergeRequest = $updateExtraDeployBranchMergeRequestFactory->createMergeRequest();
 
         if (null === $mergeRequest) {

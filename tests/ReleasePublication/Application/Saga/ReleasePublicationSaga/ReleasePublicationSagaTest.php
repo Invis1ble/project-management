@@ -24,6 +24,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDep
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDeploymentPipelineFailed;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDeploymentPipelinePending;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDeploymentPipelineSuccess;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendApplicationBranchSetToDevelopment;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendMergeRequestIntoDevelopmentBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendMergeRequestIntoDevelopmentBranchMerged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendMergeRequestIntoProductionReleaseBranchCreated;
@@ -45,12 +46,14 @@ use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestStatusChanged;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Commit\CommitCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag\TagCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
@@ -592,6 +595,23 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 targetBranchName: $developmentBranchName,
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
+            new Response(
+                status: 200,
+                body: json_encode($this->fileResponseFixture(
+                    content: Content::fromString(<<<CONFIG
+Deploy_react:
+    host:
+        _default: "v-1-0-0"
+CONFIG),
+                )),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($this->createCommitResponseFixture(
+                    message: Commit\Message::fromString("Change frontend application branch name to $developmentBranchName"),
+                    createdAt: $setFrontendApplicationBranchNameCommitCreatedAt,
+                )),
+            ),
         ]);
 
         /** @var Client $httpClient */
@@ -635,13 +655,13 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
         $this->assertObjectEquals($tagName, $publication->tagName());
         $this->assertObjectEquals($tagMessage, $publication->tagMessage());
         $this->assertObjectEquals(
-            expected: new StatusBackendMergeRequestIntoDevelopmentBranchMerged(),
+            expected: new StatusFrontendApplicationBranchSetToDevelopment(),
             actual: $publication->status(),
         );
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(90, $dispatchedEvents);
+        $this->assertCount(92, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -1401,6 +1421,24 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 'merge_request_iid' => $backendMrToMerge->iid->value(),
             ]),
             expectedStatus: new StatusBackendMergeRequestIntoDevelopmentBranchMerged(),
+        );
+
+        $this->assertArrayHasKey(90, $dispatchedEvents);
+        $event = $dispatchedEvents[90]->event;
+        $this->assertInstanceOf(CommitCreated::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($developmentBranchName, $event->branchName);
+        $this->assertNull($event->startBranchName);
+        $this->assertObjectEquals(
+            Commit\Message::fromString("Change frontend application branch name to $developmentBranchName"),
+            $event->message,
+        );
+
+        $this->assertArrayHasKey(91, $dispatchedEvents);
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[91]->event,
+            expectedPreviousStatus: new StatusBackendMergeRequestIntoDevelopmentBranchMerged(),
+            expectedStatus: new StatusFrontendApplicationBranchSetToDevelopment(),
         );
     }
 }
