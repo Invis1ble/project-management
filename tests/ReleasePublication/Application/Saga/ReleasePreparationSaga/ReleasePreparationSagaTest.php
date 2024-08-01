@@ -534,7 +534,7 @@ CONFIG),
             event: $dispatchedEvents[23]->event,
             expectedPreviousStatus: new StatusFrontendReleaseBranchCreated(),
             expectedStatus: new StatusFrontendReleaseBranchPipelineFailed([
-                'pipeline_id' => $frontendPipelineId->value()
+                'pipeline_id' => $frontendPipelineId->value(),
             ]),
         );
 
