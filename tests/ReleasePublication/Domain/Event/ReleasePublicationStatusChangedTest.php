@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\ReleasePublication\Domain\Event;
 
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationStatusChanged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusReleaseCandidateCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusReleaseCandidateRenamed;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializationTestCase;
 use Psr\Http\Message\UriFactoryInterface;
 
 /**
- * @extends SerializationTestCase<ReleasePublicationCreated>
+ * @extends SerializationTestCase<ReleasePublicationStatusChanged>
  */
-class ReleasePublicationCreatedTest extends SerializationTestCase
+class ReleasePublicationStatusChangedTest extends SerializationTestCase
 {
     use CreateIssuesTrait;
 
-    protected function createObject(): ReleasePublicationCreated
+    protected function createObject(): ReleasePublicationStatusChanged
     {
         $container = $this->getContainer();
         /** @var UriFactoryInterface $uriFactory */
@@ -30,14 +31,15 @@ class ReleasePublicationCreatedTest extends SerializationTestCase
             uriFactory: $uriFactory,
         );
 
-        $branchName = Name::fromString('v-1-0-0');
+        $branchName = Branch\Name::fromString('v-1-0-0');
 
-        return new ReleasePublicationCreated(
+        return new ReleasePublicationStatusChanged(
             id: ReleasePublicationId::fromBranchName($branchName),
             branchName: $branchName,
             tagName: Tag\VersionName::create(),
             tagMessage: Tag\Message::fromString("Release $branchName."),
-            status: new StatusCreated(),
+            previousStatus: new StatusReleaseCandidateRenamed(),
+            status: new StatusReleaseCandidateCreated(),
             readyToMergeTasks: $hotfixes,
             createdAt: new \DateTimeImmutable(),
         );
@@ -49,7 +51,7 @@ class ReleasePublicationCreatedTest extends SerializationTestCase
             && $object1->branchName->equals($object2->branchName)
             && (null === $object1->tagName ? (null === $object2->tagName) : $object1->tagName->equals($object2->tagName))
             && (null === $object1->tagMessage ? (null === $object2->tagMessage) : $object1->tagMessage->equals($object2->tagMessage))
-            && $object1->tagMessage->equals($object2->tagMessage)
+            && $object1->previousStatus->equals($object2->previousStatus)
             && $object1->status->equals($object2->status)
             && $object1->readyToMergeTasks->equals($object2->readyToMergeTasks)
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning

@@ -97,8 +97,8 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
 
         $this->eventBus->dispatch(new ReleaseCandidateRenamed(
             id: $version->id,
-            name: $version->name,
             previousName: Version\Name::fromString($releaseCandidate['name']),
+            name: $version->name,
             description: $version->description,
             archived: $version->archived,
             released: $version->released,

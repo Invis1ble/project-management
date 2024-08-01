@@ -15,12 +15,12 @@ final readonly class ReleasePublicationTagSet extends AbstractReleasePublication
     public function __construct(
         ReleasePublicationId $id,
         Branch\Name $branchName,
-        public Tag\VersionName $tagName,
-        public Tag\Message $tagMessage,
+        Tag\Name $tagName,
+        Tag\Message $tagMessage,
         StatusInterface $status,
         IssueList $readyToMergeTasks,
         \DateTimeImmutable $createdAt,
     ) {
-        parent::__construct($id, $branchName, $status, $readyToMergeTasks, $createdAt);
+        parent::__construct($id, $branchName, $tagName, $tagMessage, $status, $readyToMergeTasks, $createdAt);
     }
 }

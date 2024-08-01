@@ -51,6 +51,8 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         $release->raiseDomainEvent(new ReleasePublicationCreated(
             id: $release->id,
             branchName: $release->branchName,
+            tagName: null,
+            tagMessage: null,
             status: $release->status,
             readyToMergeTasks: $readyToMergeTasks,
             createdAt: $release->createdAt,
