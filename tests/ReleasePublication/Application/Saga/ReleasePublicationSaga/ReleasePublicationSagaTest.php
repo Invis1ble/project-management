@@ -17,6 +17,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicati
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch as ReleaseBranch;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendMergeRequestIntoDevelopmentBranchCreated;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendMergeRequestIntoDevelopmentBranchMerged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendMergeRequestIntoProductionReleaseBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendMergeRequestIntoProductionReleaseBranchMerged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDeploymentJobInited;
@@ -44,6 +45,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestStatusChanged;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Commit\CommitCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag\TagCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
@@ -571,6 +573,26 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
+            $this->createMergeRequestResponse(
+                mergeRequestIid: $backendMrToMerge->iid,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: $developmentBranchName,
+                status: MergeRequest\Status::Open,
+                detailedStatus: MergeRequest\Details\Status\Dictionary::Mergeable,
+                guiUrl: $backendMrToMerge->guiUrl,
+            ),
+            $this->createMergeMergeRequestResponse(
+                mergeRequestIid: $backendMrToMerge->iid,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: $developmentBranchName,
+                guiUrl: $backendMrToMerge->guiUrl,
+            ),
         ]);
 
         /** @var Client $httpClient */
@@ -614,16 +636,13 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
         $this->assertObjectEquals($tagName, $publication->tagName());
         $this->assertObjectEquals($tagMessage, $publication->tagMessage());
         $this->assertObjectEquals(
-            expected: new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
-                'project_id' => $backendProjectId->value(),
-                'merge_request_iid' => $backendMrToMerge->iid->value(),
-            ]),
+            expected: new StatusBackendMergeRequestIntoDevelopmentBranchMerged(),
             actual: $publication->status(),
         );
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(88, $dispatchedEvents);
+        $this->assertCount(90, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -1363,6 +1382,26 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 'project_id' => $backendProjectId->value(),
                 'merge_request_iid' => $backendMrToMerge->iid->value(),
             ]),
+        );
+
+        $this->assertArrayHasKey(88, $dispatchedEvents);
+        $event = $dispatchedEvents[88]->event;
+        $this->assertInstanceOf(MergeRequestMerged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($backendMrToMerge->iid, $event->mergeRequestIid);
+        $this->assertObjectEquals($backendMrToMerge->title, $event->title);
+        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
+        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
+        $this->assertObjectEquals($backendMrToMerge->details, $event->details);
+
+        $this->assertArrayHasKey(89, $dispatchedEvents);
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[89]->event,
+            expectedPreviousStatus: new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
+                'project_id' => $backendProjectId->value(),
+                'merge_request_iid' => $backendMrToMerge->iid->value(),
+            ]),
+            expectedStatus: new StatusBackendMergeRequestIntoDevelopmentBranchMerged(),
         );
     }
 }

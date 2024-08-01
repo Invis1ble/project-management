@@ -27,8 +27,6 @@ final readonly class StatusBackendMergeRequestIntoDevelopmentBranchCreated exten
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        return;
-
         $statusContext = $this->context->toArray();
 
         $mergeRequestManager->mergeMergeRequest(

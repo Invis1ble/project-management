@@ -1516,7 +1516,7 @@ CONFIG),
         $this->assertObjectEquals($developmentBranchName, $event->branchName);
         $this->assertNull($event->startBranchName);
         $this->assertObjectEquals(
-            Commit\Message::fromString('Change frontend application branch name to develop'),
+            Commit\Message::fromString("Change frontend application branch name to $developmentBranchName"),
             $event->message,
         );
 

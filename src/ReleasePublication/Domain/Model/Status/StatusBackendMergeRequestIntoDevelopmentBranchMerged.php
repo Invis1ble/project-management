@@ -27,6 +27,8 @@ final readonly class StatusBackendMergeRequestIntoDevelopmentBranchMerged extend
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
+        return;
+
         $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
             branchName: Name::fromString('develop'),
         );
