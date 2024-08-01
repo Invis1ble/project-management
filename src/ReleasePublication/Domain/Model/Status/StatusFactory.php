@@ -6,10 +6,10 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 
 final class StatusFactory
 {
-    public static function createStatus(Dictionary $status): StatusInterface
+    public static function createStatus(Dictionary $name, ?array $context): StatusInterface
     {
-        $statusFqcn = __NAMESPACE__ . "\Status$status->name";
+        $statusFqcn = __NAMESPACE__ . "\Status$name->name";
 
-        return new $statusFqcn();
+        return new $statusFqcn($context);
     }
 }

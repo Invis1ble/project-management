@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\fixture\CreateMergeRequestTrait;
 use Psr\Http\Message\UriFactoryInterface;
 
 trait CreateMergeRequestsTrait
 {
+    use CreateMergeRequestTrait;
+
     public function createMergeRequests(
         UriFactoryInterface $uriFactory,
-        int $id = 4,
+        int $iid = 4,
         int $backendProjectId = 1,
         int $frontendProjectId = 2,
         string $projectName = 'my-group/my-project',
@@ -23,34 +24,28 @@ trait CreateMergeRequestsTrait
         MergeRequest\Status $jiraStatus = MergeRequest\Status::Open,
         MergeRequest\Details\Status\Dictionary $gitlabStatus = MergeRequest\Details\Status\Dictionary::Mergeable,
     ): MergeRequest\MergeRequestList {
-        $mergeRequestIid = MergeRequest\MergeRequestIid::from($id);
-
         return new MergeRequest\MergeRequestList(
-            new MergeRequest\MergeRequest(
-                iid: $mergeRequestIid,
-                title: MergeRequest\Title::fromString($title),
-                projectId: Project\ProjectId::from($backendProjectId),
-                projectName: Project\Name::fromString($projectName),
-                sourceBranchName: Branch\Name::fromString($sourceBranchName),
-                targetBranchName: Branch\Name::fromString($targetBranchName),
-                status: $jiraStatus,
-                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestIid"),
-                details: new MergeRequest\Details\Details(
-                    status: MergeRequest\Details\Status\StatusFactory::createStatus($gitlabStatus),
-                ),
+            $this->createMergeRequest(
+                uriFactory: $uriFactory,
+                iid: $iid,
+                projectId: $backendProjectId,
+                projectName: $projectName,
+                title: $title,
+                sourceBranchName: $sourceBranchName,
+                targetBranchName: $targetBranchName,
+                jiraStatus: $jiraStatus,
+                gitlabStatus: $gitlabStatus,
             ),
-            new MergeRequest\MergeRequest(
-                iid: $mergeRequestIid,
-                title: MergeRequest\Title::fromString($title),
-                projectId: Project\ProjectId::from($frontendProjectId),
-                projectName: Project\Name::fromString($projectName),
-                sourceBranchName: Branch\Name::fromString($sourceBranchName),
-                targetBranchName: Branch\Name::fromString($targetBranchName),
-                status: $jiraStatus,
-                guiUrl: $uriFactory->createUri("https://gitlab.example.com/$projectName/-/merge_requests/$mergeRequestIid"),
-                details: new MergeRequest\Details\Details(
-                    status: MergeRequest\Details\Status\StatusFactory::createStatus($gitlabStatus),
-                ),
+            $this->createMergeRequest(
+                uriFactory: $uriFactory,
+                iid: $iid,
+                projectId: $frontendProjectId,
+                projectName: $projectName,
+                title: $title,
+                sourceBranchName: $sourceBranchName,
+                targetBranchName: $targetBranchName,
+                jiraStatus: $jiraStatus,
+                gitlabStatus: $gitlabStatus,
             ),
         );
     }

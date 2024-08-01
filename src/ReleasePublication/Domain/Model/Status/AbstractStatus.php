@@ -45,8 +45,10 @@ abstract readonly class AbstractStatus implements StatusInterface
         $reflection->invoke($publication, new ReleasePublicationStatusChanged(
             id: $publication->id(),
             branchName: $publication->branchName(),
-            status: $publication->status(),
+            tagName: $publication->tagName(),
+            tagMessage: $publication->tagMessage(),
             previousStatus: $previousStatus,
+            status: $publication->status(),
             readyToMergeTasks: $publication->readyToMergeTasks(),
             createdAt: $publication->createdAt(),
         ));

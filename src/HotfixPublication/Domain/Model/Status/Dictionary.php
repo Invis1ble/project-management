@@ -10,33 +10,29 @@ enum Dictionary: string
 
     case MergeRequestsMerged = 'merge_requests_merged';
 
-    case BackendBranchCreated = 'backend_branch_created';
+    case FrontendProductionReleaseBranchPipelineCreated = 'frontend_production_release_branch_pipeline_created';
 
-    case FrontendBranchCreated = 'frontend_branch_created';
+    case FrontendProductionReleaseBranchPipelineWaitingForResource = 'frontend_production_release_branch_pipeline_waiting_for_resource';
 
-    case FrontendPipelineCreated = 'frontend_pipeline_created';
+    case FrontendProductionReleaseBranchPipelinePreparing = 'frontend_production_release_branch_pipeline_preparing';
 
-    case FrontendPipelineWaitingForResource = 'frontend_pipeline_waiting_for_resource';
+    case FrontendProductionReleaseBranchPipelinePending = 'frontend_production_release_branch_pipeline_pending';
 
-    case FrontendPipelinePreparing = 'frontend_pipeline_preparing';
+    case FrontendProductionReleaseBranchPipelineRunning = 'frontend_production_release_branch_pipeline_running';
 
-    case FrontendPipelinePending = 'frontend_pipeline_pending';
+    case FrontendProductionReleaseBranchPipelineSuccess = 'frontend_production_release_branch_pipeline_success';
 
-    case FrontendPipelineRunning = 'frontend_pipeline_running';
+    case FrontendProductionReleaseBranchPipelineFailed = 'frontend_production_release_branch_pipeline_failed';
 
-    case FrontendPipelineSuccess = 'frontend_pipeline_success';
+    case FrontendProductionReleaseBranchPipelineCanceled = 'frontend_production_release_branch_pipeline_canceled';
 
-    case FrontendPipelineFailed = 'frontend_pipeline_failed';
+    case FrontendProductionReleaseBranchPipelineSkipped = 'frontend_production_release_branch_pipeline_skipped';
 
-    case FrontendPipelineCanceled = 'frontend_pipeline_canceled';
+    case FrontendProductionReleaseBranchPipelineManual = 'frontend_production_release_branch_pipeline_manual';
 
-    case FrontendPipelineSkipped = 'frontend_pipeline_skipped';
+    case FrontendProductionReleaseBranchPipelineScheduled = 'frontend_production_release_branch_pipeline_scheduled';
 
-    case FrontendPipelineManual = 'frontend_pipeline_manual';
-
-    case FrontendPipelineScheduled = 'frontend_pipeline_scheduled';
-
-    case FrontendPipelineStuck = 'frontend_pipeline_stuck';
+    case FrontendProductionReleaseBranchPipelineStuck = 'frontend_production_release_branch_pipeline_stuck';
 
     case TagCreated = 'tag_created';
 
@@ -92,17 +88,17 @@ enum Dictionary: string
 
     case HotfixesTransitionedToDone = 'hotfixes_transitioned_to_done';
 
-    case MergeRequestsIntoDevelopCreated = 'merge_requests_into_develop_created';
+    case MergeRequestsIntoDevelopmentBranchCreated = 'merge_requests_into_development_branch_created';
 
-    case DevelopBranchSynchronized = 'develop_branch_synchronized';
+    case DevelopmentBranchSynchronized = 'development_branch_synchronized';
 
-    case MergeRequestsIntoReleaseCreated = 'merge_requests_into_release_created';
+    case MergeRequestsIntoReleaseBranchCreated = 'merge_requests_into_release_branch_created';
 
     case ReleaseBranchSynchronized = 'release_branch_synchronized';
 
-    case FrontendApplicationBranchSet = 'frontend_application_branch_set';
+    case FrontendApplicationBranchSetToDevelopment = 'frontend_application_branch_set_to_development';
 
-    case UpdateExtraDeployBranchMergeRequestCreated = 'update_extra_deploy_branch_merge_request_created';
+    case MergeRequestIntoExtraDeploymentBranchCreated = 'merge_request_into_extra_deployment_branch_created';
 
     case Done = 'done';
 }

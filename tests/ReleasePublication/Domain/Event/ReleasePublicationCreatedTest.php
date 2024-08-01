@@ -8,6 +8,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicati
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusCreated;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializationTestCase;
 use Psr\Http\Message\UriFactoryInterface;
@@ -34,6 +35,8 @@ class ReleasePublicationCreatedTest extends SerializationTestCase
         return new ReleasePublicationCreated(
             id: ReleasePublicationId::fromBranchName($branchName),
             branchName: $branchName,
+            tagName: Tag\VersionName::create(),
+            tagMessage: Tag\Message::fromString("Release $branchName."),
             status: new StatusCreated(),
             readyToMergeTasks: $hotfixes,
             createdAt: new \DateTimeImmutable(),
@@ -44,6 +47,9 @@ class ReleasePublicationCreatedTest extends SerializationTestCase
     {
         return $object1->id->equals($object2->id)
             && $object1->branchName->equals($object2->branchName)
+            && (null === $object1->tagName ? (null === $object2->tagName) : $object1->tagName->equals($object2->tagName))
+            && (null === $object1->tagMessage ? (null === $object2->tagMessage) : $object1->tagMessage->equals($object2->tagMessage))
+            && $object1->tagMessage->equals($object2->tagMessage)
             && $object1->status->equals($object2->status)
             && $object1->readyToMergeTasks->equals($object2->readyToMergeTasks)
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning

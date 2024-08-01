@@ -36,7 +36,7 @@ final readonly class StatusReleaseBranchSynchronized extends AbstractStatus
 
         $newCommit?->commit($backendSourceCodeRepository);
 
-        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSet());
+        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSetToDevelopment());
     }
 
     public function __toString(): string
