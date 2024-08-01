@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 
-use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusMergeRequestIntoExtraDeploymentBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
@@ -27,8 +26,6 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        return;
-
         $mergeRequest = $updateExtraDeployBranchMergeRequestFactory->createMergeRequest();
 
         if (null === $mergeRequest) {
