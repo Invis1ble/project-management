@@ -8,7 +8,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicati
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
@@ -27,28 +27,13 @@ final readonly class StatusBackendMergeRequestIntoDevelopmentBranchMerged extend
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $release = $taskTracker->latestRelease();
+        $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
+            branchName: Name::fromString('develop'),
+        );
 
-        if (null === $release || $release->released) {
-            $next = new StatusBackendReleaseBranchSynchronized();
-        } else {
-            $releaseBranchName = $context->branchName();
-            $developmentBranchName = Branch\Name::fromString('develop');
+        $newCommit?->commit($backendSourceCodeRepository);
 
-            $mergeRequest = $mergeRequestManager->createMergeRequest(
-                projectId: $backendSourceCodeRepository->projectId(),
-                title: MergeRequest\Title::fromString("Merge branch $releaseBranchName into $developmentBranchName"),
-                sourceBranchName: $releaseBranchName,
-                targetBranchName: $developmentBranchName,
-            );
-
-            $next = new StatusBackendMergeRequestIntoReleaseBranchCreated([
-                'project_id' => $mergeRequest->projectId->value(),
-                'merge_request_iid' => $mergeRequest->iid->value(),
-            ]);
-        }
-
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSetToDevelopment());
     }
 
     public function __toString(): string

@@ -27,30 +27,20 @@ final readonly class StatusFrontendMergeRequestIntoDevelopmentBranchMerged exten
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        return;
+        $releaseBranchName = $context->branchName();
+        $developmentBranchName = Branch\Name::fromString('develop');
 
-        $release = $taskTracker->latestRelease();
+        $mergeRequest = $mergeRequestManager->createMergeRequest(
+            projectId: $backendSourceCodeRepository->projectId(),
+            title: MergeRequest\Title::fromString("Merge branch $releaseBranchName into $developmentBranchName"),
+            sourceBranchName: $releaseBranchName,
+            targetBranchName: $developmentBranchName,
+        );
 
-        if (null === $release || $release->released) {
-            $next = new StatusFrontendReleaseBranchSynchronized();
-        } else {
-            $releaseBranchName = $context->branchName();
-            $developmentBranchName = Branch\Name::fromString('develop');
-
-            $mergeRequest = $mergeRequestManager->createMergeRequest(
-                projectId: $frontendSourceCodeRepository->projectId(),
-                title: MergeRequest\Title::fromString("Merge branch $releaseBranchName into $developmentBranchName"),
-                sourceBranchName: $releaseBranchName,
-                targetBranchName: $developmentBranchName,
-            );
-
-            $next = new StatusFrontendMergeRequestIntoReleaseBranchCreated([
-                'project_id' => $mergeRequest->projectId->value(),
-                'merge_request_iid' => $mergeRequest->iid->value(),
-            ]);
-        }
-
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($context, new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
+            'project_id' => $mergeRequest->projectId->value(),
+            'merge_request_iid' => $mergeRequest->iid->value(),
+        ]));
     }
 
     public function __toString(): string

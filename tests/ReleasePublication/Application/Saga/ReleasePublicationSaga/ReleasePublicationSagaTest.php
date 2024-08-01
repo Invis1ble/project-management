@@ -11,12 +11,12 @@ use GuzzleHttp\Psr7\Response;
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Event\TraceableEventBus;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\PublishRelease\PublishReleaseCommand;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationStatusChanged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationTagSet;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseReleased;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch as ReleaseBranch;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendMergeRequestIntoDevelopmentBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendMergeRequestIntoProductionReleaseBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusBackendMergeRequestIntoProductionReleaseBranchMerged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDeploymentJobInited;
@@ -53,20 +53,11 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
-use Invis1ble\ProjectManagement\Tests\Shared\Application\Saga\PublicationTestCase;
-use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\fixture\CreateMergeRequestTrait;
-use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\SourceCodeRepository\Branch\BranchResponseFixtureTrait;
-use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Project\ProjectResponseFixtureTrait;
-use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Version\VersionResponseFixtureTrait;
+use Invis1ble\ProjectManagement\Tests\ReleasePublication\Application\Saga\ReleaseSagaTestCase;
 use Psr\Http\Message\UriFactoryInterface;
 
-class ReleasePublicationSagaTest extends PublicationTestCase
+class ReleasePublicationSagaTest extends ReleaseSagaTestCase
 {
-    use BranchResponseFixtureTrait;
-    use CreateMergeRequestTrait;
-    use VersionResponseFixtureTrait;
-    use ProjectResponseFixtureTrait;
-
     public function testReleasePublication(): void
     {
         self::bootKernel();
@@ -569,6 +560,17 @@ class ReleasePublicationSagaTest extends PublicationTestCase
                 targetBranchName: $developmentBranchName,
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
+            $this->createMergeRequestResponse(
+                mergeRequestIid: $backendMrToMerge->iid,
+                projectId: $backendMrToMerge->projectId,
+                projectName: $backendMrToMerge->projectName,
+                title: $backendMrToMerge->title,
+                sourceBranchName: $backendMrToMerge->sourceBranchName,
+                targetBranchName: $developmentBranchName,
+                status: MergeRequest\Status::Open,
+                detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
+                guiUrl: $backendMrToMerge->guiUrl,
+            ),
         ]);
 
         /** @var Client $httpClient */
@@ -612,13 +614,16 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals($tagName, $publication->tagName());
         $this->assertObjectEquals($tagMessage, $publication->tagMessage());
         $this->assertObjectEquals(
-            expected: new StatusFrontendMergeRequestIntoDevelopmentBranchMerged(),
+            expected: new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
+                'project_id' => $backendProjectId->value(),
+                'merge_request_iid' => $backendMrToMerge->iid->value(),
+            ]),
             actual: $publication->status(),
         );
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(86, $dispatchedEvents);
+        $this->assertCount(88, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -637,15 +642,13 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals($tagMessage, $event->tagMessage);
 
         $this->assertArrayHasKey(2, $dispatchedEvents);
-        $event = $dispatchedEvents[2]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusReleaseCandidateCreated(), $event->previousStatus);
-        $this->assertObjectEquals(
-            expected: new StatusFrontendMergeRequestIntoProductionReleaseBranchCreated([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[2]->event,
+            expectedPreviousStatus: new StatusReleaseCandidateCreated(),
+            expectedStatus: new StatusFrontendMergeRequestIntoProductionReleaseBranchCreated([
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(3, $dispatchedEvents);
@@ -719,16 +722,14 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals($frontendMrToMerge->details, $event->details);
 
         $this->assertArrayHasKey(10, $dispatchedEvents);
-        $event = $dispatchedEvents[10]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusFrontendMergeRequestIntoProductionReleaseBranchCreated([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[10]->event,
+            expectedPreviousStatus: new StatusFrontendMergeRequestIntoProductionReleaseBranchCreated([
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
             ]),
-            actual: $event->previousStatus,
+            expectedStatus: new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged(),
         );
-        $this->assertObjectEquals(new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged(), $event->status);
 
         $this->assertArrayHasKey(11, $dispatchedEvents);
         $event = $dispatchedEvents[11]->event;
@@ -809,27 +810,24 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(Pipeline\Status::Failed, $event->status);
 
         $this->assertArrayHasKey(22, $dispatchedEvents);
-        $event = $dispatchedEvents[22]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged(), $event->previousStatus);
-        $this->assertObjectEquals(
-            expected: new StatusFrontendProductionReleaseBranchPipelineFailed(['pipeline_id' => $frontendPipelineId->value()]),
-            actual: $event->status,
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[22]->event,
+            expectedPreviousStatus: new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged(),
+            expectedStatus: new StatusFrontendProductionReleaseBranchPipelineFailed([
+                'pipeline_id' => $frontendPipelineId->value(),
+            ]),
         );
 
         $this->assertArrayHasKey(23, $dispatchedEvents);
-        $event = $dispatchedEvents[23]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusFrontendProductionReleaseBranchPipelineFailed(['pipeline_id' => $frontendPipelineId->value()]),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusFrontendProductionReleaseBranchPipelinePending([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[23]->event,
+            expectedPreviousStatus: new StatusFrontendProductionReleaseBranchPipelineFailed([
+                'pipeline_id' => $frontendPipelineId->value(),
+            ]),
+            expectedStatus: new StatusFrontendProductionReleaseBranchPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(24, $dispatchedEvents);
@@ -868,21 +866,16 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(Pipeline\Status::Success, $event->status);
 
         $this->assertArrayHasKey(29, $dispatchedEvents);
-        $event = $dispatchedEvents[29]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusFrontendProductionReleaseBranchPipelinePending([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[29]->event,
+            expectedPreviousStatus: new StatusFrontendProductionReleaseBranchPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusFrontendProductionReleaseBranchPipelineSuccess([
+            expectedStatus: new StatusFrontendProductionReleaseBranchPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(30, $dispatchedEvents);
@@ -895,21 +888,16 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusMergeable(), $event->details->status);
 
         $this->assertArrayHasKey(31, $dispatchedEvents);
-        $event = $dispatchedEvents[31]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusFrontendProductionReleaseBranchPipelineSuccess([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[31]->event,
+            expectedPreviousStatus: new StatusFrontendProductionReleaseBranchPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusBackendMergeRequestIntoProductionReleaseBranchCreated([
+            expectedStatus: new StatusBackendMergeRequestIntoProductionReleaseBranchCreated([
                 'project_id' => $backendProjectId->value(),
                 'merge_request_iid' => $backendMrToMerge->iid->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(32, $dispatchedEvents);
@@ -923,16 +911,14 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals($backendMrToMerge->details, $event->details);
 
         $this->assertArrayHasKey(33, $dispatchedEvents);
-        $event = $dispatchedEvents[33]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusBackendMergeRequestIntoProductionReleaseBranchCreated([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[33]->event,
+            expectedPreviousStatus: new StatusBackendMergeRequestIntoProductionReleaseBranchCreated([
                 'project_id' => $backendProjectId->value(),
                 'merge_request_iid' => $backendMrToMerge->iid->value(),
             ]),
-            actual: $event->previousStatus,
+            expectedStatus: new StatusBackendMergeRequestIntoProductionReleaseBranchMerged(),
         );
-        $this->assertObjectEquals(new StatusBackendMergeRequestIntoProductionReleaseBranchMerged(), $event->status);
 
         $this->assertArrayHasKey(34, $dispatchedEvents);
         $event = $dispatchedEvents[34]->event;
@@ -942,10 +928,11 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals($tagMessage, $event->message);
 
         $this->assertArrayHasKey(35, $dispatchedEvents);
-        $event = $dispatchedEvents[35]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusBackendMergeRequestIntoProductionReleaseBranchMerged(), $event->previousStatus);
-        $this->assertObjectEquals(new StatusTagCreated(), $event->status);
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[35]->event,
+            expectedPreviousStatus: new StatusBackendMergeRequestIntoProductionReleaseBranchMerged(),
+            expectedStatus: new StatusTagCreated(),
+        );
 
         $this->assertArrayHasKey(36, $dispatchedEvents);
         $event = $dispatchedEvents[36]->event;
@@ -1026,27 +1013,24 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(Pipeline\Status::Failed, $event->status);
 
         $this->assertArrayHasKey(47, $dispatchedEvents);
-        $event = $dispatchedEvents[47]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusTagCreated(), $event->previousStatus);
-        $this->assertObjectEquals(
-            expected: new StatusTagPipelineFailed(['pipeline_id' => $tagPipelineId->value()]),
-            actual: $event->status,
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[47]->event,
+            expectedPreviousStatus: new StatusTagCreated(),
+            expectedStatus: new StatusTagPipelineFailed([
+                'pipeline_id' => $tagPipelineId->value(),
+            ]),
         );
 
         $this->assertArrayHasKey(48, $dispatchedEvents);
-        $event = $dispatchedEvents[48]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusTagPipelineFailed(['pipeline_id' => $tagPipelineId->value()]),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusTagPipelinePending([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[48]->event,
+            expectedPreviousStatus: new StatusTagPipelineFailed([
+                'pipeline_id' => $tagPipelineId->value(),
+            ]),
+            expectedStatus: new StatusTagPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(49, $dispatchedEvents);
@@ -1085,21 +1069,16 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(Pipeline\Status::Success, $event->status);
 
         $this->assertArrayHasKey(54, $dispatchedEvents);
-        $event = $dispatchedEvents[54]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusTagPipelinePending([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[54]->event,
+            expectedPreviousStatus: new StatusTagPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusTagPipelineSuccess([
+            expectedStatus: new StatusTagPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(55, $dispatchedEvents);
@@ -1111,16 +1090,14 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(Job\Name::fromString($deployJobName), $event->name);
 
         $this->assertArrayHasKey(56, $dispatchedEvents);
-        $event = $dispatchedEvents[56]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusTagPipelineSuccess([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[56]->event,
+            expectedPreviousStatus: new StatusTagPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->previousStatus,
+            expectedStatus: new StatusDeploymentJobInited(),
         );
-        $this->assertObjectEquals(new StatusDeploymentJobInited(), $event->status);
 
         $this->assertArrayHasKey(57, $dispatchedEvents);
         $event = $dispatchedEvents[57]->event;
@@ -1186,27 +1163,24 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(Pipeline\Status::Failed, $event->status);
 
         $this->assertArrayHasKey(66, $dispatchedEvents);
-        $event = $dispatchedEvents[66]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(new StatusDeploymentJobInited(), $event->previousStatus);
-        $this->assertObjectEquals(
-            expected: new StatusDeploymentPipelineFailed(['pipeline_id' => $tagPipelineId->value()]),
-            actual: $event->status,
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[66]->event,
+            expectedPreviousStatus: new StatusDeploymentJobInited(),
+            expectedStatus: new StatusDeploymentPipelineFailed([
+                'pipeline_id' => $tagPipelineId->value(),
+            ]),
         );
 
         $this->assertArrayHasKey(67, $dispatchedEvents);
-        $event = $dispatchedEvents[67]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusDeploymentPipelineFailed(['pipeline_id' => $tagPipelineId->value()]),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusDeploymentPipelinePending([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[67]->event,
+            expectedPreviousStatus: new StatusDeploymentPipelineFailed([
+                'pipeline_id' => $tagPipelineId->value(),
+            ]),
+            expectedStatus: new StatusDeploymentPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(68, $dispatchedEvents);
@@ -1245,21 +1219,16 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(Pipeline\Status::Success, $event->status);
 
         $this->assertArrayHasKey(73, $dispatchedEvents);
-        $event = $dispatchedEvents[73]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusDeploymentPipelinePending([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[73]->event,
+            expectedPreviousStatus: new StatusDeploymentPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusDeploymentPipelineSuccess([
+            expectedStatus: new StatusDeploymentPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(74, $dispatchedEvents);
@@ -1269,16 +1238,14 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertTrue($event->released);
 
         $this->assertArrayHasKey(75, $dispatchedEvents);
-        $event = $dispatchedEvents[75]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusDeploymentPipelineSuccess([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[75]->event,
+            expectedPreviousStatus: new StatusDeploymentPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            actual: $event->previousStatus,
+            expectedStatus: new StatusVersionReleased(),
         );
-        $this->assertObjectEquals(new StatusVersionReleased(), $event->status);
 
         $this->assertArrayHasKey(76, $dispatchedEvents);
         $event = $dispatchedEvents[76]->event;
@@ -1290,18 +1257,13 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusNotOpen(), $event->details->status);
 
         $this->assertArrayHasKey(77, $dispatchedEvents);
-        $event = $dispatchedEvents[77]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusVersionReleased(),
-            actual: $event->previousStatus,
-        );
-        $this->assertObjectEquals(
-            expected: new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[77]->event,
+            expectedPreviousStatus: new StatusVersionReleased(),
+            expectedStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
             ]),
-            actual: $event->status,
         );
 
         $this->assertArrayHasKey(78, $dispatchedEvents);
@@ -1375,18 +1337,32 @@ class ReleasePublicationSagaTest extends PublicationTestCase
         $this->assertObjectEquals($frontendMrToMerge->details, $event->details);
 
         $this->assertArrayHasKey(85, $dispatchedEvents);
-        $event = $dispatchedEvents[85]->event;
-        $this->assertInstanceOf(ReleasePublicationStatusChanged::class, $event);
-        $this->assertObjectEquals(
-            expected: new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[85]->event,
+            expectedPreviousStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
             ]),
-            actual: $event->previousStatus,
+            expectedStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchMerged(),
         );
-        $this->assertObjectEquals(
-            expected: new StatusFrontendMergeRequestIntoDevelopmentBranchMerged(),
-            actual: $event->status,
+
+        $this->assertArrayHasKey(86, $dispatchedEvents);
+        $event = $dispatchedEvents[86]->event;
+        $this->assertInstanceOf(MergeRequestCreated::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($backendMrToMerge->title, $event->title);
+        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
+        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
+        $this->assertObjectEquals(new MergeRequest\Details\Status\StatusNotOpen(), $event->details->status);
+
+        $this->assertArrayHasKey(87, $dispatchedEvents);
+        $this->assertReleasePublicationStatusChanged(
+            event: $dispatchedEvents[87]->event,
+            expectedPreviousStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchMerged(),
+            expectedStatus: new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
+                'project_id' => $backendProjectId->value(),
+                'merge_request_iid' => $backendMrToMerge->iid->value(),
+            ]),
         );
     }
 }

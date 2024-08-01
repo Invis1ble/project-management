@@ -134,17 +134,9 @@ enum Dictionary: string
 
     case FrontendMergeRequestIntoDevelopmentBranchMerged = 'frontend_merge_request_into_development_branch_merged';
 
-    case FrontendMergeRequestIntoReleaseBranchCreated = 'frontend_merge_request_into_release_branch_created';
-
-    case FrontendReleaseBranchSynchronized = 'frontend_release_branch_synchronized';
-
     case BackendMergeRequestIntoDevelopmentBranchCreated = 'backend_merge_request_into_development_branch_created';
 
     case BackendMergeRequestIntoDevelopmentBranchMerged = 'backend_merge_request_into_development_branch_merged';
-
-    case BackendMergeRequestIntoReleaseBranchCreated = 'backend_merge_request_into_release_branch_created';
-
-    case BackendReleaseBranchSynchronized = 'backend_release_branch_synchronized';
 
     case FrontendApplicationBranchSetToDevelopment = 'frontend_application_branch_set_to_development';
 

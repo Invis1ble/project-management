@@ -25,7 +25,7 @@ use Psr\Http\Message\UriInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 
-abstract class PublicationTestCase extends KernelTestCase
+abstract class PublicationSagaTestCase extends KernelTestCase
 {
     use ClockSensitiveTrait;
     use CreateCommitResponseFixtureTrait;
