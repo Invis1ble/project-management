@@ -182,7 +182,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         )
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode([
-                'release' => true,
+                'released' => true,
                 'releaseDate' => date('Y-m-d'),
             ])));
 
