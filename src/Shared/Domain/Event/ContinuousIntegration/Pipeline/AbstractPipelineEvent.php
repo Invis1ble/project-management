@@ -17,7 +17,6 @@ abstract readonly class AbstractPipelineEvent extends RefAwareEvent
         Ref $ref,
         public PipelineId $pipelineId,
         public Status $status,
-        public \DateInterval $maxAwaitingTime,
     ) {
         parent::__construct($projectId, $ref);
     }

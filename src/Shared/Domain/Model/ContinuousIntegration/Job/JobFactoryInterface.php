@@ -8,8 +8,21 @@ interface JobFactoryInterface
 {
     public function createJob(
         int $id,
+        int $projectId,
+        int $pipelineId,
+        string $sha,
         string $name,
         string $ref,
+        string $status,
         string $createdAt,
+        ?string $startedAt,
+        ?string $finishedAt,
+        string $pipelineStatus,
+        string $pipelineCreatedAt,
+        ?string $pipelineUpdatedAt,
+        ?string $pipelineStartedAt,
+        ?string $pipelineFinishedAt,
+        ?string $pipelineCommittedAt,
+        string $pipelineGuiUrl,
     ): Job;
 }

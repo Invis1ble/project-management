@@ -18,7 +18,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentJobInited;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentPipelineFailed;
-use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentPipelinePending;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentJobPending;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentPipelineSuccess;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDevelopmentBranchSynchronized;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDone;
@@ -1194,7 +1194,7 @@ CONFIG),
             expectedPreviousStatus: new StatusDeploymentPipelineFailed([
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
-            expectedStatus: new StatusDeploymentPipelinePending([
+            expectedStatus: new StatusDeploymentJobPending([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
@@ -1238,7 +1238,7 @@ CONFIG),
         $this->assertArrayHasKey(62, $dispatchedEvents);
         $this->assertHotfixPublicationStatusChanged(
             event: $dispatchedEvents[62]->event,
-            expectedPreviousStatus: new StatusDeploymentPipelinePending([
+            expectedPreviousStatus: new StatusDeploymentJobPending([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
             ]),

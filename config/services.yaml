@@ -216,6 +216,7 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FileFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FileFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\DetailsFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\Status\StatusFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Job\Status\StatusFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\IssueFactory'
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationFactoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\HotfixPublicationFactory'
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Repository\HotfixPublicationRepository'

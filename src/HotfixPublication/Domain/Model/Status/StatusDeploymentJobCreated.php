@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status;
 
-final readonly class StatusDeploymentPipelineScheduled extends StatusDeploymentPipelineNotInProgress
+final readonly class StatusDeploymentJobCreated extends StatusDeploymentJobAwaitable
 {
     public function __toString(): string
     {
-        return Dictionary::DeploymentPipelineScheduled->value;
+        return Dictionary::DeploymentJobCreated->value;
     }
 }
