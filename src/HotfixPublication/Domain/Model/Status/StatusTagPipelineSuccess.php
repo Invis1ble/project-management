@@ -33,6 +33,9 @@ final readonly class StatusTagPipelineSuccess extends AbstractStatus
             tagName: $context->tagName(),
         );
 
+        // todo: refactor to the job awaiting
+        sleep(30);
+
         $this->setPublicationStatus($context, new StatusDeploymentJobInited());
     }
 
