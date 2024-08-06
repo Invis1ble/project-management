@@ -7,17 +7,17 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegr
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 
-trait PlayJobResponseFixtureTrait
+trait RetryJobResponseFixtureTrait
 {
-    public function playJobResponseFixture(
+    public function retryJobResponseFixture(
         Job\JobId $jobId,
         Job\Name $jobName,
         Ref $ref,
         Job\Status\Dictionary $status,
         \DateTimeImmutable $createdAt,
     ): array {
-        $playJob = file_get_contents(__DIR__ . '/fixture/response/play_job.200.json');
-        $playJob = json_decode($playJob, true);
+        $retryJob = file_get_contents(__DIR__ . '/fixture/response/retry_job.200.json');
+        $retryJob = json_decode($retryJob, true);
 
         return [
             'id' => $jobId->value(),
@@ -25,6 +25,6 @@ trait PlayJobResponseFixtureTrait
             'ref' => (string) $ref,
             'status' => (string) Job\Status\StatusFactory::createStatus($status),
             'created_at' => $createdAt->format(DATE_RFC3339_EXTENDED),
-        ] + $playJob;
+        ] + $retryJob;
     }
 }

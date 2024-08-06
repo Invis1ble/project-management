@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Event\ContinuousIntegration\Job;
 
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRetried;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializationTestCase;
 
 /**
- * @extends SerializationTestCase<JobRan>
+ * @extends SerializationTestCase<JobRetried>
  */
-class JobRanTest extends SerializationTestCase
+class JobRetriedTest extends SerializationTestCase
 {
-    protected function createObject(): JobRan
+    protected function createObject(): JobRetried
     {
-        return new JobRan(
+        return new JobRetried(
             projectId: Project\ProjectId::from(1),
             ref: Ref::fromString('1234567890abcdef1234567890abcdef12345678'),
             jobId: Job\JobId::from(3),

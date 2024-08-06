@@ -14,7 +14,7 @@ final readonly class Job
         public Name $name,
         public Ref $ref,
         public Status\StatusInterface $status,
-        public Pipeline $pipeline,
+        public ?Pipeline $pipeline,
         public \DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $startedAt,
         public ?\DateTimeImmutable $finishedAt,

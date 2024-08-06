@@ -39,10 +39,10 @@ abstract readonly class StatusDeploymentJobRetryable extends StatusDeploymentJob
             return; // failed
         }
 
-        $pipeline = $backendCiClient->retryJob(Job\JobId::from($statusContext['job_id']));
+        $job = $backendCiClient->retryJob(Job\JobId::from($statusContext['job_id']));
         $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
 
-        $next = match ($pipeline->status) {
+        $next = match (Job\Status\Dictionary::from((string) $job->status)) {
             Job\Status\Dictionary::Created => new StatusDeploymentJobCreated($statusContext),
             Job\Status\Dictionary::WaitingForResource => new StatusDeploymentJobWaitingForResource($statusContext),
             Job\Status\Dictionary::Preparing => new StatusDeploymentJobPreparing($statusContext),

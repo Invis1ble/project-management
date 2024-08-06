@@ -19,28 +19,26 @@ final readonly class JobFactory implements JobFactoryInterface
     public function createJob(
         int $id,
         int $projectId,
-        int $pipelineId,
-        string $sha,
+        ?int $pipelineId,
+        ?string $sha,
         string $name,
         string $ref,
         string $status,
         string $createdAt,
         ?string $startedAt,
         ?string $finishedAt,
-        string $pipelineStatus,
-        string $pipelineCreatedAt,
+        ?string $pipelineStatus,
+        ?string $pipelineCreatedAt,
         ?string $pipelineUpdatedAt,
         ?string $pipelineStartedAt,
         ?string $pipelineFinishedAt,
         ?string $pipelineCommittedAt,
-        string $pipelineGuiUrl,
+        ?string $pipelineGuiUrl,
     ): Job {
-        return new Job(
-            id: JobId::from($id),
-            name: Name::fromString($name),
-            ref: Ref::fromString($ref),
-            status: $this->statusFactory->createStatus(Status\Dictionary::from($status)),
-            pipeline: $this->pipelineFactory->createPipeline(
+        if (null === $pipelineId) {
+            $pipeline = null;
+        } else {
+            $pipeline = $this->pipelineFactory->createPipeline(
                 projectId: $projectId,
                 ref: $ref,
                 id: $pipelineId,
@@ -52,7 +50,15 @@ final readonly class JobFactory implements JobFactoryInterface
                 finishedAt: $pipelineFinishedAt,
                 committedAt: $pipelineCommittedAt,
                 guiUrl: $pipelineGuiUrl,
-            ),
+            );
+        }
+
+        return new Job(
+            id: JobId::from($id),
+            name: Name::fromString($name),
+            ref: Ref::fromString($ref),
+            status: $this->statusFactory->createStatus(Status\Dictionary::from($status)),
+            pipeline: $pipeline,
             createdAt: new \DateTimeImmutable($createdAt),
             startedAt: null === $startedAt ? null : new \DateTimeImmutable($startedAt),
             finishedAt: null === $finishedAt ? null : new \DateTimeImmutable($finishedAt),

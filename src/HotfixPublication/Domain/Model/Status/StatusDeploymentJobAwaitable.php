@@ -41,7 +41,7 @@ abstract readonly class StatusDeploymentJobAwaitable extends AbstractStatus
         if (null === $job) {
             $next = new StatusDeploymentJobStuck();
         } else {
-            $next = match ($job->status) {
+            $next = match (Job\Status\Dictionary::from((string) $job->status)) {
                 Job\Status\Dictionary::Created => new StatusDeploymentJobCreated($statusContext),
                 Job\Status\Dictionary::WaitingForResource => new StatusDeploymentJobWaitingForResource($statusContext),
                 Job\Status\Dictionary::Preparing => new StatusDeploymentJobPreparing($statusContext),

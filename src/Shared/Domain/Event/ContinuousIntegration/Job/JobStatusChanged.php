@@ -14,7 +14,7 @@ final readonly class JobStatusChanged extends AbstractJobEvent
     public function __construct(
         Project\ProjectId $projectId,
         Ref $ref,
-        Pipeline\PipelineId $pipelineId,
+        public Pipeline\PipelineId $pipelineId,
         Job\JobId $jobId,
         Job\Name $name,
         public ?Job\Status\StatusInterface $previousStatus,
@@ -27,7 +27,6 @@ final readonly class JobStatusChanged extends AbstractJobEvent
         parent::__construct(
             projectId: $projectId,
             ref: $ref,
-            pipelineId: $pipelineId,
             jobId: $jobId,
             name: $name,
             status: $status,

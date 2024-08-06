@@ -14,7 +14,7 @@ final readonly class JobAwaitingTick extends AbstractJobEvent
     public function __construct(
         Project\ProjectId $projectId,
         Ref $ref,
-        Pipeline\PipelineId $pipelineId,
+        public Pipeline\PipelineId $pipelineId,
         Job\JobId $jobId,
         Job\Name $name,
         Job\Status\StatusInterface $status,
@@ -26,7 +26,6 @@ final readonly class JobAwaitingTick extends AbstractJobEvent
         parent::__construct(
             projectId: $projectId,
             ref: $ref,
-            pipelineId: $pipelineId,
             jobId: $jobId,
             name: $name,
             status: $status,

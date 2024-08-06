@@ -77,6 +77,10 @@ services:
         tags:
             - { name: serializer.normalizer, priority: 990 }
 
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Job\Status\StatusNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 990 }
+
 
 
 

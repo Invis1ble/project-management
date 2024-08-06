@@ -12,11 +12,11 @@ interface PipelineFactoryInterface
         int $id,
         string $sha,
         string $status,
-        string $createdAt,
+        ?string $createdAt,
         ?string $updatedAt,
         ?string $startedAt,
         ?string $finishedAt,
         ?string $committedAt,
-        string $guiUrl,
+        ?string $guiUrl,
     ): Pipeline;
 }
