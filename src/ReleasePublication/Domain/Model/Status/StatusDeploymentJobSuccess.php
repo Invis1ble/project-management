@@ -11,7 +11,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
-abstract readonly class StatusDeploymentPipelineNotInProgress extends AbstractStatus
+final readonly class StatusDeploymentJobSuccess extends AbstractStatus
 {
     public function proceedToNext(
         MergeRequest\MergeRequestManagerInterface $mergeRequestManager,
@@ -26,6 +26,13 @@ abstract readonly class StatusDeploymentPipelineNotInProgress extends AbstractSt
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        throw new \RuntimeException('Not implemented yet');
+        $taskTracker->releaseVersion($context->branchName());
+
+        $this->setPublicationStatus($context, new StatusVersionReleased());
+    }
+
+    public function __toString(): string
+    {
+        return Dictionary::DeploymentJobSuccess->value;
     }
 }

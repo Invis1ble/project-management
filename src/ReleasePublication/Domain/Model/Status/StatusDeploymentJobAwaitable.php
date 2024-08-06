@@ -7,12 +7,12 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
-abstract readonly class StatusDeploymentPipelineAwaitable extends AbstractStatus
+abstract readonly class StatusDeploymentJobAwaitable extends AbstractStatus
 {
     public function proceedToNext(
         MergeRequest\MergeRequestManagerInterface $mergeRequestManager,
@@ -27,31 +27,28 @@ abstract readonly class StatusDeploymentPipelineAwaitable extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $pipeline = $backendCiClient->awaitLatestPipeline(
-            ref: $context->tagName(),
-            createdAfter: $context->createdAt(),
+        $statusContext = $this->context->toArray();
+
+        $job = $backendCiClient->awaitJob(
+            jobId: Job\JobId::from($statusContext['job_id']),
             maxAwaitingTime: $pipelineMaxAwaitingTime,
             tickInterval: $pipelineTickInterval,
         );
 
-        $statusContext = $this->context->toArray();
-        $statusContext['pipeline_id'] = $pipeline->id->value();
-
-        if (null === $pipeline) {
-            $next = new StatusDeploymentPipelineStuck();
+        if (null === $job) {
+            $next = new StatusDeploymentJobStuck();
         } else {
-            $next = match ($pipeline->status) {
-                Status::Created => new StatusDeploymentPipelineCreated($statusContext),
-                Status::WaitingForResource => new StatusDeploymentPipelineWaitingForResource($statusContext),
-                Status::Preparing => new StatusDeploymentPipelinePreparing($statusContext),
-                Status::Pending => new StatusDeploymentPipelinePending($statusContext),
-                Status::Running => new StatusDeploymentPipelineRunning($statusContext),
-                Status::Success => new StatusDeploymentPipelineSuccess($statusContext),
-                Status::Failed => new StatusDeploymentPipelineFailed($statusContext),
-                Status::Canceled => new StatusDeploymentPipelineCanceled($statusContext),
-                Status::Skipped => new StatusDeploymentPipelineSkipped($statusContext),
-                Status::Manual => new StatusDeploymentPipelineManual($statusContext),
-                Status::Scheduled => new StatusDeploymentPipelineScheduled($statusContext),
+            $next = match (Job\Status\Dictionary::from((string) $job->status)) {
+                Job\Status\Dictionary::Created => new StatusDeploymentJobCreated($statusContext),
+                Job\Status\Dictionary::WaitingForResource => new StatusDeploymentJobWaitingForResource($statusContext),
+                Job\Status\Dictionary::Preparing => new StatusDeploymentJobPreparing($statusContext),
+                Job\Status\Dictionary::Pending => new StatusDeploymentJobPending($statusContext),
+                Job\Status\Dictionary::Running => new StatusDeploymentJobRunning($statusContext),
+                Job\Status\Dictionary::Success => new StatusDeploymentJobSuccess($statusContext),
+                Job\Status\Dictionary::Failed => new StatusDeploymentJobFailed($statusContext),
+                Job\Status\Dictionary::Canceled => new StatusDeploymentJobCanceled($statusContext),
+                Job\Status\Dictionary::Skipped => new StatusDeploymentJobSkipped($statusContext),
+                Job\Status\Dictionary::Manual => new StatusDeploymentJobManual($statusContext),
             };
         }
 
