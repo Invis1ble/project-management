@@ -7,8 +7,7 @@ namespace Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
@@ -40,21 +39,21 @@ abstract readonly class StatusTagPipelineRetryable extends StatusTagPipelineNotI
             return; // failed
         }
 
-        $pipeline = $backendCiClient->retryPipeline(PipelineId::from($statusContext['pipeline_id']));
+        $pipeline = $backendCiClient->retryPipeline(Pipeline\PipelineId::from($statusContext['pipeline_id']));
         $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
 
         $next = match ($pipeline->status) {
-            Status::Created => new StatusTagPipelineCreated($statusContext),
-            Status::WaitingForResource => new StatusTagPipelineWaitingForResource($statusContext),
-            Status::Preparing => new StatusTagPipelinePreparing($statusContext),
-            Status::Pending => new StatusTagPipelinePending($statusContext),
-            Status::Running => new StatusTagPipelineRunning($statusContext),
-            Status::Success => new StatusTagPipelineSuccess($statusContext),
-            Status::Failed => new StatusTagPipelineFailed($statusContext),
-            Status::Canceled => new StatusTagPipelineCanceled($statusContext),
-            Status::Skipped => new StatusTagPipelineSkipped($statusContext),
-            Status::Manual => new StatusTagPipelineManual($statusContext),
-            Status::Scheduled => new StatusTagPipelineScheduled($statusContext),
+            Pipeline\Status::Created => new StatusTagPipelineCreated($statusContext),
+            Pipeline\Status::WaitingForResource => new StatusTagPipelineWaitingForResource($statusContext),
+            Pipeline\Status::Preparing => new StatusTagPipelinePreparing($statusContext),
+            Pipeline\Status::Pending => new StatusTagPipelinePending($statusContext),
+            Pipeline\Status::Running => new StatusTagPipelineRunning($statusContext),
+            Pipeline\Status::Success => new StatusTagPipelineSuccess($statusContext),
+            Pipeline\Status::Failed => new StatusTagPipelineFailed($statusContext),
+            Pipeline\Status::Canceled => new StatusTagPipelineCanceled($statusContext),
+            Pipeline\Status::Skipped => new StatusTagPipelineSkipped($statusContext),
+            Pipeline\Status::Manual => new StatusTagPipelineManual($statusContext),
+            Pipeline\Status::Scheduled => new StatusTagPipelineScheduled($statusContext),
         };
 
         $this->setPublicationStatus(

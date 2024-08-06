@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 
 /**
- * @see https://docs.gitlab.com/ee/api/pipelines.html
+ * @see https://docs.gitlab.com/ee/api/pipelines.html#list-project-pipelines
  */
 enum Status: string
 {

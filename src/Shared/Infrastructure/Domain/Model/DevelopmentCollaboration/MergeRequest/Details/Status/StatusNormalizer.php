@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status;
 
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\Dictionary;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\AbstractValueObjectNormalizer;
 
 final class StatusNormalizer extends AbstractValueObjectNormalizer
 {
-    public function __construct(private readonly StatusFactoryInterface $statusFactory)
+    public function __construct(private readonly Status\StatusFactoryInterface $statusFactory)
     {
     }
 
@@ -20,8 +18,8 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
         string $type,
         ?string $format = null,
         array $context = [],
-    ): StatusInterface {
-        return $this->statusFactory->createStatus(Dictionary::from($data));
+    ): Status\StatusInterface {
+        return $this->statusFactory->createStatus(Status\Dictionary::from($data));
     }
 
     public function normalize(
@@ -34,6 +32,6 @@ final class StatusNormalizer extends AbstractValueObjectNormalizer
 
     protected function getSupportedType(): string
     {
-        return StatusInterface::class;
+        return Status\StatusInterface::class;
     }
 }

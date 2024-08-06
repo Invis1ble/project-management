@@ -62,29 +62,27 @@ enum Dictionary: string
 
     case DeploymentJobInited = 'deployment_job_inited';
 
-    case DeploymentPipelineCreated = 'deployment_pipeline_created';
+    case DeploymentJobCreated = 'deployment_job_created';
 
-    case DeploymentPipelineWaitingForResource = 'deployment_pipeline_waiting_for_resource';
+    case DeploymentJobWaitingForResource = 'deployment_job_waiting_for_resource';
 
-    case DeploymentPipelinePreparing = 'deployment_pipeline_preparing';
+    case DeploymentJobPreparing = 'deployment_job_preparing';
 
-    case DeploymentPipelinePending = 'deployment_pipeline_pending';
+    case DeploymentJobPending = 'deployment_job_pending';
 
-    case DeploymentPipelineRunning = 'deployment_pipeline_running';
+    case DeploymentJobRunning = 'deployment_job_running';
 
-    case DeploymentPipelineSuccess = 'deployment_pipeline_success';
+    case DeploymentJobSuccess = 'deployment_job_success';
 
-    case DeploymentPipelineFailed = 'deployment_pipeline_failed';
+    case DeploymentJobFailed = 'deployment_job_failed';
 
-    case DeploymentPipelineCanceled = 'deployment_pipeline_canceled';
+    case DeploymentJobCanceled = 'deployment_job_canceled';
 
-    case DeploymentPipelineSkipped = 'deployment_pipeline_skipped';
+    case DeploymentJobSkipped = 'deployment_job_skipped';
 
-    case DeploymentPipelineManual = 'deployment_pipeline_manual';
+    case DeploymentJobManual = 'deployment_job_manual';
 
-    case DeploymentPipelineScheduled = 'deployment_pipeline_scheduled';
-
-    case DeploymentPipelineStuck = 'deployment_pipeline_stuck';
+    case DeploymentJobStuck = 'deployment_job_stuck';
 
     case HotfixesTransitionedToDone = 'hotfixes_transitioned_to_done';
 
