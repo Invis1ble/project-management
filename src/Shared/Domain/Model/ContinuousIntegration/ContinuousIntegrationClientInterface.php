@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration;
 
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\Job;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Pipeline;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\VersionName;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 
 interface ContinuousIntegrationClientInterface
 {
@@ -21,9 +18,21 @@ interface ContinuousIntegrationClientInterface
         \DateTimeImmutable $createdAfter,
         ?\DateInterval $maxAwaitingTime = null,
         ?\DateInterval $tickInterval = null,
-    ): ?Pipeline;
+    ): ?Pipeline\Pipeline;
 
-    public function retryPipeline(PipelineId $pipelineId): ?Pipeline;
+    /**
+     * @param ?\DateInterval $maxAwaitingTime default max awaiting time is 30 min
+     * @param ?\DateInterval $tickInterval    default tick interval is 10 sec
+     */
+    public function awaitJob(
+        Job\JobId $jobId,
+        ?\DateInterval $maxAwaitingTime = null,
+        ?\DateInterval $tickInterval = null,
+    ): ?Job\Job;
 
-    public function deployOnProduction(VersionName $tagName): Job;
+    public function retryPipeline(Pipeline\PipelineId $pipelineId): ?Pipeline\Pipeline;
+
+    public function retryJob(Job\JobId $jobId): ?Job\Job;
+
+    public function deployOnProduction(Tag\VersionName $tagName): Job\Job;
 }

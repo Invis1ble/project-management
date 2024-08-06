@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Tests\Shared\Application\Saga;
 
 use GuzzleHttp\Psr7\Response;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\Job\JobResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\Job\PipelineJobsResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\Job\PlayJobResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineResponseFixtureTrait;
@@ -34,6 +37,7 @@ abstract class PublicationSagaTestCase extends KernelTestCase
     use FileResponseFixtureTrait;
     use IssueTransitionsResponseFixtureTrait;
     use IssuesResponseFixtureTrait;
+    use JobResponseFixtureTrait;
     use MapMergeRequestsToMergeToMergedTrait;
     use MergeRequestResponseFixtureTrait;
     use PipelineJobsResponseFixtureTrait;
@@ -106,6 +110,27 @@ abstract class PublicationSagaTestCase extends KernelTestCase
             status: MergeRequest\Status::Merged,
             detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
             guiUrl: $guiUrl,
+        );
+    }
+
+    protected function createJobResponse(
+        Job\JobId $jobId,
+        Job\Name $jobName,
+        Ref $ref,
+        Job\Status\Dictionary $status,
+        Pipeline\PipelineId $pipelineId,
+        \DateTimeImmutable $createdAt,
+    ): Response {
+        return new Response(
+            status: 200,
+            body: json_encode($this->jobResponseFixture(
+                jobId: $jobId,
+                jobName: $jobName,
+                ref: $ref,
+                status: $status,
+                pipelineId: $pipelineId,
+                createdAt: $createdAt,
+            )),
         );
     }
 }

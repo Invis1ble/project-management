@@ -26,14 +26,13 @@ final readonly class StatusTagPipelineSuccess extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $backendCiClient->deployOnProduction(
+        $job = $backendCiClient->deployOnProduction(
             tagName: $context->tagName(),
         );
 
-        // todo: refactor to the job awaiting
-        sleep(30);
-
-        $this->setPublicationStatus($context, new StatusDeploymentJobInited());
+        $this->setPublicationStatus($context, new StatusDeploymentJobInited([
+            'job_id' => $job->id->value(),
+        ]));
     }
 
     public function __toString(): string

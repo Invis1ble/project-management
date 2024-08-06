@@ -6,7 +6,6 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Event\ContinuousIntegr
 
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializationTestCase;
@@ -21,10 +20,12 @@ class JobRanTest extends SerializationTestCase
         return new JobRan(
             projectId: Project\ProjectId::from(1),
             ref: Ref::fromString('1234567890abcdef1234567890abcdef12345678'),
-            pipelineId: Pipeline\PipelineId::from(2),
             jobId: Job\JobId::from(3),
             name: Job\Name::fromString('deploy'),
-            createdAt: new \DateTimeImmutable(),
+            status: new Job\Status\StatusPending(),
+            createdAt: new \DateTimeImmutable('-1 hour'),
+            startedAt: new \DateTimeImmutable('-30 minutes'),
+            finishedAt: new \DateTimeImmutable(),
         );
     }
 
@@ -32,11 +33,12 @@ class JobRanTest extends SerializationTestCase
     {
         return $object1->projectId->equals($object2->projectId)
             && $object1->ref->equals($object2->ref)
-            && $object1->pipelineId->equals($object2->pipelineId)
             && $object1->jobId->equals($object2->jobId)
             && $object1->name->equals($object2->name)
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning
             && $object1->createdAt == $object2->createdAt
+            && $object1->startedAt == $object2->startedAt
+            && $object1->finishedAt == $object2->finishedAt
             // phpcs:enable Symfony.ControlStructure.IdenticalComparison.Warning
         ;
     }

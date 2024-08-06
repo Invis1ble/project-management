@@ -17,12 +17,12 @@ final readonly class Pipeline
         public PipelineId $id,
         public CommitId $sha,
         public Status $status,
-        public \DateTimeImmutable $createdAt,
+        public ?\DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $updatedAt,
         public ?\DateTimeImmutable $startedAt,
         public ?\DateTimeImmutable $finishedAt,
         public ?\DateTimeImmutable $committedAt,
-        public UriInterface $guiUrl,
+        public ?UriInterface $guiUrl,
     ) {
     }
 
@@ -38,6 +38,10 @@ final readonly class Pipeline
 
     public function createdAfter(\DateTimeImmutable $datetime): bool
     {
+        if (null === $this->createdAt) {
+            throw new \BadMethodCallException('Unknown createdAt time');
+        }
+
         return $this->createdAt > $datetime;
     }
 }
