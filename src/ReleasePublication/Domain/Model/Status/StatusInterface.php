@@ -32,5 +32,7 @@ interface StatusInterface extends \Stringable
 
     public function prepared(): bool;
 
+    public function published(): bool;
+
     public function context(): Context;
 }

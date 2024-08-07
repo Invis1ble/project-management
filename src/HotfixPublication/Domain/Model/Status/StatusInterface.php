@@ -30,6 +30,8 @@ interface StatusInterface extends \Stringable
         HotfixPublicationInterface $context,
     ): void;
 
+    public function published(): bool;
+
     public function equals(self $status): bool;
 
     public function context(): Context;

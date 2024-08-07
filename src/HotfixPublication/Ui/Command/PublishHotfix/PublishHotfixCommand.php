@@ -7,10 +7,12 @@ namespace Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublishHotfix
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublicationByTag\GetLatestHotfixPublicationByTagQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint\GetReadyForPublishHotfixesInActiveSprintQuery;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
@@ -21,6 +23,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:hotfix:publish', description: 'Publish hotfixes')]
 final class PublishHotfixCommand extends IssuesAwareCommand
@@ -29,9 +32,17 @@ final class PublishHotfixCommand extends IssuesAwareCommand
         QueryBusInterface $queryBus,
         CommandBusInterface $commandBus,
         GuiUrlFactoryInterface $issueGuiUrlFactory,
+        SerializerInterface $serializer,
+        \DateInterval $pipelineMaxAwaitingTime,
         private readonly MessageFactoryInterface $tagMessageFactory,
     ) {
-        parent::__construct($queryBus, $commandBus, $issueGuiUrlFactory);
+        parent::__construct(
+            queryBus: $queryBus,
+            commandBus: $commandBus,
+            issueGuiUrlFactory: $issueGuiUrlFactory,
+            serializer: $serializer,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+        );
     }
 
     protected function configure(): void
@@ -104,10 +115,13 @@ final class PublishHotfixCommand extends IssuesAwareCommand
             hotfixes: $hotfixes,
         ));
 
-        return Command::SUCCESS;
+        return $this->showProgressLog(
+            query: new GetLatestHotfixPublicationByTagQuery($tagName),
+            inFinalState: fn (HotfixPublicationInterface $publication): bool => $publication->published(),
+        );
     }
 
-    private function newTagMessage(IssueList $hotfixes): Message
+    private function newTagMessage(IssueList $hotfixes): Tag\Message
     {
         $this->phase('Compiling new tag message...');
 
@@ -119,7 +133,7 @@ final class PublishHotfixCommand extends IssuesAwareCommand
         return $this->io->ask(
             question: 'New tag message',
             default: (string) $tagMessage,
-            validator: fn (string $tagMessage): Message => Message::fromString($tagMessage),
+            validator: fn (string $tagMessage): Tag\Message => Tag\Message::fromString($tagMessage),
         );
     }
 
