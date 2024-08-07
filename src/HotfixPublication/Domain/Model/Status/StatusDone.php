@@ -32,6 +32,11 @@ final readonly class StatusDone extends AbstractStatus
         // do nothing
     }
 
+    public function published(): bool
+    {
+        return true;
+    }
+
     public function __toString(): string
     {
         return Dictionary::Done->value;

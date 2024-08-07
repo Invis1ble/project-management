@@ -46,6 +46,10 @@ interface ReleasePublicationInterface extends AggregateRootInterface
         \DateInterval $pipelineTickInterval,
     ): void;
 
+    public function prepared(): bool;
+
+    public function published(): bool;
+
     public function id(): ReleasePublicationId;
 
     public function branchName(): Branch\Name;

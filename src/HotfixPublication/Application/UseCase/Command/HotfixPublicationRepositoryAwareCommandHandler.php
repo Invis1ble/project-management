@@ -15,13 +15,13 @@ abstract readonly class HotfixPublicationRepositoryAwareCommandHandler implement
     {
     }
 
-    protected function getHotfixPublication(HotfixPublicationId $hotfixPublication): HotfixPublicationInterface
+    protected function getHotfixPublication(HotfixPublicationId $publicationId): HotfixPublicationInterface
     {
-        return $this->repository->get($hotfixPublication);
+        return $this->repository->get($publicationId);
     }
 
-    protected function storeHotfixPublication(HotfixPublicationInterface $hotfixPublication): void
+    protected function storeHotfixPublication(HotfixPublicationInterface $publication): void
     {
-        $this->repository->store($hotfixPublication);
+        $this->repository->store($publication);
     }
 }

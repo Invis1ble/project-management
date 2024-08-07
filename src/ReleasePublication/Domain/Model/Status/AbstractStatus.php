@@ -34,6 +34,11 @@ abstract readonly class AbstractStatus implements StatusInterface
         return false;
     }
 
+    public function published(): bool
+    {
+        return false;
+    }
+
     protected function setPublicationStatus(
         ReleasePublicationInterface $publication,
         StatusInterface $status,

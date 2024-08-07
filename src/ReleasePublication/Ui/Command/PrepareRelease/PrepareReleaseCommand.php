@@ -7,6 +7,9 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\PrepareRelea
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReleasePublication\GetReleasePublicationQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
@@ -72,7 +75,10 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
             readyToMergeTasks: $tasks,
         ));
 
-        return Command::SUCCESS;
+        return $this->showProgressLog(
+            query: new GetReleasePublicationQuery(ReleasePublicationId::fromBranchName($newReleaseBranchName)),
+            inFinalState: fn (ReleasePublicationInterface $publication): bool => $publication->prepared(),
+        );
     }
 
     private function newReleaseBranchName(): Branch\Name

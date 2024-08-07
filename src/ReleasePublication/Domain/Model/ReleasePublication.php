@@ -130,6 +130,16 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         );
     }
 
+    public function prepared(): bool
+    {
+        return $this->status->prepared();
+    }
+
+    public function published(): bool
+    {
+        return $this->status->published();
+    }
+
     public function id(): ReleasePublicationId
     {
         return $this->id;

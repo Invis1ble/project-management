@@ -99,6 +99,11 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         return $this->hotfixes->containsFrontendMergeRequestToMerge($projectResolver);
     }
 
+    public function published(): bool
+    {
+        return $this->status->published();
+    }
+
     public function id(): HotfixPublicationId
     {
         return $this->id;
