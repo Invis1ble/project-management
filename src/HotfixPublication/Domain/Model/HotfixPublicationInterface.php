@@ -36,6 +36,8 @@ interface HotfixPublicationInterface extends AggregateRootInterface
 
     public function containsFrontendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool;
 
+    public function published(): bool;
+
     public function id(): HotfixPublicationId;
 
     public function tagName(): Tag\VersionName;

@@ -12,6 +12,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Repository\EventDispatchingRepository;
 
 final class HotfixPublicationRepository extends EventDispatchingRepository implements HotfixPublicationRepositoryInterface
@@ -41,7 +42,25 @@ final class HotfixPublicationRepository extends EventDispatchingRepository imple
         $hotfixPublication = $this->find($id);
 
         if (null === $hotfixPublication) {
-            throw new HotfixPublicationNotFoundException($id);
+            throw new HotfixPublicationNotFoundException("Hotfix publication $id not found.");
+        }
+
+        return $hotfixPublication;
+    }
+
+    public function getLatestByTagName(Tag\VersionName $tagName): HotfixPublicationInterface
+    {
+        $hotfixPublication = $this->findOneBy(
+            criteria: [
+                'tagName' => $tagName,
+            ],
+            orderBy: [
+                'createdAt' => 'DESC',
+            ],
+        );
+
+        if (null === $hotfixPublication) {
+            throw new HotfixPublicationNotFoundException("Hotfix publication with tag $tagName not found.");
         }
 
         return $hotfixPublication;

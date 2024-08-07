@@ -17,6 +17,11 @@ abstract readonly class AbstractStatus implements StatusInterface
         $this->context = new Context($context);
     }
 
+    public function published(): bool
+    {
+        return false;
+    }
+
     public function equals(StatusInterface $status): bool
     {
         return static::class === $status::class

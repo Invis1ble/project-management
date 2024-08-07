@@ -5,7 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     eight_points_guzzle.symfony_log_formatter.pattern: '{method} {uri} {code} {res_headers} {res_body}'
-    invis1ble_project_management.jira.sprint_filed_id: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
+    invis1ble_project_management.jira.sprint_field_id: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
     invis1ble_project_management.jira.hotfix_transition_to_done: '%env(JIRA_HOTFIX_TRANSITION_TO_DONE_NAME)%'
 
 services:
@@ -169,7 +169,7 @@ services:
     Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         arguments:
             $httpClient: '@eight_points_guzzle.client.jira'
-            $sprintFieldId: '%invis1ble_project_management.jira.sprint_filed_id%'
+            $sprintFieldId: '%invis1ble_project_management.jira.sprint_field_id%'
     
     Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker

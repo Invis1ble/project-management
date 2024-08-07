@@ -6,6 +6,9 @@ namespace Invis1ble\ProjectManagement\Shared\Ui\Command;
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
+use Invis1ble\Messenger\Query\QueryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
@@ -19,8 +22,10 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class IssuesAwareCommand extends Command
 {
@@ -46,6 +51,8 @@ abstract class IssuesAwareCommand extends Command
         protected readonly QueryBusInterface $queryBus,
         protected readonly CommandBusInterface $commandBus,
         protected readonly GuiUrlFactoryInterface $issueGuiUrlFactory,
+        protected readonly SerializerInterface $serializer,
+        protected readonly \DateInterval $pipelineMaxAwaitingTime,
     ) {
         parent::__construct();
     }
@@ -154,6 +161,47 @@ abstract class IssuesAwareCommand extends Command
         );
     }
 
+    protected function showProgressLog(QueryInterface $query, callable $inFinalState): int
+    {
+        $startTime = new \DateTimeImmutable();
+        $untilTime = $startTime->add($this->pipelineMaxAwaitingTime);
+        $tickInterval = 10;
+        $previousStatus = null;
+        $statusChanged = false;
+
+        while (new \DateTimeImmutable() <= $untilTime) {
+            /** @var HotfixPublicationInterface|ReleasePublicationInterface $publication */
+            $publication = $this->queryBus->ask($query);
+            $status = $publication->status();
+            $this->displayProgress($this->serializer->serialize($status, 'json'));
+
+            if (null === $previousStatus || ($statusChanged = !$status->equals($previousStatus))) {
+                $previousStatus = $status;
+            }
+
+            if ($inFinalState($publication)) {
+                return Command::SUCCESS;
+            }
+
+            sleep($tickInterval);
+
+            if (isset($statusChanged) && $statusChanged) {
+                $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
+            }
+        }
+
+        if (null === $previousStatus || !$statusChanged) {
+            $this->abort('Publication stuck');
+        }
+
+        return Command::SUCCESS;
+    }
+
+    protected function displayProgress(string $message): void
+    {
+        $this->io->writeln('[' . date('Y-m-d\TH:i:s.uP') . "] $message");
+    }
+
     protected function caption(string $text): void
     {
         $this->io->block($text, null, 'fg=green');
@@ -169,9 +217,9 @@ abstract class IssuesAwareCommand extends Command
         $this->io->listing($elements);
     }
 
-    protected function abort(): void
+    protected function abort(string $message = 'Aborted'): void
     {
-        throw new \RuntimeException('Aborted');
+        throw new \RuntimeException($message);
     }
 
     private function issueMergeRequests(Issue $issue): MergeRequestList
