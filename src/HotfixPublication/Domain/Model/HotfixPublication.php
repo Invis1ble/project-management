@@ -22,12 +22,12 @@ use Psr\Clock\ClockInterface;
 class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicationInterface
 {
     public function __construct(
-        private readonly HotfixPublicationId $id,
-        private readonly Tag\VersionName $tagName,
-        private readonly Tag\Message $tagMessage,
+        private HotfixPublicationId $id,
+        private Tag\VersionName $tagName,
+        private Tag\Message $tagMessage,
         private StatusInterface $status,
         private IssueList $hotfixes,
-        private readonly \DateTimeImmutable $createdAt,
+        private \DateTimeImmutable $createdAt,
     ) {
     }
 
