@@ -7,12 +7,15 @@ namespace Invis1ble\ProjectManagement\Shared\Ui\Command;
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\Messenger\Query\QueryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Exception\ReleasePublicationNotFoundException;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRequests\GetIssueMergeRequestsQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
+use Invis1ble\ProjectManagement\Shared\Domain\Exception\PublicationNotFoundException;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
@@ -168,9 +171,25 @@ abstract class IssuesAwareCommand extends Command
         $previousStatus = null;
         $statusChanged = false;
 
+        $getPublicationMaxTries = 3;
+        $retryCounter = 0;
+
         while (new \DateTimeImmutable() <= $untilTime) {
-            /** @var HotfixPublicationInterface|ReleasePublicationInterface $publication */
-            $publication = $this->queryBus->ask($query);
+            try {
+                /** @var HotfixPublicationInterface|ReleasePublicationInterface $publication */
+                $publication = $this->queryBus->ask($query);
+            } catch (PublicationNotFoundException $exception) {
+                // publication is not created, await async handlers
+                sleep(3);
+                ++$retryCounter;
+
+                if ($retryCounter >= $getPublicationMaxTries) {
+                    break;
+                }
+
+                continue;
+            }
+
             $status = $publication->status();
             $this->displayProgress($this->serializer->serialize($status, 'json'));
 
