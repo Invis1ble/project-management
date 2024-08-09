@@ -176,7 +176,7 @@ abstract class IssuesAwareCommand extends Command
             try {
                 /** @var HotfixPublicationInterface|ReleasePublicationInterface $publication */
                 $publication = $this->queryBus->ask($query);
-            } catch (PublicationNotFoundException $exception) {
+            } catch (PublicationNotFoundException) {
                 // publication is not created, await async handlers
                 sleep(3);
                 ++$retryCounter;
