@@ -684,6 +684,12 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             $previousTaskTrackerStatus = $mergeRequest->status;
         }
 
+        if (!isset($mergeRequest)) {
+            throw new \RuntimeException(
+                "Merge request $mergeRequestIid not fetched",
+            );
+        }
+
         if (!$mergeRequest->mergeable()) {
             $this->eventBus->dispatch(new MergeRequestStuck(
                 projectId: $mergeRequest->projectId,
