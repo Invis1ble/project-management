@@ -23,13 +23,13 @@ use Psr\Clock\ClockInterface;
 class ReleasePublication extends AbstractAggregateRoot implements ReleasePublicationInterface
 {
     public function __construct(
-        private readonly ReleasePublicationId $id,
-        private readonly Name $branchName,
+        private ReleasePublicationId $id,
+        private Name $branchName,
         private StatusInterface $status,
         private ?Tag\VersionName $tagName,
         private ?Tag\Message $tagMessage,
         private IssueList $readyToMergeTasks,
-        private readonly \DateTimeImmutable $createdAt,
+        private \DateTimeImmutable $createdAt,
     ) {
     }
 

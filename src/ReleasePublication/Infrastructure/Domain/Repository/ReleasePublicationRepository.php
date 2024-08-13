@@ -38,13 +38,14 @@ final class ReleasePublicationRepository extends EventDispatchingRepository impl
 
     public function get(ReleasePublicationId $id): ReleasePublicationInterface
     {
-        $releasePublication = $this->find($id);
+        $publication = $this->find($id);
+        $this->getEntityManager()->refresh($publication);
 
-        if (null === $releasePublication) {
+        if (null === $publication) {
             throw new ReleasePublicationNotFoundException($id);
         }
 
-        return $releasePublication;
+        return $publication;
     }
 
     public function store(ReleasePublicationInterface $releasePublication): void

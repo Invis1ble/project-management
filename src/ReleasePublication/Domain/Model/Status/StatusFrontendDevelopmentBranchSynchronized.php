@@ -12,7 +12,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 
-final readonly class StatusFrontendMergeRequestIntoDevelopmentBranchMerged extends AbstractStatus
+final readonly class StatusFrontendDevelopmentBranchSynchronized extends AbstractStatus
 {
     public function proceedToNext(
         MergeRequest\MergeRequestManagerInterface $mergeRequestManager,
@@ -45,6 +45,6 @@ final readonly class StatusFrontendMergeRequestIntoDevelopmentBranchMerged exten
 
     public function __toString(): string
     {
-        return Dictionary::FrontendMergeRequestIntoDevelopmentBranchMerged->value;
+        return Dictionary::FrontendDevelopmentBranchSynchronized->value;
     }
 }

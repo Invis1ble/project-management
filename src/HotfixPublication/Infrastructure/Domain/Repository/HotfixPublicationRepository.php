@@ -39,13 +39,14 @@ final class HotfixPublicationRepository extends EventDispatchingRepository imple
 
     public function get(HotfixPublicationId $id): HotfixPublicationInterface
     {
-        $hotfixPublication = $this->find($id);
+        $publication = $this->find($id);
+        $this->getEntityManager()->refresh($publication);
 
-        if (null === $hotfixPublication) {
+        if (null === $publication) {
             throw new HotfixPublicationNotFoundException("Hotfix publication $id not found.");
         }
 
-        return $hotfixPublication;
+        return $publication;
     }
 
     public function getLatestByTagName(Tag\VersionName $tagName): HotfixPublicationInterface

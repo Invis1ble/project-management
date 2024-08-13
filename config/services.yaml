@@ -216,6 +216,7 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\JobFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\JobFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit\CommitFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Diff\CompareResultFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Diff\CompareResultFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\TagFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\TagFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FileFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FileFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status\StatusFactory'

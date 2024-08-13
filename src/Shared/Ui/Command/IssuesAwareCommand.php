@@ -13,6 +13,7 @@ use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRe
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
+use Invis1ble\ProjectManagement\Shared\Domain\Exception\PublicationNotFoundException;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
@@ -168,9 +169,25 @@ abstract class IssuesAwareCommand extends Command
         $previousStatus = null;
         $statusChanged = false;
 
+        $getPublicationMaxTries = 3;
+        $retryCounter = 0;
+
         while (new \DateTimeImmutable() <= $untilTime) {
-            /** @var HotfixPublicationInterface|ReleasePublicationInterface $publication */
-            $publication = $this->queryBus->ask($query);
+            try {
+                /** @var HotfixPublicationInterface|ReleasePublicationInterface $publication */
+                $publication = $this->queryBus->ask($query);
+            } catch (PublicationNotFoundException) {
+                // publication is not created, await async handlers
+                sleep(3);
+                ++$retryCounter;
+
+                if ($retryCounter >= $getPublicationMaxTries) {
+                    break;
+                }
+
+                continue;
+            }
+
             $status = $publication->status();
             $this->displayProgress($this->serializer->serialize($status, 'json'));
 
