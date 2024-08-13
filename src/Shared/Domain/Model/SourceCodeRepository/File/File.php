@@ -11,7 +11,7 @@ final readonly class File
 {
     public function __construct(
         public Filename $fileName,
-        public FilePath $filePath,
+        public Path $filePath,
         public Content $content,
         public Name $ref,
         public CommitId $commitId,

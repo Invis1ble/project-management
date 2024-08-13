@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
 
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Path;
 
 abstract readonly class AbstractAction
 {
     public function __construct(
         public Dictionary $action,
-        public FilePath $filePath,
+        public Path $filePath,
     ) {
     }
 

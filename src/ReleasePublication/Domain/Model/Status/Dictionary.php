@@ -130,7 +130,7 @@ enum Dictionary: string
 
     case FrontendMergeRequestIntoDevelopmentBranchCreated = 'frontend_merge_request_into_development_branch_created';
 
-    case FrontendMergeRequestIntoDevelopmentBranchMerged = 'frontend_merge_request_into_development_branch_merged';
+    case FrontendDevelopmentBranchSynchronized = 'frontend_development_branch_synchronized';
 
     case BackendMergeRequestIntoDevelopmentBranchCreated = 'backend_merge_request_into_development_branch_created';
 

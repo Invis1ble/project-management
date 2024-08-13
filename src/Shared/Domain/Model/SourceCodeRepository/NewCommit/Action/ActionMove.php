@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\Action;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\FilePath;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Path;
 
 final readonly class ActionMove extends AbstractAction
 {
     public function __construct(
-        FilePath $filePath,
+        Path $filePath,
         public ?Content $content,
     ) {
         parent::__construct(Dictionary::Move, $filePath);

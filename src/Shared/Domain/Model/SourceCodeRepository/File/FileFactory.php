@@ -20,7 +20,7 @@ final readonly class FileFactory implements FileFactoryInterface
     ): File {
         return new File(
             fileName: Filename::fromString($fileName),
-            filePath: FilePath::fromString($filePath),
+            filePath: Path::fromString($filePath),
             content: Content::fromBase64Encoded($content),
             ref: Branch\Name::fromString($ref),
             commitId: CommitId::fromString($commitId),

@@ -31,6 +31,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Projec
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Diff;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
@@ -57,6 +58,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         private File\FileFactoryInterface $fileFactory,
         private MergeRequest\MergeRequestFactoryInterface $mergeRequestFactory,
         private MergeRequest\Details\DetailsFactoryInterface $detailsFactory,
+        private Diff\CompareResultFactoryInterface $compareResultFactory,
         private EventBusInterface $eventBus,
         private Project\ProjectId $projectId,
         private ?\DateInterval $mergeRequestMaxAwaitingTime = new \DateInterval('PT1M'),
@@ -492,6 +494,34 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         return $commit;
     }
 
+    public function compare(
+        Ref $from,
+        Ref $to,
+    ): Diff\CompareResult {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/compare?" . http_build_query([
+                'from' => (string) $from,
+                'to' => (string) $to,
+            ])),
+        );
+
+        $content = $this->httpClient->sendRequest($request)
+            ->getBody()
+            ->getContents();
+
+        $data = json_decode($content, true);
+
+        return $this->compareResultFactory->createCompareResult(
+            commit: $data['commit'],
+            commits: $data['commits'],
+            diffs: $data['diffs'],
+            compareTimout: $data['compare_timeout'],
+            compareSameRef: $data['compare_same_ref'],
+            guiUrl: $data['web_url'],
+        );
+    }
+
     public function latestTagToday(): ?Tag\Tag
     {
         $now = new \DateTimeImmutable();
@@ -548,7 +578,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
     public function file(
         Branch\Name $branchName,
-        File\FilePath $filePath,
+        File\Path $filePath,
     ): File\File {
         $encodedFilePath = urlencode((string) $filePath);
 
@@ -682,6 +712,12 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
             $previousStatus = $mergeRequest->details->status;
             $previousTaskTrackerStatus = $mergeRequest->status;
+        }
+
+        if (!isset($mergeRequest)) {
+            throw new \RuntimeException(
+                "Merge request $mergeRequestIid not fetched",
+            );
         }
 
         if (!$mergeRequest->mergeable()) {

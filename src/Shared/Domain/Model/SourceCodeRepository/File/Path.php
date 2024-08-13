@@ -6,7 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\F
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\NonEmptyString;
 
-final readonly class FilePath extends NonEmptyString
+final readonly class Path extends NonEmptyString
 {
     protected function validate(string $value): void
     {
