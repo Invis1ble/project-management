@@ -7,10 +7,12 @@ namespace Invis1ble\ProjectManagement\Tests\ReleasePublication\Application\Saga;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationStatusChanged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusInterface;
 use Invis1ble\ProjectManagement\Tests\Shared\Application\Saga\PublicationSagaTestCase;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\SourceCodeRepository\Diff\CompareResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Version\VersionResponseFixtureTrait;
 
 abstract class ReleaseSagaTestCase extends PublicationSagaTestCase
 {
+    use CompareResponseFixtureTrait;
     use VersionResponseFixtureTrait;
 
     protected function assertReleasePublicationStatusChanged(

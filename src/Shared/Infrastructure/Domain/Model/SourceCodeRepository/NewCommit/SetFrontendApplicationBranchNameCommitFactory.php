@@ -24,7 +24,7 @@ final readonly class SetFrontendApplicationBranchNameCommitFactory implements Se
 
     public function createSetFrontendApplicationBranchNameCommit(Branch\Name $branchName): ?NewCommit
     {
-        $configFilePath = File\FilePath::fromString('.helm/values.yaml');
+        $configFilePath = File\Path::fromString('.helm/values.yaml');
 
         $file = $this->backendSourceCodeRepository->file(Branch\Name::fromString('develop'), $configFilePath);
 

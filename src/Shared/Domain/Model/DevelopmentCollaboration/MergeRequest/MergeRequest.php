@@ -129,6 +129,16 @@ final readonly class MergeRequest implements \Stringable
 
     public function equals(self $other): bool
     {
+        if (null === $this->details) {
+            if (null !== $other->details) {
+                return false;
+            }
+        } elseif (null === $other->details) {
+            return false;
+        } elseif (!$this->details->equals($other->details)) {
+            return false;
+        }
+
         return $this->iid->equals($other->iid)
             && $this->title->equals($other->title)
             && $this->projectId->equals($other->projectId)
@@ -137,7 +147,6 @@ final readonly class MergeRequest implements \Stringable
             && $this->targetBranchName->equals($other->targetBranchName)
             && $this->status->equals($other->status)
             && (string) $this->guiUrl === (string) $other->guiUrl
-            && $this->details?->equals($other->details)
         ;
     }
 

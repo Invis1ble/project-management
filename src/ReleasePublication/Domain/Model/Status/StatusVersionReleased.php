@@ -30,17 +30,28 @@ final readonly class StatusVersionReleased extends AbstractStatus
         $releaseBranchName = $context->branchName();
         $developmentBranchName = Branch\Name::fromString('develop');
 
-        $mergeRequest = $mergeRequestManager->createMergeRequest(
-            projectId: $frontendSourceCodeRepository->projectId(),
-            title: MergeRequest\Title::fromString("Merge branch $releaseBranchName into $developmentBranchName"),
-            sourceBranchName: $releaseBranchName,
-            targetBranchName: $developmentBranchName,
+        $compareResult = $frontendSourceCodeRepository->compare(
+            from: $releaseBranchName,
+            to: $developmentBranchName,
         );
 
-        $this->setPublicationStatus($context, new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
-            'project_id' => $mergeRequest->projectId->value(),
-            'merge_request_iid' => $mergeRequest->iid->value(),
-        ]));
+        if ($compareResult->diffsEmpty()) {
+            $next = new StatusFrontendDevelopmentBranchSynchronized();
+        } else {
+            $mergeRequest = $mergeRequestManager->createMergeRequest(
+                projectId: $frontendSourceCodeRepository->projectId(),
+                title: MergeRequest\Title::fromString("Merge branch $releaseBranchName into $developmentBranchName"),
+                sourceBranchName: $releaseBranchName,
+                targetBranchName: $developmentBranchName,
+            );
+
+            $next = new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
+                'project_id' => $mergeRequest->projectId->value(),
+                'merge_request_iid' => $mergeRequest->iid->value(),
+            ]);
+        }
+
+        $this->setPublicationStatus($context, $next);
     }
 
     public function __toString(): string

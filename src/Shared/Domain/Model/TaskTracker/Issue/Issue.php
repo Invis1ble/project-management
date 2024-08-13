@@ -94,13 +94,31 @@ final readonly class Issue implements \Stringable
 
     public function equals(self $other): bool
     {
+        if (null === $this->mergeRequests) {
+            if (null !== $other->mergeRequests) {
+                return false;
+            }
+        } elseif (null === $other->mergeRequests) {
+            return false;
+        } elseif (!$this->mergeRequests->equals($other->mergeRequests)) {
+            return false;
+        }
+
+        if (null === $this->mergeRequestsToMerge) {
+            if (null !== $other->mergeRequestsToMerge) {
+                return false;
+            }
+        } elseif (null === $other->mergeRequestsToMerge) {
+            return false;
+        } elseif (!$this->mergeRequestsToMerge->equals($other->mergeRequestsToMerge)) {
+            return false;
+        }
+
         return $this->id->equals($other->id)
             && $this->key->equals($other->key)
             && $this->typeId->equals($other->typeId)
             && $this->summary->equals($other->summary)
             && $this->sprints->equals($other->sprints)
-            && $this->mergeRequests?->equals($other->mergeRequests)
-            && $this->mergeRequestsToMerge?->equals($other->mergeRequestsToMerge)
         ;
     }
 }

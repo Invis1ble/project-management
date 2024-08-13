@@ -28,6 +28,11 @@ interface SourceCodeRepositoryInterface
         NewCommit\Action\ActionList $actions,
     ): Commit\Commit;
 
+    public function compare(
+        Ref $from,
+        Ref $to,
+    ): Diff\CompareResult;
+
     /**
      * @return ?Tag\Tag<Tag\VersionName>
      */
@@ -35,7 +40,7 @@ interface SourceCodeRepositoryInterface
 
     public function file(
         Branch\Name $branchName,
-        File\FilePath $filePath,
+        File\Path $filePath,
     ): File\File;
 
     public function projectId(): Project\ProjectId;

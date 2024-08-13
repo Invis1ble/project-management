@@ -15,9 +15,20 @@ final readonly class Commit
 
     public function equals(self $other): bool
     {
+        if (null === $this->message) {
+            if (null !== $other->message) {
+                return false;
+            }
+        } elseif (null === $other->message) {
+            return false;
+        } elseif (!$this->message->equals($other->message)) {
+            return false;
+        }
+
         return $this->id->equals($other->id)
-            && $this->message?->equals($other->message)
-            && $this->createdAt === $other->createdAt
+            // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning
+            && $this->createdAt == $other->createdAt
+            // phpcs:enable Symfony.ControlStructure.IdenticalComparison.Warning
         ;
     }
 }

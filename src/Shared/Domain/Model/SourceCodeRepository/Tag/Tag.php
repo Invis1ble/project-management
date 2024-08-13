@@ -24,13 +24,24 @@ final readonly class Tag
     ) {
     }
 
-    public function equals(self $element2): bool
+    public function equals(self $other): bool
     {
-        return $this->commit->equals($element2->commit)
-            && $this->name->equals($element2->name)
-            && $this->target->equals($element2->target)
-            && $this->message?->equals($element2->message)
-            && $this->createdAt === $element2->createdAt
+        if (null === $this->message) {
+            if (null !== $other->message) {
+                return false;
+            }
+        } elseif (null === $other->message) {
+            return false;
+        } elseif (!$this->message->equals($other->message)) {
+            return false;
+        }
+
+        return $this->commit->equals($other->commit)
+            && $this->name->equals($other->name)
+            && $this->target->equals($other->target)
+            // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning
+            && $this->createdAt == $other->createdAt
+            // phpcs:enable Symfony.ControlStructure.IdenticalComparison.Warning
         ;
     }
 }

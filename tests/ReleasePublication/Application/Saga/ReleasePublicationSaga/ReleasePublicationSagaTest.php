@@ -26,8 +26,8 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDep
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDeploymentJobSuccess;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusDone;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendApplicationBranchSetToDevelopment;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendDevelopmentBranchSynchronized;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendMergeRequestIntoDevelopmentBranchCreated;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendMergeRequestIntoDevelopmentBranchMerged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendMergeRequestIntoProductionReleaseBranchCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendMergeRequestIntoProductionReleaseBranchMerged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusFrontendProductionReleaseBranchPipelineFailed;
@@ -59,7 +59,8 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeli
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Diff;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
@@ -522,6 +523,21 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 pipelineId: $tagPipelineId,
                 createdAt: $deploymentJobCreatedAt,
             ),
+            new Response(
+                status: 200,
+                body: json_encode($this->compareResponseFixture(
+                    diffs: new Diff\DiffList(
+                        new Diff\Diff(
+                            oldPath: File\Path::fromString('foo'),
+                            newPath: File\Path::fromString('foo'),
+                            content: Diff\Content::fromString("@@ -0,0 +0,0 @@\nbar"),
+                            newFile: false,
+                            renamedFile: false,
+                            deletedFile: false,
+                        ),
+                    ),
+                )),
+            ),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $frontendMrToMerge->iid,
                 projectId: $frontendMrToMerge->projectId,
@@ -620,7 +636,7 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
             new Response(
                 status: 200,
                 body: json_encode($this->fileResponseFixture(
-                    content: Content::fromString(<<<CONFIG
+                    content: File\Content::fromString(<<<CONFIG
 Deploy_react:
     host:
         _default: "v-1-0-0"
@@ -1470,7 +1486,7 @@ CONFIG),
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
             ]),
-            expectedStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchMerged(),
+            expectedStatus: new StatusFrontendDevelopmentBranchSynchronized(),
         );
 
         $this->assertArrayHasKey(89, $dispatchedEvents);
@@ -1485,7 +1501,7 @@ CONFIG),
         $this->assertArrayHasKey(90, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
             event: $dispatchedEvents[90]->event,
-            expectedPreviousStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchMerged(),
+            expectedPreviousStatus: new StatusFrontendDevelopmentBranchSynchronized(),
             expectedStatus: new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
                 'project_id' => $backendProjectId->value(),
                 'merge_request_iid' => $backendMrToMerge->iid->value(),
