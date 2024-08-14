@@ -5,24 +5,26 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\PrepareRelease;
 
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestReleasePublication\GetLatestReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReleasePublication\GetReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\ReleasePublicationAwareCommand;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
-use Invis1ble\ProjectManagement\Shared\Ui\Command\IssuesAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'pm:release:prepare', description: 'Prepares a new release')]
-final class PrepareReleaseCommand extends IssuesAwareCommand
+final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -30,12 +32,29 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
 
         $this->io->title('Preparing a new release');
 
-        $newReleaseBranchName = $this->newReleaseBranchName();
-        $tasks = $this->readyToMergeTasks();
-        $tasks = $this->enrichIssuesWithMergeRequests(
-            issues: $tasks,
-            targetBranchName: BasicBranchName::fromString('develop'),
-        );
+        $resume = $input->getOption('resume');
+
+        if (false === $resume) {
+            $newReleaseBranchName = $this->newReleaseBranchName();
+            $tasks = $this->readyToMergeTasks();
+            $tasks = $this->enrichIssuesWithMergeRequests(
+                issues: $tasks,
+                targetBranchName: BasicBranchName::fromString('develop'),
+            );
+
+            $publicationId = ReleasePublicationId::fromBranchName($newReleaseBranchName);
+        } else {
+            if (is_string($resume)) {
+                $publicationId = ReleasePublicationId::fromString($resume);
+                $publication = $this->getPublication(new GetReleasePublicationQuery($publicationId));
+            } else {
+                $publication = $this->getPublication(new GetLatestReleasePublicationQuery());
+                $publicationId = $publication->id();
+            }
+
+            $newReleaseBranchName = $publication->branchName();
+            $tasks = $publication->readyToMergeTasks();
+        }
 
         $this->io->section('Summary');
 
@@ -70,13 +89,17 @@ final class PrepareReleaseCommand extends IssuesAwareCommand
             $this->abort();
         }
 
-        $this->commandBus->dispatch(new CreateReleasePublicationCommand(
-            branchName: $newReleaseBranchName,
-            readyToMergeTasks: $tasks,
-        ));
+        if (false === $resume) {
+            $this->commandBus->dispatch(new CreateReleasePublicationCommand(
+                branchName: $newReleaseBranchName,
+                readyToMergeTasks: $tasks,
+            ));
+        } else {
+            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+        }
 
         return $this->showProgressLog(
-            query: new GetReleasePublicationQuery(ReleasePublicationId::fromBranchName($newReleaseBranchName)),
+            query: new GetReleasePublicationQuery($publicationId),
             inFinalState: fn (ReleasePublicationInterface $publication): bool => $publication->prepared(),
         );
     }
