@@ -31,8 +31,8 @@ final readonly class StatusVersionReleased extends AbstractStatus
         $developmentBranchName = Branch\Name::fromString('develop');
 
         $compareResult = $frontendSourceCodeRepository->compare(
-            from: $releaseBranchName,
-            to: $developmentBranchName,
+            from: $developmentBranchName,
+            to: $releaseBranchName,
         );
 
         if ($compareResult->diffsEmpty()) {
