@@ -90,14 +90,14 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
         /** @var TraceableEventBus $eventBus */
         $eventBus = $container->get(TraceableEventBus::class);
 
-        $tasks = $this->createIssues(
-            uriFactory: $uriFactory,
-            mergeRequestTargetBranchName: 'develop',
-        );
-
         $releaseBranchName = ReleaseBranch\Name::fromString('v-1-0-0');
         $developmentBranchName = Branch\Name::fromString('develop');
         $productionReleaseBranchName = Branch\Name::fromString('master');
+
+        $tasks = $this->createIssues(
+            uriFactory: $uriFactory,
+            mergeRequestTargetBranchName: (string) $developmentBranchName,
+        );
 
         $backendMrToMerge = $this->createMergeRequest(
             uriFactory: $uriFactory,

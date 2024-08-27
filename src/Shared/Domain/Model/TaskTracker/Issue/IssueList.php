@@ -21,6 +21,11 @@ final readonly class IssueList extends AbstractList
         $this->elements = $issues;
     }
 
+    public function withoutMergeRequestsToMergeOnly(): self
+    {
+        return $this->filter(fn (Issue $issue): bool => !$issue->containsMergeRequestToMerge());
+    }
+
     public function mergeMergeRequests(MergeRequestManagerInterface $mergeRequestManager): self
     {
         return new self(

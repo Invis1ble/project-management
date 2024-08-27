@@ -13,7 +13,6 @@ use Invis1ble\Messenger\Event\TraceableEventBus;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
-use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\TaskTracker\HotfixTransitionedToDone;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusCreated;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusDeploymentJobFailed;
@@ -51,6 +50,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Commit\CommitCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag\TagCreated;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\TaskTracker\Issue\IssueTransitioned;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
@@ -104,6 +104,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
         $frontendProjectId = $frontendMrToMerge->projectId;
         $backendProjectName = $backendMrToMerge->projectName;
         $frontendProjectName = $frontendMrToMerge->projectName;
+        $transitionToDoneName = $container->get('invis1ble_project_management.jira.hotfix_transition_to_done.name');
 
         $tagName = Tag\VersionName::create();
         $tagMessage = Tag\Message::fromString("{$hotfixesArray[0]->summary} | {$hotfixesArray[0]->key}");
@@ -714,7 +715,7 @@ CONFIG),
             new Response(
                 status: 200,
                 body: json_encode($this->issueTransitionsResponseFixture(
-                    transitionName: $container->getParameter('invis1ble_project_management.jira.hotfix_transition_to_done'),
+                    transitionName: (string) $transitionToDoneName,
                 )),
             ),
             new Response(
@@ -1286,9 +1287,10 @@ CONFIG),
 
         $this->assertArrayHasKey(66, $dispatchedEvents);
         $event = $dispatchedEvents[66]->event;
-        $this->assertInstanceOf(HotfixTransitionedToDone::class, $event);
+        $this->assertInstanceOf(IssueTransitioned::class, $event);
         $this->assertObjectEquals($container->get(Project\Key::class), $event->projectKey);
         $this->assertObjectEquals($hotfixesArray[0]->key, $event->key);
+        $this->assertObjectEquals($transitionToDoneName, $event->transitionName);
 
         $this->assertArrayHasKey(67, $dispatchedEvents);
         $this->assertHotfixPublicationStatusChanged(

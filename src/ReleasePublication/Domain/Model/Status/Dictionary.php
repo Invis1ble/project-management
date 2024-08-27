@@ -8,6 +8,8 @@ enum Dictionary: string
 {
     case Created = 'created';
 
+    case TasksWithoutMergeRequestTransitioned = 'tasks_without_merge_request_transitioned';
+
     case MergeRequestsIntoDevelopmentBranchMerged = 'merge_requests_into_development_branch_merged';
 
     case BackendReleaseBranchCreated = 'backend_release_branch_created';

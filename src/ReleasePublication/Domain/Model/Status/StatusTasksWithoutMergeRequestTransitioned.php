@@ -11,9 +11,8 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
-final readonly class StatusCreated extends AbstractStatus
+final readonly class StatusTasksWithoutMergeRequestTransitioned extends AbstractStatus
 {
     public function proceedToNext(
         MergeRequestManagerInterface $mergeRequestManager,
@@ -29,18 +28,14 @@ final readonly class StatusCreated extends AbstractStatus
         ReleasePublicationInterface $context,
     ): void {
         $tasks = $context->readyToMergeTasks()
-            ->withoutMergeRequestsToMergeOnly()
-        ;
+            ->mergeMergeRequests($mergeRequestManager);
 
-        $taskTracker->transitionTasksToReleaseCandidate(
-            ...$tasks->map(fn (Issue\Issue $issue): Issue\Key => $issue->key),
-        );
-
-        $this->setPublicationStatus($context, new StatusTasksWithoutMergeRequestTransitioned());
+        $this->setPublicationProperty($context, 'readyToMergeTasks', $tasks);
+        $this->setPublicationStatus($context, new StatusMergeRequestsIntoDevelopmentBranchMerged());
     }
 
     public function __toString(): string
     {
-        return Dictionary::Created->value;
+        return Dictionary::TasksWithoutMergeRequestTransitioned->value;
     }
 }
