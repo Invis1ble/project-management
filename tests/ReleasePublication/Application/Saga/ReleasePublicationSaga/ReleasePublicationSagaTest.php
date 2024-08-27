@@ -130,7 +130,7 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
         $tagMessage = Tag\Message::fromString("Release $releaseBranchName");
 
         $updateExtraDeploymentMrIid = MergeRequest\MergeRequestIid::from(12345);
-        $updateExtraDeploymentMrTargetBranchName = $container->get('invis1ble_project_management.extra_deploy_branch_name');
+        $updateExtraDeploymentMrTargetBranchName = $container->get('invis1ble_project_management.extra_deployment_branch_name');
         $updateExtraDeploymentMrSourceBranchName = $developmentBranchName;
         $updateExtraDeploymentMrTitle = MergeRequest\Title::fromString("Merge branch $developmentBranchName into $updateExtraDeploymentMrTargetBranchName");
 
@@ -648,6 +648,21 @@ CONFIG),
                 body: json_encode($this->createCommitResponseFixture(
                     message: Commit\Message::fromString("Change frontend application branch name to $developmentBranchName"),
                     createdAt: $setFrontendApplicationBranchNameCommitCreatedAt,
+                )),
+            ),
+            new Response(
+                status: 200,
+                body: json_encode($this->compareResponseFixture(
+                    diffs: new Diff\DiffList(
+                        new Diff\Diff(
+                            oldPath: File\Path::fromString('foo'),
+                            newPath: File\Path::fromString('foo'),
+                            content: Diff\Content::fromString("@@ -0,0 +0,0 @@\nbar"),
+                            newFile: false,
+                            renamedFile: false,
+                            deletedFile: false,
+                        ),
+                    ),
                 )),
             ),
             $this->createMergeRequestResponse(

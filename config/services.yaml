@@ -194,17 +194,17 @@ services:
         arguments:
             - !tagged_iterator invis1ble_project_management.development_collaboration.merge_request_manager
     
-    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory:
-        arguments: ['%env(EXTRA_DEPLOY_BRANCH_NAME)%']
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory:
+        arguments: ['%env(EXTRA_DEPLOYMENT_BRANCH_NAME)%']
     
-    invis1ble_project_management.extra_deploy_branch_name:
+    invis1ble_project_management.extra_deployment_branch_name:
         class: Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name
-        factory: ['@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory', 'createExtraDeployBranchName']
+        factory: ['@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory', 'createExtraDeploymentBranchName']
     
-    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactory:
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactory:
         bind:
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId: '@invis1ble_project_management.gitlab_project.backend'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name: '@invis1ble_project_management.extra_deploy_branch_name'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name: '@invis1ble_project_management.extra_deployment_branch_name'
 
 
 
@@ -218,7 +218,7 @@ services:
     
     
     
-    Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Project\ProjectResolver'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactory'
@@ -237,7 +237,7 @@ services:
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\ReleasePublicationFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactory'
-    Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactory'
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactory'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactory'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'

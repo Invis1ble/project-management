@@ -110,7 +110,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
         $tagMessage = Tag\Message::fromString("{$hotfixesArray[0]->summary} | {$hotfixesArray[0]->key}");
 
         $updateExtraDeploymentMrIid = MergeRequest\MergeRequestIid::from(12345);
-        $updateExtraDeploymentMrTargetBranchName = $container->get('invis1ble_project_management.extra_deploy_branch_name');
+        $updateExtraDeploymentMrTargetBranchName = $container->get('invis1ble_project_management.extra_deployment_branch_name');
         $updateExtraDeploymentMrSourceBranchName = $developmentBranchName;
         $updateExtraDeploymentMrTitle = MergeRequest\Title::fromString("Merge branch $developmentBranchName into $updateExtraDeploymentMrTargetBranchName");
 
