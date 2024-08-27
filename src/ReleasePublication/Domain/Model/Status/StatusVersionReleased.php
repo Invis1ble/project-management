@@ -21,7 +21,7 @@ final readonly class StatusVersionReleased extends AbstractStatus
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
-        MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
+        MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
@@ -31,8 +31,8 @@ final readonly class StatusVersionReleased extends AbstractStatus
         $developmentBranchName = Branch\Name::fromString('develop');
 
         $compareResult = $frontendSourceCodeRepository->compare(
-            from: $releaseBranchName,
-            to: $developmentBranchName,
+            from: $developmentBranchName,
+            to: $releaseBranchName,
         );
 
         if ($compareResult->diffsEmpty()) {

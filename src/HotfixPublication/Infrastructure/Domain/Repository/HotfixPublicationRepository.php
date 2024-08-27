@@ -40,10 +40,22 @@ final class HotfixPublicationRepository extends EventDispatchingRepository imple
     public function get(HotfixPublicationId $id): HotfixPublicationInterface
     {
         $publication = $this->find($id);
-        $this->getEntityManager()->refresh($publication);
 
         if (null === $publication) {
             throw new HotfixPublicationNotFoundException("Hotfix publication $id not found.");
+        }
+
+        $this->getEntityManager()->refresh($publication);
+
+        return $publication;
+    }
+
+    public function getLatest(): HotfixPublicationInterface
+    {
+        $publication = $this->findLatestByCriteria();
+
+        if (null === $publication) {
+            throw new HotfixPublicationNotFoundException('No hotfix publications.');
         }
 
         return $publication;
@@ -51,24 +63,29 @@ final class HotfixPublicationRepository extends EventDispatchingRepository imple
 
     public function getLatestByTagName(Tag\VersionName $tagName): HotfixPublicationInterface
     {
-        $hotfixPublication = $this->findOneBy(
-            criteria: [
-                'tagName' => $tagName,
-            ],
+        $publication = $this->findLatestByCriteria([
+            'tagName' => $tagName,
+        ]);
+
+        if (null === $publication) {
+            throw new HotfixPublicationNotFoundException("Hotfix publication with tag $tagName not found.");
+        }
+
+        return $publication;
+    }
+
+    public function store(HotfixPublicationInterface $publication): void
+    {
+        $this->persist($publication);
+    }
+
+    private function findLatestByCriteria(array $criteria = []): ?HotfixPublicationInterface
+    {
+        return $this->findOneBy(
+            criteria: $criteria,
             orderBy: [
                 'createdAt' => 'DESC',
             ],
         );
-
-        if (null === $hotfixPublication) {
-            throw new HotfixPublicationNotFoundException("Hotfix publication with tag $tagName not found.");
-        }
-
-        return $hotfixPublication;
-    }
-
-    public function store(HotfixPublicationInterface $hotfixPublication): void
-    {
-        $this->persist($hotfixPublication);
     }
 }

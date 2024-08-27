@@ -12,6 +12,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicati
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Repository\EventDispatchingRepository;
 
 final class ReleasePublicationRepository extends EventDispatchingRepository implements ReleasePublicationRepositoryInterface
@@ -39,10 +40,35 @@ final class ReleasePublicationRepository extends EventDispatchingRepository impl
     public function get(ReleasePublicationId $id): ReleasePublicationInterface
     {
         $publication = $this->find($id);
-        $this->getEntityManager()->refresh($publication);
 
         if (null === $publication) {
-            throw new ReleasePublicationNotFoundException($id);
+            throw new ReleasePublicationNotFoundException("Release publication $id not found.");
+        }
+
+        $this->getEntityManager()->refresh($publication);
+
+        return $publication;
+    }
+
+    public function getLatest(): ReleasePublicationInterface
+    {
+        $publication = $this->findLatestByCriteria();
+
+        if (null === $publication) {
+            throw new ReleasePublicationNotFoundException('No release publications.');
+        }
+
+        return $publication;
+    }
+
+    public function getLatestByTagName(Tag\VersionName $tagName): ReleasePublicationInterface
+    {
+        $publication = $this->findLatestByCriteria([
+            'tagName' => $tagName,
+        ]);
+
+        if (null === $publication) {
+            throw new ReleasePublicationNotFoundException("Release publication with tag $tagName not found.");
         }
 
         return $publication;
@@ -51,5 +77,15 @@ final class ReleasePublicationRepository extends EventDispatchingRepository impl
     public function store(ReleasePublicationInterface $releasePublication): void
     {
         $this->persist($releasePublication);
+    }
+
+    private function findLatestByCriteria(array $criteria = []): ?ReleasePublicationInterface
+    {
+        return $this->findOneBy(
+            criteria: $criteria,
+            orderBy: [
+                'createdAt' => 'DESC',
+            ],
+        );
     }
 }

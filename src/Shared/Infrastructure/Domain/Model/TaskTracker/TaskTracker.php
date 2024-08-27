@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker;
 
+use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch\Name;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\TaskTracker\Issue\IssueTransitioned;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -28,17 +28,56 @@ readonly class TaskTracker implements TaskTrackerInterface
         protected StreamFactoryInterface $streamFactory,
         protected RequestFactoryInterface $requestFactory,
         protected Version\VersionFactoryInterface $versionFactory,
-        protected IssueFactoryInterface $issueFactory,
+        protected Issue\IssueFactoryInterface $issueFactory,
         protected MergeRequestFactoryInterface $mergeRequestFactory,
+        protected Transition\TransitionFactoryInterface $transitionFactory,
+        protected EventBusInterface $eventBus,
         protected Project\Key $projectKey,
         protected Board\BoardId $sprintBoardId,
         private int $sprintFieldId,
     ) {
     }
 
+    /**
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post Transition API
+     */
+    public function transitionTo(
+        Issue\Key $key,
+        Transition\Name $transitionName,
+    ): void {
+        $transitions = $this->issueTransitions($key);
+        $transition = $transitions->get($transitionName);
+
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->uriFactory->createUri("/rest/api/3/issue/$key/transitions"),
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode([
+                'transition' => (string) $transition->id,
+            ])))
+        ;
+
+        $statusCode = $this->httpClient->sendRequest($request)
+            ->getStatusCode();
+
+        if (204 !== $statusCode) {
+            throw new \RuntimeException("Something went wrong during issue '$key' transition to '$transition->name'");
+        }
+
+        $this->eventBus->dispatch(new IssueTransitioned(
+            projectKey: $this->projectKey,
+            key: $key,
+            transitionId: $transition->id,
+            transitionName: $transition->name,
+        ));
+    }
+
+    /**
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-project-versions/#api-rest-api-3-project-projectidorkey-version-get Version API
+     */
     public function latestRelease(): ?Version\Version
     {
-        // {@link} https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-project-versions/#api-rest-api-3-project-projectidorkey-version-get
         $request = $this->requestFactory->createRequest(
             'GET',
             $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
@@ -94,8 +133,8 @@ readonly class TaskTracker implements TaskTrackerInterface
     public function issuesFromActiveSprint(
         ?string $status = null,
         ?array $types = null,
-        Key ...$keys,
-    ): IssueList {
+        Issue\Key ...$keys,
+    ): Issue\IssueList {
         $jqlAnd = ["project=\"$this->projectKey\""];
 
         if (0 !== iterator_count($keys)) {
@@ -135,7 +174,7 @@ readonly class TaskTracker implements TaskTrackerInterface
             ));
         }
 
-        $issues = new IssueList();
+        $issues = new Issue\IssueList();
 
         foreach ($data['issues'] as $issue) {
             $issue = $this->issueFactory->createIssue(
@@ -155,7 +194,7 @@ readonly class TaskTracker implements TaskTrackerInterface
         return $issues;
     }
 
-    public function mergeRequestsRelatedToIssue(IssueId $issueId): MergeRequestList
+    public function mergeRequestsRelatedToIssue(Issue\IssueId $issueId): MergeRequestList
     {
         $request = $this->requestFactory->createRequest(
             'GET',
@@ -205,7 +244,7 @@ readonly class TaskTracker implements TaskTrackerInterface
         );
     }
 
-    public function issueTransitions(Key $key): array
+    public function issueTransitions(Issue\Key $key): Transition\TransitionList
     {
         $request = $this->requestFactory->createRequest(
             'GET',
@@ -218,6 +257,15 @@ readonly class TaskTracker implements TaskTrackerInterface
 
         $data = json_decode($content, true);
 
-        return $data['transitions'];
+        return new Transition\TransitionList(
+            ...(function ($data): iterable {
+                foreach ($data['transitions'] as $transition) {
+                    yield $this->transitionFactory->createTransition(
+                        id: $transition['id'],
+                        name: $transition['name'],
+                    );
+                }
+            })($data),
+        );
     }
 }

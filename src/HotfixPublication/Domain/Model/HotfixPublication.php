@@ -12,7 +12,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractAggregateRoot;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
@@ -67,7 +67,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
-        UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
+        UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
         \DateInterval $pipelineMaxAwaitingTime,
@@ -80,7 +80,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             frontendCiClient: $frontendCiClient,
             backendCiClient: $backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
-            updateExtraDeployBranchMergeRequestFactory: $updateExtraDeployBranchMergeRequestFactory,
+            updateExtraDeploymentBranchMergeRequestFactory: $updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $taskTracker,
             projectResolver: $projectResolver,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,

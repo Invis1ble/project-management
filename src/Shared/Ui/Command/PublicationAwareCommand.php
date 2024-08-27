@@ -13,7 +13,6 @@ use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRe
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
-use Invis1ble\ProjectManagement\Shared\Domain\Exception\PublicationNotFoundException;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
@@ -27,7 +26,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Serializer\SerializerInterface;
 
-abstract class IssuesAwareCommand extends Command
+abstract class PublicationAwareCommand extends Command
 {
     protected SymfonyStyle $io;
 
@@ -63,10 +62,17 @@ abstract class IssuesAwareCommand extends Command
 
         $this
             ->addOption(
-                'dry-run',
-                null,
-                InputOption::VALUE_NONE,
-                'Execute the command as a dry run.',
+                name: 'resume',
+                shortcut: null,
+                mode: InputOption::VALUE_OPTIONAL,
+                description: 'Resume saga with an optional publication id.',
+                default: false,
+            )
+            ->addOption(
+                name: 'dry-run',
+                shortcut: null,
+                mode: InputOption::VALUE_NONE,
+                description: 'Execute the command as a dry run.',
             )
         ;
     }
@@ -163,31 +169,13 @@ abstract class IssuesAwareCommand extends Command
 
     protected function showProgressLog(QueryInterface $query, callable $inFinalState): int
     {
-        $startTime = new \DateTimeImmutable();
-        $untilTime = $startTime->add($this->pipelineMaxAwaitingTime);
+        $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
         $tickInterval = 10;
         $previousStatus = null;
         $statusChanged = false;
 
-        $getPublicationMaxTries = 3;
-        $retryCounter = 0;
-
         while (new \DateTimeImmutable() <= $untilTime) {
-            try {
-                /** @var HotfixPublicationInterface|ReleasePublicationInterface $publication */
-                $publication = $this->queryBus->ask($query);
-            } catch (PublicationNotFoundException) {
-                // publication is not created, await async handlers
-                sleep(3);
-                ++$retryCounter;
-
-                if ($retryCounter >= $getPublicationMaxTries) {
-                    break;
-                }
-
-                continue;
-            }
-
+            $publication = $this->getPublication($query);
             $status = $publication->status();
             $this->displayProgress($this->serializer->serialize($status, 'json'));
 
@@ -212,6 +200,8 @@ abstract class IssuesAwareCommand extends Command
 
         return Command::SUCCESS;
     }
+
+    abstract protected function getPublication(QueryInterface $query): ReleasePublicationInterface|HotfixPublicationInterface;
 
     protected function displayProgress(string $message): void
     {

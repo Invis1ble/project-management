@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 
-interface ExtraDeployBranchNameFactoryInterface
+interface ExtraDeploymentBranchNameFactoryInterface
 {
-    public function createExtraDeployBranchName(): ?Name;
+    public function createExtraDeploymentBranchName(): ?Name;
 }

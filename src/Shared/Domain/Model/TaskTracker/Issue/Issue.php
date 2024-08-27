@@ -72,14 +72,22 @@ final readonly class Issue implements \Stringable
         );
     }
 
+    public function containsMergeRequestToMerge(): bool
+    {
+        return null !== $this->mergeRequestsToMerge
+            && !$this->mergeRequestsToMerge->empty();
+    }
+
     public function containsBackendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
     {
-        return $this->mergeRequestsToMerge->containsBackendMergeRequest($projectResolver);
+        return null !== $this->mergeRequestsToMerge
+            && $this->mergeRequestsToMerge->containsBackendMergeRequest($projectResolver);
     }
 
     public function containsFrontendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
     {
-        return $this->mergeRequestsToMerge->containsFrontendMergeRequest($projectResolver);
+        return null !== $this->mergeRequestsToMerge
+            && $this->mergeRequestsToMerge->containsFrontendMergeRequest($projectResolver);
     }
 
     public function inActiveSprintOnBoard(BoardId $boardId): bool

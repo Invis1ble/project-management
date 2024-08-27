@@ -6,9 +6,15 @@ namespace Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublishHotfix
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
+use Invis1ble\Messenger\Query\QueryInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixPublication\GetHotfixPublicationQuery;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublication\GetLatestHotfixPublicationQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublicationByTag\GetLatestHotfixPublicationByTagQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint\GetReadyForPublishHotfixesInActiveSprintQuery;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
@@ -17,7 +23,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFact
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
-use Invis1ble\ProjectManagement\Shared\Ui\Command\IssuesAwareCommand;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,7 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:hotfix:publish', description: 'Publish hotfixes')]
-final class PublishHotfixCommand extends IssuesAwareCommand
+final class PublishHotfixCommand extends PublicationAwareCommand
 {
     public function __construct(
         QueryBusInterface $queryBus,
@@ -64,20 +70,36 @@ final class PublishHotfixCommand extends IssuesAwareCommand
 
         $this->io->title('Publishing hotfixes');
 
-        $keys = $input->getArgument('key');
+        $resume = $input->getOption('resume');
 
-        $hotfixes = $this->readyForPublishHotfixes($keys);
+        if (false === $resume) {
+            $keys = $input->getArgument('key');
 
-        if ($hotfixes->empty()) {
-            return Command::SUCCESS;
+            $hotfixes = $this->readyForPublishHotfixes($keys);
+
+            if ($hotfixes->empty()) {
+                return Command::SUCCESS;
+            }
+
+            $tagName = $this->newTagName();
+            $tagMessage = $this->newTagMessage($hotfixes);
+            $hotfixes = $this->enrichIssuesWithMergeRequests(
+                issues: $hotfixes,
+                targetBranchName: Branch\Name::fromString('master'),
+            );
+        } else {
+            if (is_string($resume)) {
+                $publicationId = HotfixPublicationId::fromString($resume);
+                $publication = $this->getPublication(new GetHotfixPublicationQuery($publicationId));
+            } else {
+                $publication = $this->getPublication(new GetLatestHotfixPublicationQuery());
+                $publicationId = $publication->id();
+            }
+
+            $tagName = $publication->tagName();
+            $tagMessage = $publication->tagMessage();
+            $hotfixes = $publication->hotfixes();
         }
-
-        $tagName = $this->newTagName();
-        $tagMessage = $this->newTagMessage($hotfixes);
-        $hotfixes = $this->enrichIssuesWithMergeRequests(
-            issues: $hotfixes,
-            targetBranchName: Branch\Name::fromString('master'),
-        );
 
         $this->io->section('Summary');
 
@@ -109,16 +131,50 @@ final class PublishHotfixCommand extends IssuesAwareCommand
             $this->abort();
         }
 
-        $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
-            tagName: $tagName,
-            tagMessage: $tagMessage,
-            hotfixes: $hotfixes,
-        ));
+        if (false === $resume) {
+            $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
+                tagName: $tagName,
+                tagMessage: $tagMessage,
+                hotfixes: $hotfixes,
+            ));
+
+            $publication = $this->getPublication(new GetLatestHotfixPublicationByTagQuery($tagName));
+            $publicationId = $publication->id();
+        } else {
+            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+        }
 
         return $this->showProgressLog(
-            query: new GetLatestHotfixPublicationByTagQuery($tagName),
+            query: new GetHotfixPublicationQuery($publicationId),
             inFinalState: fn (HotfixPublicationInterface $publication): bool => $publication->published(),
         );
+    }
+
+    protected function getPublication(QueryInterface $query): HotfixPublicationInterface
+    {
+        $startTime = new \DateTimeImmutable();
+        $untilTime = $startTime->add($this->pipelineMaxAwaitingTime);
+
+        $getPublicationMaxTries = 3;
+        $retryCounter = 0;
+
+        while (new \DateTimeImmutable() <= $untilTime) {
+            try {
+                return $this->queryBus->ask($query);
+            } catch (HotfixPublicationNotFoundException $exception) {
+                // publication is not created, await async handlers
+                sleep(3);
+                ++$retryCounter;
+
+                if ($retryCounter >= $getPublicationMaxTries) {
+                    throw $exception;
+                }
+
+                continue;
+            }
+        }
+
+        throw new HotfixPublicationNotFoundException();
     }
 
     private function newTagMessage(IssueList $hotfixes): Tag\Message

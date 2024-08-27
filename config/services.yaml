@@ -6,7 +6,6 @@
 parameters:
     eight_points_guzzle.symfony_log_formatter.pattern: '{method} {uri} {code} {res_headers} {res_body}'
     invis1ble_project_management.jira.sprint_field_id: '%env(JIRA_SPRINT_SECTION_FIELD_ID)%'
-    invis1ble_project_management.jira.hotfix_transition_to_done: '%env(JIRA_HOTFIX_TRANSITION_TO_DONE_NAME)%'
 
 services:
     # default configuration for services in *this* file
@@ -17,6 +16,8 @@ services:
             Psr\Http\Message\UriInterface $jiraUrl: '@invis1ble_project_management.jira_url'
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $backendProjectId: '@invis1ble_project_management.gitlab_project.backend'
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $frontendProjectId: '@invis1ble_project_management.gitlab_project.frontend'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name $issueTransitionToReleaseCandidateName: '@invis1ble_project_management.jira.issue_transition_to_release_candidate.name'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name $hotfixTransitionToDoneName: '@invis1ble_project_management.jira.hotfix_transition_to_done.name'
             DateInterval $pipelineMaxAwaitingTime: '@invis1ble_project_management.pipeline_max_awaiting_time'
             DateInterval $pipelineTickInterval: '@invis1ble_project_management.pipeline_tick_interval'
             DateInterval $mergeRequestMaxAwaitingTime: '@invis1ble_project_management.merge_request_max_awaiting_time'
@@ -151,8 +152,17 @@ services:
         arguments:
             $duration: '%env(MERGE_REQUEST_TICK_INTERVAL)%'
 
+    invis1ble_project_management.jira.issue_transition_to_release_candidate.name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name
+        public: true
+        arguments:
+            $value: '%env(JIRA_ISSUE_TRANSITION_TO_RELEASE_CANDIDATE_NAME)%'
 
-
+    invis1ble_project_management.jira.hotfix_transition_to_done.name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name
+        public: true
+        arguments:
+            $value: '%env(JIRA_HOTFIX_TRANSITION_TO_DONE_NAME)%'
     
     invis1ble_project_management.gitlab_backend_client:
         class: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Gitlab\GitlabClient
@@ -175,7 +185,6 @@ services:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
         arguments:
             $readyForPublishStatus: 'Ready for Publish'
-            $transitionToDoneName: '%invis1ble_project_management.jira.hotfix_transition_to_done%'
             $supportedIssueTypes: ['Hotfix']
     
     Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
@@ -185,17 +194,17 @@ services:
         arguments:
             - !tagged_iterator invis1ble_project_management.development_collaboration.merge_request_manager
     
-    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory:
-        arguments: ['%env(EXTRA_DEPLOY_BRANCH_NAME)%']
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory:
+        arguments: ['%env(EXTRA_DEPLOYMENT_BRANCH_NAME)%']
     
-    invis1ble_project_management.extra_deploy_branch_name:
+    invis1ble_project_management.extra_deployment_branch_name:
         class: Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name
-        factory: ['@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory', 'createExtraDeployBranchName']
+        factory: ['@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory', 'createExtraDeploymentBranchName']
     
-    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactory:
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactory:
         bind:
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId: '@invis1ble_project_management.gitlab_project.backend'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name: '@invis1ble_project_management.extra_deploy_branch_name'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name: '@invis1ble_project_management.extra_deployment_branch_name'
 
 
 
@@ -209,7 +218,7 @@ services:
     
     
     
-    Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeployBranchNameFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Project\ProjectResolver'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactory'
@@ -228,13 +237,14 @@ services:
     Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationFactoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\ReleasePublicationFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactory'
-    Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactory'
-    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Sprint\SprintFactory'
-    Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository\ReleasePublicationRepository'
-    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactory'
+    Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactory'
+    Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactory'
     Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
-    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\GuiUrlFactory'
+    Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Repository\ReleasePublicationRepository'
     Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerStack'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactory'
-    Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface: '@Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactory'
-    Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\GuiUrlFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\SprintFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Sprint\SprintFactory'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\TransitionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Transition\TransitionFactory'

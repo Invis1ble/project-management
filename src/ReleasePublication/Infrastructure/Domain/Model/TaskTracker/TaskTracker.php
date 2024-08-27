@@ -12,9 +12,9 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeReposi
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker as BasicTaskTracker;
 use Psr\Http\Client\ClientInterface;
@@ -30,13 +30,15 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         StreamFactoryInterface $streamFactory,
         RequestFactoryInterface $requestFactory,
         Version\VersionFactoryInterface $versionFactory,
-        IssueFactoryInterface $issueFactory,
+        Issue\IssueFactoryInterface $issueFactory,
         MergeRequestFactoryInterface $mergeRequestFactory,
-        private EventBusInterface $eventBus,
+        Transition\TransitionFactoryInterface $transitionFactory,
+        EventBusInterface $eventBus,
         Project\Key $projectKey,
         Board\BoardId $sprintBoardId,
         int $sprintFieldId,
         private string $readyToMergeStatus = 'Ready to Merge',
+        private Transition\Name $issueTransitionToReleaseCandidateName = new Transition\Name('Release Candidate'),
         private array $supportedIssueTypes = ['Bug', 'Story', 'Tech Dept'],
     ) {
         parent::__construct(
@@ -47,10 +49,19 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
             $versionFactory,
             $issueFactory,
             $mergeRequestFactory,
+            $transitionFactory,
+            $eventBus,
             $projectKey,
             $sprintBoardId,
             $sprintFieldId,
         );
+    }
+
+    public function transitionTasksToReleaseCandidate(Issue\Key ...$keys): void
+    {
+        foreach ($keys as $key) {
+            $this->transitionTo($key, $this->issueTransitionToReleaseCandidateName);
+        }
     }
 
     public function renameReleaseCandidate(Branch\Name $branchName): Version\Version
@@ -213,7 +224,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         return $version;
     }
 
-    public function readyToMergeTasksInActiveSprint(): IssueList
+    public function readyToMergeTasksInActiveSprint(): Issue\IssueList
     {
         return $this->issuesFromActiveSprint(
             status: $this->readyToMergeStatus,

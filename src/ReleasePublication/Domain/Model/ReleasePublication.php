@@ -13,7 +13,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\Task
 use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractAggregateRoot;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
@@ -70,7 +70,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
-        UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
+        UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
@@ -95,7 +95,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             frontendCiClient: $frontendCiClient,
             backendCiClient: $backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
-            updateExtraDeployBranchMergeRequestFactory: $updateExtraDeployBranchMergeRequestFactory,
+            updateExtraDeploymentBranchMergeRequestFactory: $updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $taskTracker,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
             pipelineTickInterval: $pipelineTickInterval,
@@ -110,7 +110,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
-        UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
+        UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
@@ -122,7 +122,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             frontendCiClient: $frontendCiClient,
             backendCiClient: $backendCiClient,
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
-            updateExtraDeployBranchMergeRequestFactory: $updateExtraDeployBranchMergeRequestFactory,
+            updateExtraDeploymentBranchMergeRequestFactory: $updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $taskTracker,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
             pipelineTickInterval: $pipelineTickInterval,

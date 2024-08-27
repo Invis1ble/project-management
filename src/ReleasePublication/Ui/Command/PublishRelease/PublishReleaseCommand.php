@@ -6,17 +6,20 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\PublishRelea
 
 use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\PublishRelease as Application;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestReleasePublication\GetLatestReleasePublicationQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestReleasePublicationByTag\GetLatestReleasePublicationByTagQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReleasePublication\GetReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
+use Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\ReleasePublicationAwareCommand;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
-use Invis1ble\ProjectManagement\Shared\Ui\Command\IssuesAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,7 +27,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:release:publish', description: 'Publishes a new release')]
-final class PublishReleaseCommand extends IssuesAwareCommand
+final class PublishReleaseCommand extends ReleasePublicationAwareCommand
 {
     public function __construct(
         QueryBusInterface $queryBus,
@@ -49,9 +52,25 @@ final class PublishReleaseCommand extends IssuesAwareCommand
 
         $this->io->title('Publishing a new release');
 
-        $tagName = $this->newTagName();
-        $preparedReleaseBranchName = $this->preparedReleaseBranchName();
-        $tagMessage = $this->newTagMessage($preparedReleaseBranchName);
+        $resume = $input->getOption('resume');
+
+        if (false === $resume) {
+            $tagName = $this->newTagName();
+            $preparedReleaseBranchName = $this->preparedReleaseBranchName();
+            $tagMessage = $this->newTagMessage($preparedReleaseBranchName);
+        } else {
+            if (is_string($resume)) {
+                $publicationId = ReleasePublicationId::fromString($resume);
+                $publication = $this->getPublication(new GetReleasePublicationQuery($publicationId));
+            } else {
+                $publication = $this->getPublication(new GetLatestReleasePublicationQuery());
+                $publicationId = $publication->id();
+            }
+
+            $preparedReleaseBranchName = $publication->branchName();
+            $tagName = $publication->tagName();
+            $tagMessage = $publication->tagMessage();
+        }
 
         $this->io->section('Summary');
 
@@ -74,14 +93,21 @@ final class PublishReleaseCommand extends IssuesAwareCommand
             $this->abort();
         }
 
-        $this->commandBus->dispatch(new Application\PublishReleaseCommand(
-            id: ReleasePublicationId::fromBranchName($preparedReleaseBranchName),
-            tagName: $tagName,
-            tagMessage: $tagMessage,
-        ));
+        if (false === $resume) {
+            $this->commandBus->dispatch(new Application\PublishReleaseCommand(
+                id: ReleasePublicationId::fromBranchName($preparedReleaseBranchName),
+                tagName: $tagName,
+                tagMessage: $tagMessage,
+            ));
+
+            $publication = $this->getPublication(new GetLatestReleasePublicationByTagQuery($tagName));
+            $publicationId = $publication->id();
+        } else {
+            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+        }
 
         return $this->showProgressLog(
-            query: new GetReleasePublicationQuery(ReleasePublicationId::fromBranchName($preparedReleaseBranchName)),
+            query: new GetReleasePublicationQuery($publicationId),
             inFinalState: fn (ReleasePublicationInterface $publication): bool => $publication->published(),
         );
     }

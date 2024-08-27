@@ -20,13 +20,32 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
-        MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
+        MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
-        $mergeRequest = $updateExtraDeployBranchMergeRequestFactory->createMergeRequest();
+        $extraDeploymentBranchName = $updateExtraDeploymentBranchMergeRequestFactory->extraDeploymentBranchName();
+
+        if (null === $extraDeploymentBranchName) {
+            $this->setPublicationStatus($context, new StatusDone());
+
+            return;
+        }
+
+        $compareResult = $backendSourceCodeRepository->compare(
+            from: $extraDeploymentBranchName,
+            to: $updateExtraDeploymentBranchMergeRequestFactory->developmentBranchName(),
+        );
+
+        if ($compareResult->diffsEmpty()) {
+            $this->setPublicationStatus($context, new StatusDone());
+
+            return;
+        }
+
+        $mergeRequest = $updateExtraDeploymentBranchMergeRequestFactory->createMergeRequest();
 
         if (null === $mergeRequest) {
             $next = new StatusDone();

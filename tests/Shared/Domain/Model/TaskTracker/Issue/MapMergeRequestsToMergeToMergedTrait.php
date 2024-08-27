@@ -17,9 +17,15 @@ trait MapMergeRequestsToMergeToMergedTrait
     public function mapMergeRequestsToMergeToMerged(Issue\IssueList $issues): Issue\IssueList
     {
         return new Issue\IssueList(...$issues->map(
-            fn (Issue\Issue $issue): Issue\Issue => $issue->withMergeRequestsToMerge(
-                $this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge),
-            ),
+            function (Issue\Issue $issue): Issue\Issue {
+                if (null === $issue->mergeRequestsToMerge) {
+                    return $issue;
+                }
+
+                return $issue->withMergeRequestsToMerge(
+                    $this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge),
+                );
+            },
         ));
     }
 
@@ -29,26 +35,32 @@ trait MapMergeRequestsToMergeToMergedTrait
         Name $newTargetBranchName,
     ): Issue\IssueList {
         return new Issue\IssueList(...$issues->map(
-            fn (Issue\Issue $issue): Issue\Issue => $issue->withMergeRequestsToMerge(
-                $this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge)
-                    ->concat(new MergeRequestList(...(function () use ($issue, $targetBranchName, $newTargetBranchName): iterable {
-                        foreach ($issue->mergeRequestsToMerge as $mr) {
-                            if ($mr->targetBranchName->equals($targetBranchName)) {
-                                yield new MergeRequest(
-                                    iid: $mr->iid,
-                                    title: $mr->title,
-                                    projectId: $mr->projectId,
-                                    projectName: $mr->projectName,
-                                    sourceBranchName: $mr->sourceBranchName,
-                                    targetBranchName: $newTargetBranchName,
-                                    status: $mr->status,
-                                    guiUrl: $mr->guiUrl,
-                                    details: $mr->details,
-                                );
+            function (Issue\Issue $issue) use ($targetBranchName, $newTargetBranchName): Issue\Issue {
+                if (null === $issue->mergeRequestsToMerge) {
+                    return $issue;
+                }
+
+                return $issue->withMergeRequestsToMerge(
+                    $this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge)
+                        ->concat(new MergeRequestList(...(function () use ($issue, $targetBranchName, $newTargetBranchName): iterable {
+                            foreach ($issue->mergeRequestsToMerge as $mr) {
+                                if ($mr->targetBranchName->equals($targetBranchName)) {
+                                    yield new MergeRequest(
+                                        iid: $mr->iid,
+                                        title: $mr->title,
+                                        projectId: $mr->projectId,
+                                        projectName: $mr->projectName,
+                                        sourceBranchName: $mr->sourceBranchName,
+                                        targetBranchName: $newTargetBranchName,
+                                        status: $mr->status,
+                                        guiUrl: $mr->guiUrl,
+                                        details: $mr->details,
+                                    );
+                                }
                             }
-                        }
-                    })())),
-            ),
+                        })())),
+                );
+            },
         ));
     }
 }

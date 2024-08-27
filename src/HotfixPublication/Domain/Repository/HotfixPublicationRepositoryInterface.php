@@ -21,7 +21,12 @@ interface HotfixPublicationRepositoryInterface
     /**
      * @throws HotfixPublicationNotFoundException
      */
+    public function getLatest(): HotfixPublicationInterface;
+
+    /**
+     * @throws HotfixPublicationNotFoundException
+     */
     public function getLatestByTagName(Tag\VersionName $tagName): HotfixPublicationInterface;
 
-    public function store(HotfixPublicationInterface $hotfixPublication): void;
+    public function store(HotfixPublicationInterface $publication): void;
 }

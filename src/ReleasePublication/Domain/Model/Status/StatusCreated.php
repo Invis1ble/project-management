@@ -11,6 +11,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 
 final readonly class StatusCreated extends AbstractStatus
 {
@@ -21,17 +22,21 @@ final readonly class StatusCreated extends AbstractStatus
         ContinuousIntegrationClientInterface $frontendCiClient,
         ContinuousIntegrationClientInterface $backendCiClient,
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
-        MergeRequest\UpdateExtraDeployBranchMergeRequestFactoryInterface $updateExtraDeployBranchMergeRequestFactory,
+        MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
     ): void {
         $tasks = $context->readyToMergeTasks()
-            ->mergeMergeRequests($mergeRequestManager);
+            ->withoutMergeRequestsToMergeOnly()
+        ;
 
-        $this->setPublicationProperty($context, 'readyToMergeTasks', $tasks);
-        $this->setPublicationStatus($context, new StatusMergeRequestsIntoDevelopmentBranchMerged());
+        $taskTracker->transitionTasksToReleaseCandidate(
+            ...$tasks->map(fn (Issue\Issue $issue): Issue\Key => $issue->key),
+        );
+
+        $this->setPublicationStatus($context, new StatusTasksWithoutMergeRequestTransitioned());
     }
 
     public function __toString(): string
