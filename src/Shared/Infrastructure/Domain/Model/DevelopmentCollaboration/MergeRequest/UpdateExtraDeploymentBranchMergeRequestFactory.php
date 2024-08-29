@@ -29,7 +29,7 @@ final readonly class UpdateExtraDeploymentBranchMergeRequestFactory implements U
 
         return $this->mergeRequestManager->createMergeRequest(
             projectId: $this->projectId,
-            title: Title::fromString('Update from develop'),
+            title: Title::fromString("Update from $this->developmentBranchName"),
             sourceBranchName: $this->developmentBranchName,
             targetBranchName: $this->extraDeploymentBranchName,
         );
