@@ -22,6 +22,8 @@ services:
             DateInterval $pipelineTickInterval: '@invis1ble_project_management.pipeline_tick_interval'
             DateInterval $mergeRequestMaxAwaitingTime: '@invis1ble_project_management.merge_request_max_awaiting_time'
             DateInterval $mergeRequestTickInterval: '@invis1ble_project_management.merge_request_tick_interval'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name $extraDeploymentBranchName: '@invis1ble_project_management.extra_deployment_branch_name'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name $developmentBranchName: '@invis1ble_project_management.development_branch_name'
             Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $backendSourceCodeRepository: '@invis1ble_project_management.gitlab_backend_client'
             Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface $frontendSourceCodeRepository: '@invis1ble_project_management.gitlab_frontend_client'
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface $frontendCiClient: '@invis1ble_project_management.gitlab_frontend_client'
@@ -201,10 +203,13 @@ services:
         class: Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name
         factory: ['@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory', 'createExtraDeploymentBranchName']
     
+    invis1ble_project_management.development_branch_name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name
+        arguments: ['%env(DEVELOPMENT_BRANCH_NAME)%']
+
     Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactory:
         bind:
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId: '@invis1ble_project_management.gitlab_project.backend'
-            Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name: '@invis1ble_project_management.extra_deployment_branch_name'
 
 
 

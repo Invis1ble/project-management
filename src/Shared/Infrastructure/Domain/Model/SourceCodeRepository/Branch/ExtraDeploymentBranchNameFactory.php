@@ -9,7 +9,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\
 
 final readonly class ExtraDeploymentBranchNameFactory implements ExtraDeploymentBranchNameFactoryInterface
 {
-    public function __construct(private string $branchName)
+    public function __construct(private ?string $branchName)
     {
     }
 
