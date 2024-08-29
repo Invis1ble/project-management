@@ -8,6 +8,8 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
@@ -35,28 +37,46 @@ final readonly class StatusDevelopmentBranchSynchronized extends AbstractStatus
         $release = $taskTracker->latestRelease();
         $hasNewMergeRequestToMerge = false;
 
-        if (null !== $release && !$release->released) {
-            $hotfixes = new IssueList(
-                ...$context->hotfixes()
-                    ->map(function (Issue $hotfix) use ($mergeRequestManager, $release, &$hasNewMergeRequestToMerge): Issue {
-                        $mergeRequestsToMergeIntoRelease = $hotfix->mergeRequestsToMerge->createCopiesWithNewTargetBranch(
-                            mergeRequestManager: $mergeRequestManager,
-                            targetBranchName: Branch\Name::fromString('master'),
-                            newTargetBranchName: Branch\Name::fromString((string) $release->name),
-                        );
+        if (null === $release || $release->released) {
+            $this->setPublicationStatus($context, new StatusReleaseBranchSynchronized());
 
-                        if (!$mergeRequestsToMergeIntoRelease->empty()) {
-                            $hasNewMergeRequestToMerge = true;
-                        }
-
-                        return $hotfix->withMergeRequestsToMerge(
-                            $hotfix->mergeRequestsToMerge->concat($mergeRequestsToMergeIntoRelease),
-                        );
-                    }),
-            );
+            return;
         }
 
-        if (isset($hotfixes) && $hasNewMergeRequestToMerge) {
+        $hotfixes = new IssueList(
+            ...$context->hotfixes()
+                ->map(function (Issue $hotfix) use ($frontendSourceCodeRepository, $projectResolver, $backendSourceCodeRepository, $mergeRequestManager, $release, &$hasNewMergeRequestToMerge): Issue {
+                    $releaseBranchName = Branch\Name::fromString((string) $release->name);
+                    $productionReleaseBranchName = Branch\Name::fromString('master');
+
+                    $mergeRequestsToMerge = new MergeRequestList(
+                        ...$hotfix->mergeRequestsToMerge
+                            ->targetToBranch($productionReleaseBranchName)
+                            ->onlyShouldBeCopiedWithNewTargetBranch(
+                                projectResolver: $projectResolver,
+                                frontendSourceCodeRepository: $frontendSourceCodeRepository,
+                                backendSourceCodeRepository: $backendSourceCodeRepository,
+                                branchName: $releaseBranchName,
+                            )
+                            ->map(fn (MergeRequest $mergeRequest): MergeRequest => $mergeRequestManager->createMergeRequest(
+                                projectId: $mergeRequest->projectId,
+                                title: $mergeRequest->title,
+                                sourceBranchName: $mergeRequest->sourceBranchName,
+                                targetBranchName: $releaseBranchName,
+                            )),
+                    );
+
+                    if (!$mergeRequestsToMerge->empty()) {
+                        $hasNewMergeRequestToMerge = true;
+                    }
+
+                    return $hotfix->withMergeRequestsToMerge(
+                        $hotfix->mergeRequestsToMerge->concat($mergeRequestsToMerge),
+                    );
+                }),
+        );
+
+        if ($hasNewMergeRequestToMerge) {
             $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
             $next = new StatusMergeRequestsIntoReleaseBranchCreated();
         } else {

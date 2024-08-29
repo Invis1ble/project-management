@@ -10,6 +10,8 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeli
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Diff;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\Job\JobResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\Job\PipelineJobsResponseFixtureTrait;
@@ -17,6 +19,7 @@ use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\SourceCodeRepository\Commit\CreateCommitResponseFixtureTrait;
+use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\SourceCodeRepository\Diff\CompareResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\SourceCodeRepository\File\FileResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\SourceCodeRepository\Tag\CreateTagResponseFixtureTrait;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Model\TaskTracker\Issue\CreateIssuesTrait;
@@ -31,6 +34,7 @@ use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 abstract class PublicationSagaTestCase extends KernelTestCase
 {
     use ClockSensitiveTrait;
+    use CompareResponseFixtureTrait;
     use CreateCommitResponseFixtureTrait;
     use CreateIssuesTrait;
     use CreateTagResponseFixtureTrait;
@@ -60,6 +64,25 @@ abstract class PublicationSagaTestCase extends KernelTestCase
                 projectName: $projectName,
                 status: $status,
                 createdAt: $createdAt,
+            )),
+        );
+    }
+
+    protected function createCompareResponseWithNonEmptyDiffs(): Response
+    {
+        return new Response(
+            status: 200,
+            body: json_encode($this->compareResponseFixture(
+                diffs: new Diff\DiffList(
+                    new Diff\Diff(
+                        oldPath: File\Path::fromString('foo'),
+                        newPath: File\Path::fromString('foo'),
+                        content: Diff\Content::fromString("@@ -0,0 +0,0 @@\nbar"),
+                        newFile: false,
+                        renamedFile: false,
+                        deletedFile: false,
+                    ),
+                ),
             )),
         );
     }

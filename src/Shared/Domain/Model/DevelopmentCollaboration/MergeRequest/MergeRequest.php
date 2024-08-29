@@ -38,27 +38,6 @@ final readonly class MergeRequest implements \Stringable
         return $this->details->merge($mergeRequestManager, $this);
     }
 
-    public function createCopyWithNewTargetBranch(
-        MergeRequestManagerInterface $mergeRequestManager,
-        Branch\Name $targetBranchName,
-        Branch\Name $newTargetBranchName,
-    ): ?self {
-        if (!$this->targetBranchName->equals($targetBranchName)) {
-            return null;
-        }
-
-        if (null === $this->details) {
-            throw new \RuntimeException("Merge request $this->iid details not set");
-        }
-
-        return $mergeRequestManager->createMergeRequest(
-            projectId: $this->projectId,
-            title: $this->title,
-            sourceBranchName: $this->sourceBranchName,
-            targetBranchName: $newTargetBranchName,
-        );
-    }
-
     public function withDetails(Details $details): self
     {
         return new self(
@@ -125,6 +104,11 @@ final readonly class MergeRequest implements \Stringable
         }
 
         return $this->details->mergeable();
+    }
+
+    public function targetToBranch(Branch\Name $branchName): bool
+    {
+        return $this->targetBranchName->equals($branchName);
     }
 
     public function equals(self $other): bool
