@@ -59,7 +59,6 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeli
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Diff;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
@@ -523,21 +522,7 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 pipelineId: $tagPipelineId,
                 createdAt: $deploymentJobCreatedAt,
             ),
-            new Response(
-                status: 200,
-                body: json_encode($this->compareResponseFixture(
-                    diffs: new Diff\DiffList(
-                        new Diff\Diff(
-                            oldPath: File\Path::fromString('foo'),
-                            newPath: File\Path::fromString('foo'),
-                            content: Diff\Content::fromString("@@ -0,0 +0,0 @@\nbar"),
-                            newFile: false,
-                            renamedFile: false,
-                            deletedFile: false,
-                        ),
-                    ),
-                )),
-            ),
+            $this->createCompareResponseWithNonEmptyDiffs(),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $frontendMrToMerge->iid,
                 projectId: $frontendMrToMerge->projectId,
@@ -650,21 +635,7 @@ CONFIG),
                     createdAt: $setFrontendApplicationBranchNameCommitCreatedAt,
                 )),
             ),
-            new Response(
-                status: 200,
-                body: json_encode($this->compareResponseFixture(
-                    diffs: new Diff\DiffList(
-                        new Diff\Diff(
-                            oldPath: File\Path::fromString('foo'),
-                            newPath: File\Path::fromString('foo'),
-                            content: Diff\Content::fromString("@@ -0,0 +0,0 @@\nbar"),
-                            newFile: false,
-                            renamedFile: false,
-                            deletedFile: false,
-                        ),
-                    ),
-                )),
-            ),
+            $this->createCompareResponseWithNonEmptyDiffs(),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $updateExtraDeploymentMrIid,
                 projectId: $backendProjectId,

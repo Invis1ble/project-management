@@ -126,6 +126,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
         $pipelineJobsFixture = $this->pipelineJobsResponseFixture($deploymentJobName);
 
         $latestReleaseVersionName = Version\Name::fromString('v-1-0-0');
+        $latestReleaseBranchName = Branch\Name::fromString((string) $latestReleaseVersionName);
 
         $frontendPipelineId = Pipeline\PipelineId::from(1);
         $tagPipelineId = Pipeline\PipelineId::from(2);
@@ -434,6 +435,8 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 pipelineId: $tagPipelineId,
                 createdAt: $deploymentJobCreatedAt,
             ),
+            $this->createCompareResponseWithNonEmptyDiffs(),
+            $this->createCompareResponseWithNonEmptyDiffs(),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $backendMrToMerge->iid,
                 projectId: $backendMrToMerge->projectId,
@@ -551,13 +554,15 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 targetBranchName: $developmentBranchName,
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
+            $this->createCompareResponseWithNonEmptyDiffs(),
+            $this->createCompareResponseWithNonEmptyDiffs(),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $backendMrToMerge->iid,
                 projectId: $backendMrToMerge->projectId,
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
                 sourceBranchName: $backendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
                 guiUrl: $frontendMrToMerge->guiUrl,
@@ -568,7 +573,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
                 sourceBranchName: $frontendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
                 guiUrl: $frontendMrToMerge->guiUrl,
@@ -579,7 +584,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
                 sourceBranchName: $backendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Preparing,
                 guiUrl: $frontendMrToMerge->guiUrl,
@@ -590,7 +595,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
                 sourceBranchName: $backendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Mergeable,
                 guiUrl: $frontendMrToMerge->guiUrl,
@@ -601,7 +606,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 projectName: $backendMrToMerge->projectName,
                 title: $backendMrToMerge->title,
                 sourceBranchName: $backendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeRequestResponse(
@@ -610,7 +615,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
                 sourceBranchName: $frontendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Preparing,
                 guiUrl: $frontendMrToMerge->guiUrl,
@@ -621,7 +626,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
                 sourceBranchName: $frontendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Mergeable,
                 guiUrl: $frontendMrToMerge->guiUrl,
@@ -632,7 +637,7 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
                 projectName: $frontendMrToMerge->projectName,
                 title: $frontendMrToMerge->title,
                 sourceBranchName: $frontendMrToMerge->sourceBranchName,
-                targetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+                targetBranchName: $latestReleaseBranchName,
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
             new Response(
@@ -661,7 +666,7 @@ CONFIG),
                 targetBranchName: $updateExtraDeploymentMrTargetBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
-                guiUrl: $frontendMrToMerge->guiUrl,
+                guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $updateExtraDeploymentMrIid,
@@ -672,7 +677,7 @@ CONFIG),
                 targetBranchName: $updateExtraDeploymentMrTargetBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Preparing,
-                guiUrl: $frontendMrToMerge->guiUrl,
+                guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $updateExtraDeploymentMrIid,
@@ -683,7 +688,7 @@ CONFIG),
                 targetBranchName: $updateExtraDeploymentMrTargetBranchName,
                 status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Mergeable,
-                guiUrl: $frontendMrToMerge->guiUrl,
+                guiUrl: $backendMrToMerge->guiUrl,
             ),
             $this->createMergeMergeRequestResponse(
                 mergeRequestIid: $updateExtraDeploymentMrIid,
@@ -755,7 +760,7 @@ CONFIG),
         $expectedHotfixes = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
             issues: $expectedHotfixes,
             targetBranchName: $productionReleaseBranchName,
-            newTargetBranchName: Branch\Name::fromString((string) $latestReleaseVersionName),
+            newTargetBranchName: $latestReleaseBranchName,
         );
         $expectedMrsToMerge = $expectedHotfixes->toArray()[0]->mergeRequestsToMerge->toArray();
 
@@ -1460,7 +1465,7 @@ CONFIG),
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($backendMrToMerge->title, $event->title);
         $this->assertObjectEquals($backendMrToMerge->sourceBranchName, $event->sourceBranchName);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $latestReleaseVersionName), $event->targetBranchName);
+        $this->assertObjectEquals($latestReleaseBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusNotOpen(), $event->details->status);
 
         $this->assertArrayHasKey(85, $dispatchedEvents);
@@ -1469,7 +1474,7 @@ CONFIG),
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
         $this->assertObjectEquals($frontendMrToMerge->sourceBranchName, $event->sourceBranchName);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $latestReleaseVersionName), $event->targetBranchName);
+        $this->assertObjectEquals($latestReleaseBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusNotOpen(), $event->details->status);
 
         $this->assertArrayHasKey(86, $dispatchedEvents);

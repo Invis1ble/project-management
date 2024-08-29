@@ -8,6 +8,8 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\ContinuousIntegrationClientInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
@@ -36,19 +38,33 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
 
         $hotfixes = new IssueList(
             ...$context->hotfixes()
-                ->map(function (Issue $hotfix) use ($mergeRequestManager, &$hasNewMergeRequestToMerge): Issue {
-                    $mergeRequestsToMergeIntoDevelop = $hotfix->mergeRequestsToMerge->createCopiesWithNewTargetBranch(
-                        mergeRequestManager: $mergeRequestManager,
-                        targetBranchName: Branch\Name::fromString('master'),
-                        newTargetBranchName: Branch\Name::fromString('develop'),
+                ->map(function (Issue $hotfix) use ($backendSourceCodeRepository, $projectResolver, $mergeRequestManager, $frontendSourceCodeRepository, &$hasNewMergeRequestToMerge): Issue {
+                    $developmentBranchName = Branch\Name::fromString('develop');
+                    $productionReleaseBranchName = Branch\Name::fromString('master');
+
+                    $mergeRequestsToMerge = new MergeRequestList(
+                        ...$hotfix->mergeRequestsToMerge
+                            ->targetToBranch($productionReleaseBranchName)
+                            ->onlyShouldBeCopiedWithNewTargetBranch(
+                                projectResolver: $projectResolver,
+                                frontendSourceCodeRepository: $frontendSourceCodeRepository,
+                                backendSourceCodeRepository: $backendSourceCodeRepository,
+                                branchName: $developmentBranchName,
+                            )
+                            ->map(fn (MergeRequest $mergeRequest): MergeRequest => $mergeRequestManager->createMergeRequest(
+                                projectId: $mergeRequest->projectId,
+                                title: $mergeRequest->title,
+                                sourceBranchName: $mergeRequest->sourceBranchName,
+                                targetBranchName: $developmentBranchName,
+                            )),
                     );
 
-                    if (!$mergeRequestsToMergeIntoDevelop->empty()) {
+                    if (!$mergeRequestsToMerge->empty()) {
                         $hasNewMergeRequestToMerge = true;
                     }
 
                     return $hotfix->withMergeRequestsToMerge(
-                        $hotfix->mergeRequestsToMerge->concat($mergeRequestsToMergeIntoDevelop),
+                        $hotfix->mergeRequestsToMerge->concat($mergeRequestsToMerge),
                     );
                 }),
         );

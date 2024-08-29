@@ -7,6 +7,8 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaborati
 use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Project\ProjectResolver;
 
 /**
  * @extends AbstractList<MergeRequest>
@@ -31,24 +33,6 @@ final readonly class MergeRequestList extends AbstractList
         );
     }
 
-    public function createCopiesWithNewTargetBranch(
-        MergeRequestManagerInterface $mergeRequestManager,
-        Branch\Name $targetBranchName,
-        Branch\Name $newTargetBranchName,
-    ): self {
-        return new self(
-            ...(function () use ($mergeRequestManager, $targetBranchName, $newTargetBranchName): iterable {
-                foreach ($this->elements as $mr) {
-                    $mr = $mr->createCopyWithNewTargetBranch($mergeRequestManager, $targetBranchName, $newTargetBranchName);
-
-                    if (null !== $mr) {
-                        yield $mr;
-                    }
-                }
-            })(),
-        );
-    }
-
     public function append(MergeRequest $mergeRequest): self
     {
         return new self(
@@ -67,9 +51,33 @@ final readonly class MergeRequestList extends AbstractList
         );
     }
 
+    public function onlyShouldBeCopiedWithNewTargetBranch(
+        ProjectResolver $projectResolver,
+        SourceCodeRepositoryInterface $frontendSourceCodeRepository,
+        SourceCodeRepositoryInterface $backendSourceCodeRepository,
+        Branch\Name $branchName,
+    ): self {
+        return $this->filter(function (MergeRequest $mergeRequest) use ($backendSourceCodeRepository, $frontendSourceCodeRepository, $projectResolver, $branchName): bool {
+            if ($mergeRequest->frontend($projectResolver)) {
+                $sourceCodeRepository = $frontendSourceCodeRepository;
+            } elseif ($mergeRequest->backend($projectResolver)) {
+                $sourceCodeRepository = $backendSourceCodeRepository;
+            } else {
+                throw new \UnexpectedValueException("Unexpected project $mergeRequest->projectId");
+            }
+
+            $compareResult = $sourceCodeRepository->compare(
+                from: $branchName,
+                to: $mergeRequest->sourceBranchName,
+            );
+
+            return !$compareResult->diffsEmpty();
+        });
+    }
+
     public function targetToBranch(Branch\Name $branchName): self
     {
-        return $this->filter(fn (MergeRequest $mr): bool => $mr->targetBranchName->equals($branchName));
+        return $this->filter(fn (MergeRequest $mr): bool => $mr->targetToBranch($branchName));
     }
 
     public function awaitingToMerge(): self
