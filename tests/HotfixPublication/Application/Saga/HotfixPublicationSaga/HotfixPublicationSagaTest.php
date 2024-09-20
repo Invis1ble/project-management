@@ -657,6 +657,7 @@ CONFIG),
                     createdAt: $setFrontendApplicationBranchNameCommitCreatedAt,
                 )),
             ),
+            $this->createCompareResponseWithNonEmptyDiffs(),
             $this->createMergeRequestResponse(
                 mergeRequestIid: $updateExtraDeploymentMrIid,
                 projectId: $backendProjectId,
