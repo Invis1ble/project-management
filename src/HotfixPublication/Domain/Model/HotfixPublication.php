@@ -41,7 +41,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             throw new \InvalidArgumentException('No hotfixes provided');
         }
 
-        $hotfix = new self(
+        $publication = new self(
             id: HotfixPublicationId::fromVersionName($tagName),
             tagName: $tagName,
             tagMessage: $tagMessage,
@@ -50,14 +50,14 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             createdAt: $clock->now(),
         );
 
-        $hotfix->raiseDomainEvent(new HotfixPublicationCreated(
-            id: $hotfix->id(),
-            status: $hotfix->status(),
+        $publication->raiseDomainEvent(new HotfixPublicationCreated(
+            id: $publication->id(),
+            status: $publication->status(),
             hotfixes: $hotfixes,
-            createdAt: $hotfix->createdAt(),
+            createdAt: $publication->createdAt(),
         ));
 
-        return $hotfix;
+        return $publication;
     }
 
     public function proceedToNextStatus(
