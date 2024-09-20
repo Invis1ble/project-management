@@ -29,16 +29,37 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,
     ): void {
+        $extraDeploymentBranchName = $updateExtraDeploymentBranchMergeRequestFactory->extraDeploymentBranchName();
+
+        if (null === $extraDeploymentBranchName) {
+            $this->setStatusDone($context);
+
+            return;
+        }
+
+        $compareResult = $backendSourceCodeRepository->compare(
+            from: $extraDeploymentBranchName,
+            to: $updateExtraDeploymentBranchMergeRequestFactory->developmentBranchName(),
+        );
+
+        if ($compareResult->diffsEmpty()) {
+            $this->setStatusDone($context);
+
+            return;
+        }
+
         $mergeRequest = $updateExtraDeploymentBranchMergeRequestFactory->createMergeRequest();
 
         if (null === $mergeRequest) {
-            $next = new StatusDone();
-        } else {
-            $next = new StatusMergeRequestIntoExtraDeploymentBranchCreated([
-                'project_id' => $mergeRequest->projectId->value(),
-                'merge_request_iid' => $mergeRequest->iid->value(),
-            ]);
+            $this->setStatusDone($context);
+
+            return;
         }
+
+        $next = new StatusMergeRequestIntoExtraDeploymentBranchCreated([
+            'project_id' => $mergeRequest->projectId->value(),
+            'merge_request_iid' => $mergeRequest->iid->value(),
+        ]);
 
         $this->setPublicationStatus($context, $next);
     }
@@ -46,5 +67,10 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
     public function __toString(): string
     {
         return Dictionary::FrontendApplicationBranchSetToDevelopment->value;
+    }
+
+    private function setStatusDone(HotfixPublicationInterface $context): void
+    {
+        $this->setPublicationStatus($context, new StatusDone());
     }
 }

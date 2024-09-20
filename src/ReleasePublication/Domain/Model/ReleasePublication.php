@@ -38,7 +38,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         IssueList $readyToMergeTasks,
         ClockInterface $clock,
     ): self {
-        $release = new self(
+        $publication = new self(
             id: ReleasePublicationId::fromBranchName($branchName),
             branchName: $branchName,
             status: new StatusCreated(),
@@ -48,17 +48,17 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             createdAt: $clock->now(),
         );
 
-        $release->raiseDomainEvent(new ReleasePublicationCreated(
-            id: $release->id,
-            branchName: $release->branchName,
+        $publication->raiseDomainEvent(new ReleasePublicationCreated(
+            id: $publication->id,
+            branchName: $publication->branchName,
             tagName: null,
             tagMessage: null,
-            status: $release->status,
+            status: $publication->status,
             readyToMergeTasks: $readyToMergeTasks,
-            createdAt: $release->createdAt,
+            createdAt: $publication->createdAt,
         ));
 
-        return $release;
+        return $publication;
     }
 
     public function publish(
