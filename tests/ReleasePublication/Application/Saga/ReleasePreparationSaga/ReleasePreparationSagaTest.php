@@ -61,17 +61,20 @@ class ReleasePreparationSagaTest extends ReleaseSagaTestCase
 
         $container = static::getContainer();
 
-        /** @var ReleasePublicationRepositoryInterface $releasePublicationRepository */
-        $releasePublicationRepository = $container->get(ReleasePublicationRepositoryInterface::class);
-
-        /** @var UriFactoryInterface $uriFactory */
-        $uriFactory = $container->get(UriFactoryInterface::class);
-
         /** @var CommandBusInterface $commandBus */
         $commandBus = $container->get(CommandBusInterface::class);
 
         /** @var TraceableEventBus $eventBus */
         $eventBus = $container->get(TraceableEventBus::class);
+
+        /** @var ReleasePublicationRepositoryInterface $releasePublicationRepository */
+        $releasePublicationRepository = $container->get(ReleasePublicationRepositoryInterface::class);
+
+        /** @var Issue\StatusProviderInterface $issueStatusProvider */
+        $issueStatusProvider = $container->get(Issue\StatusProviderInterface::class);
+
+        /** @var UriFactoryInterface $uriFactory */
+        $uriFactory = $container->get(UriFactoryInterface::class);
 
         $developmentBranchName = Branch\Name::fromString('develop');
         $productionReleaseBranchName = Branch\Name::fromString('master');
@@ -95,6 +98,7 @@ class ReleasePreparationSagaTest extends ReleaseSagaTestCase
             key: Issue\Key::fromString('PROJECT-3'),
             typeId: Issue\TypeId::fromString('3'),
             subtask: false,
+            status: Issue\Status::fromString('Ready to Merge'),
             summary: Issue\Summary::fromString('Task without MR to merge'),
             sprints: $tasksArray[0]->sprints,
             mergeRequests: null,
@@ -343,7 +347,7 @@ CONFIG),
 
         $createReleasePublicationCommand = new CreateReleasePublicationCommand(
             branchName: $branchName,
-            readyToMergeTasks: $tasks,
+            tasks: $tasks,
         );
 
         static::mockTime($now->sub(new \DateInterval('PT1M')));
@@ -354,12 +358,19 @@ CONFIG),
             ReleasePublicationId::fromBranchName($createReleasePublicationCommand->branchName),
         );
 
-        $expectedTasks = $this->mapMergeRequestsToMergeToMerged($createReleasePublicationCommand->readyToMergeTasks);
+        $expectedTasks = $this->mapMergeRequestsToMergeToMerged(
+            issues: $createReleasePublicationCommand->tasks,
+            issueTargetStatus: $issueStatusProvider->releaseCandidate(),
+        );
+
+        $expectedTasks = $expectedTasks->withStatus($issueStatusProvider->releaseCandidate());
+
         $expectedTasks = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
             issues: $expectedTasks,
             targetBranchName: $productionReleaseBranchName,
             newTargetBranchName: $developmentBranchName,
         );
+
         $expectedTasks = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
             issues: $expectedTasks,
             targetBranchName: $productionReleaseBranchName,
@@ -368,7 +379,7 @@ CONFIG),
         $expectedMrsToMerge = $expectedTasks->toArray()[0]->mergeRequestsToMerge->toArray();
 
         $this->assertObjectEquals($branchName, $publication->branchName());
-        $this->assertObjectEquals($expectedTasks, $publication->readyToMergeTasks());
+        $this->assertObjectEquals($expectedTasks, $publication->tasks());
         $this->assertObjectEquals(new StatusReleaseCandidateCreated(), $publication->status());
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
@@ -379,7 +390,7 @@ CONFIG),
         $event = $dispatchedEvents[0]->event;
         $this->assertInstanceOf(ReleasePublicationCreated::class, $event);
         $this->assertObjectEquals(new StatusCreated(), $event->status);
-        $this->assertObjectEquals($createReleasePublicationCommand->readyToMergeTasks, $event->readyToMergeTasks);
+        $this->assertObjectEquals($createReleasePublicationCommand->tasks, $event->tasks);
 
         $this->assertArrayHasKey(1, $dispatchedEvents);
         $event = $dispatchedEvents[1]->event;

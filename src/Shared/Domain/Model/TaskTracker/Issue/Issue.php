@@ -18,6 +18,7 @@ final readonly class Issue implements \Stringable
         public Key $key,
         public TypeId $typeId,
         public bool $subtask,
+        public Status $status,
         public Summary $summary,
         public SprintList $sprints,
         public ?MergeRequestList $mergeRequests,
@@ -32,6 +33,7 @@ final readonly class Issue implements \Stringable
             $this->key,
             $this->typeId,
             $this->subtask,
+            $this->status,
             $this->summary,
             $this->sprints,
             $this->mergeRequests,
@@ -44,6 +46,21 @@ final readonly class Issue implements \Stringable
         return $this->key->toBranchName();
     }
 
+    public function withStatus(Status $status): self
+    {
+        return new self(
+            $this->id,
+            $this->key,
+            $this->typeId,
+            $this->subtask,
+            $status,
+            $this->summary,
+            $this->sprints,
+            $this->mergeRequests,
+            $this->mergeRequestsToMerge,
+        );
+    }
+
     public function withMergeRequests(MergeRequestList $mergeRequests): self
     {
         return new self(
@@ -51,6 +68,7 @@ final readonly class Issue implements \Stringable
             $this->key,
             $this->typeId,
             $this->subtask,
+            $this->status,
             $this->summary,
             $this->sprints,
             $mergeRequests,
@@ -65,6 +83,7 @@ final readonly class Issue implements \Stringable
             $this->key,
             $this->typeId,
             $this->subtask,
+            $this->status,
             $this->summary,
             $this->sprints,
             $this->mergeRequests,
@@ -125,6 +144,8 @@ final readonly class Issue implements \Stringable
         return $this->id->equals($other->id)
             && $this->key->equals($other->key)
             && $this->typeId->equals($other->typeId)
+            && $this->subtask === $other->subtask
+            && $this->status->equals($other->status)
             && $this->summary->equals($other->summary)
             && $this->sprints->equals($other->sprints)
         ;

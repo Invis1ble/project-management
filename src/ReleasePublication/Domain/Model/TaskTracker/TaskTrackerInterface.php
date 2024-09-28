@@ -19,5 +19,5 @@ interface TaskTrackerInterface extends BasicTaskTrackerInterface
 
     public function releaseVersion(Branch\Name $branchName): Version\Version;
 
-    public function readyToMergeTasksInActiveSprint(): Issue\IssueList;
+    public function tasksInActiveSprint(Issue\Status ...$statuses): Issue\IssueList;
 }

@@ -18,6 +18,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Name;
@@ -41,6 +42,7 @@ final class IssueListType extends JsonType
                     'key' => (string) $issue->key,
                     'type_id' => (string) $issue->typeId,
                     'subtask' => $issue->subtask,
+                    'status' => (string) $issue->status,
                     'summary' => (string) $issue->summary,
                     'sprints' => array_map(
                         fn (Sprint $sprint): array => [
@@ -76,6 +78,7 @@ final class IssueListType extends JsonType
                     key: Key::fromString($issue['key']),
                     typeId: TypeId::fromString($issue['type_id']),
                     subtask: $issue['subtask'],
+                    status: Status::fromString($issue['status']),
                     summary: Summary::fromString($issue['summary']),
                     sprints: new SprintList(...array_map(fn (array $sprint): Sprint => new Sprint(
                         boardId: BoardId::from($sprint['board_id']),

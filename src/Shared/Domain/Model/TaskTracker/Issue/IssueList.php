@@ -14,24 +14,39 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
  */
 final readonly class IssueList extends AbstractList
 {
-    private iterable $elements;
+    /**
+     * @var \SplObjectStorage<Key>
+     */
+    private \SplObjectStorage $storage;
 
     public function __construct(Issue ...$issues)
     {
-        $this->elements = $issues;
-    }
+        $this->storage = new class() extends \SplObjectStorage {
+            public function getHash(object $object): string
+            {
+                if (!$object instanceof Key) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Object must be an instance of %s, %s given',
+                        Key::class,
+                        $object::class,
+                    ));
+                }
 
-    public function withoutMergeRequestsToMergeOnly(): self
-    {
-        return $this->filter(fn (Issue $issue): bool => !$issue->containsMergeRequestToMerge());
+                return (string) $object;
+            }
+        };
+
+        foreach ($issues as $issue) {
+            $this->storage->attach($issue->key, $issue);
+        }
     }
 
     public function mergeMergeRequests(MergeRequestManagerInterface $mergeRequestManager): self
     {
         return new self(
             ...(function (MergeRequestManagerInterface $mergeRequestManager): iterable {
-                foreach ($this->elements as $element) {
-                    yield $element->mergeMergeRequests($mergeRequestManager);
+                foreach ($this->elements() as $issue) {
+                    yield $issue->mergeMergeRequests($mergeRequestManager);
                 }
             })($mergeRequestManager),
         );
@@ -41,9 +56,9 @@ final readonly class IssueList extends AbstractList
     {
         $mergeRequests = new MergeRequestList();
 
-        foreach ($this->elements as $element) {
-            if (null !== $element->mergeRequestsToMerge) {
-                $mergeRequests = $mergeRequests->concat($element->mergeRequestsToMerge);
+        foreach ($this->elements() as $issue) {
+            if (null !== $issue->mergeRequestsToMerge) {
+                $mergeRequests = $mergeRequests->concat($issue->mergeRequestsToMerge);
             }
         }
 
@@ -54,10 +69,39 @@ final readonly class IssueList extends AbstractList
     {
         return new self(
             ...(function (Issue $issue): iterable {
-                yield from $this->elements;
+                yield from $this->elements();
                 yield $issue;
             })($issue),
         );
+    }
+
+    public function replace(self $issues): self
+    {
+        $this->storage->removeAll($issues->storage);
+        $this->storage->addAll($issues->storage);
+
+        return new self(...$this->elements());
+    }
+
+    public function withStatus(Status $status): self
+    {
+        return new self(
+            ...(function (Status $status): iterable {
+                foreach ($this->elements() as $issue) {
+                    yield $issue->withStatus($status);
+                }
+            })($status),
+        );
+    }
+
+    public function onlyInStatus(Status $status): self
+    {
+        return $this->filter(fn (Issue $issue): bool => $issue->status->equals($status));
+    }
+
+    public function onlyWithoutMergeRequestsToMerge(): self
+    {
+        return $this->filter(fn (Issue $issue): bool => !$issue->containsMergeRequestToMerge());
     }
 
     public function containsBackendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
@@ -74,19 +118,42 @@ final readonly class IssueList extends AbstractList
         );
     }
 
+    public function equals(AbstractList $other): bool
+    {
+        if (!$other instanceof self || $this->count() !== $other->count()) {
+            return false;
+        }
+
+        foreach ($this->storage as $key) {
+            if (!$other->storage->contains($key)) {
+                return false;
+            }
+
+            if (!$this->storage[$key]->equals($other->storage[$key])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @return iterable<Key>
      */
     public function toKeys(): iterable
     {
-        foreach ($this->elements as $element) {
-            yield $element->key;
-        }
+        return $this->pluck('key');
     }
 
     protected function elements(): iterable
     {
-        return $this->elements;
+        $this->storage->rewind();
+
+        while ($this->storage->valid()) {
+            yield $this->storage->getInfo();
+
+            $this->storage->next();
+        }
     }
 
     protected function elementsEquals($element1, $element2): bool

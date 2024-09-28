@@ -13,6 +13,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 final readonly class ProceedToNextStatusCommandHandler extends HotfixPublicationRepositoryAwareCommandHandler
 {
@@ -27,6 +28,7 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
         private UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         private TaskTrackerInterface $taskTracker,
         private ProjectResolverInterface $projectResolver,
+        private StatusProviderInterface $issueStatusProvider,
         private \DateInterval $pipelineMaxAwaitingTime,
         private \DateInterval $pipelineTickInterval,
     ) {
@@ -47,6 +49,7 @@ final readonly class ProceedToNextStatusCommandHandler extends HotfixPublication
             updateExtraDeploymentBranchMergeRequestFactory: $this->updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $this->taskTracker,
             projectResolver: $this->projectResolver,
+            issueStatusProvider: $this->issueStatusProvider,
             pipelineMaxAwaitingTime: $this->pipelineMaxAwaitingTime,
             pipelineTickInterval: $this->pipelineTickInterval,
         );

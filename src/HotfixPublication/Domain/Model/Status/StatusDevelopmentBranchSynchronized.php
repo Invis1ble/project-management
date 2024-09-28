@@ -17,6 +17,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewComm
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 final readonly class StatusDevelopmentBranchSynchronized extends AbstractStatus
 {
@@ -30,6 +31,7 @@ final readonly class StatusDevelopmentBranchSynchronized extends AbstractStatus
         UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $context,

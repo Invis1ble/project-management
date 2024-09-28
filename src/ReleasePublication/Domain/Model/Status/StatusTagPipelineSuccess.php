@@ -10,6 +10,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Contin
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 final readonly class StatusTagPipelineSuccess extends AbstractStatus
 {
@@ -22,9 +23,10 @@ final readonly class StatusTagPipelineSuccess extends AbstractStatus
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
-        \DateInterval $pipelineMaxAwaitingTime,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
+        \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $job = $backendCiClient->deployOnProduction(
             tagName: $context->tagName(),

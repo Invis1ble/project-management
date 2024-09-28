@@ -87,6 +87,18 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
     }
 
     /**
+     * @template R
+     *
+     * @return \Generator<R>
+     */
+    public function pluck(string $propertyName): \Generator
+    {
+        foreach ($this->elements() as $element) {
+            yield $element->$propertyName;
+        }
+    }
+
+    /**
      * @return array<T>
      */
     public function toArray(): array
@@ -96,13 +108,13 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
 
     public function equals(self $other): bool
     {
-        if ($this->count() !== $other->count()) {
+        if (static::class !== $other::class || $this->count() !== $other->count()) {
             return false;
         }
 
-        $otherElements = $other->elements();
+        $otherElements = $other->toArray();
 
-        foreach ($this->elements() as $k => $element) {
+        foreach ($this->toArray() as $k => $element) {
             if (!isset($otherElements[$k])) {
                 return false;
             }

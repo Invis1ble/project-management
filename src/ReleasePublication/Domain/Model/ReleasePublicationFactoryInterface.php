@@ -11,6 +11,6 @@ interface ReleasePublicationFactoryInterface
 {
     public function createReleasePublication(
         Name $branchName,
-        IssueList $readyToMergeTasks,
+        IssueList $tasks,
     ): ReleasePublicationInterface;
 }

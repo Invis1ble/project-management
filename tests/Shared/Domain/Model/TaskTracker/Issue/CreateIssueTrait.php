@@ -21,6 +21,7 @@ trait CreateIssueTrait
         int $backendProjectId = 1,
         int $frontendProjectId = 2,
         string $projectName = 'my-group/my-project',
+        string $status = 'Ready to Merge',
         string $summary = 'Fix terrible bug',
         int $mergeRequestIid = 4,
         string $mergeRequestTargetBranchName = 'master',
@@ -59,6 +60,7 @@ trait CreateIssueTrait
             key: Issue\Key::fromString($key),
             typeId: Issue\TypeId::fromString('3'),
             subtask: false,
+            status: Issue\Status::fromString($status),
             summary: Issue\Summary::fromString($summary),
             sprints: new Sprint\SprintList(
                 new Sprint\Sprint(

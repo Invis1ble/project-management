@@ -18,7 +18,7 @@ abstract readonly class AbstractReleasePublicationEvent extends ReleasePublicati
         public ?Tag\Name $tagName,
         public ?Tag\Message $tagMessage,
         public StatusInterface $status,
-        public IssueList $readyToMergeTasks,
+        public IssueList $tasks,
         public \DateTimeImmutable $createdAt,
     ) {
         parent::__construct($id);

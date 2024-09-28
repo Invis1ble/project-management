@@ -15,6 +15,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewComm
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 interface HotfixPublicationInterface extends AggregateRootInterface
 {
@@ -28,6 +29,7 @@ interface HotfixPublicationInterface extends AggregateRootInterface
         UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
     ): void;

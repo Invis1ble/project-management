@@ -9,20 +9,17 @@ use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\Messenger\Query\QueryInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
+use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixesInActiveSprint\GetHotfixesInActiveSprintQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixPublication\GetHotfixPublicationQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublication\GetLatestHotfixPublicationQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublicationByTag\GetLatestHotfixPublicationByTagQuery;
-use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetReadyForPublishHotfixesInActiveSprint\GetReadyForPublishHotfixesInActiveSprintQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -34,19 +31,25 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[AsCommand(name: 'pm:hotfix:publish', description: 'Publish hotfixes')]
 final class PublishHotfixCommand extends PublicationAwareCommand
 {
+    private readonly Issue\Status $statusReadyForPublish;
+
     public function __construct(
         QueryBusInterface $queryBus,
         CommandBusInterface $commandBus,
-        GuiUrlFactoryInterface $issueGuiUrlFactory,
+        Issue\GuiUrlFactoryInterface $issueGuiUrlFactory,
         SerializerInterface $serializer,
+        Issue\StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         private readonly MessageFactoryInterface $tagMessageFactory,
     ) {
+        $this->statusReadyForPublish = $issueStatusProvider->readyForPublish();
+
         parent::__construct(
             queryBus: $queryBus,
             commandBus: $commandBus,
-            issueGuiUrlFactory: $issueGuiUrlFactory,
             serializer: $serializer,
+            issueStatusProvider: $issueStatusProvider,
+            issueGuiUrlFactory: $issueGuiUrlFactory,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }
@@ -75,7 +78,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
         if (false === $resume) {
             $keys = $input->getArgument('key');
 
-            $hotfixes = $this->readyForPublishHotfixes($keys);
+            $hotfixes = $this->readyForPublishHotfixes(empty($keys) ? null : $keys);
 
             if ($hotfixes->empty()) {
                 return Command::SUCCESS;
@@ -85,6 +88,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             $tagMessage = $this->newTagMessage($hotfixes);
             $hotfixes = $this->enrichIssuesWithMergeRequests(
                 issues: $hotfixes,
+                statusReadyToMerge: $this->statusReadyForPublish,
                 targetBranchName: Branch\Name::fromString('master'),
             );
         } else {
@@ -177,7 +181,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
         throw new HotfixPublicationNotFoundException();
     }
 
-    private function newTagMessage(IssueList $hotfixes): Tag\Message
+    private function newTagMessage(Issue\IssueList $hotfixes): Tag\Message
     {
         $this->phase('Compiling new tag message...');
 
@@ -194,20 +198,23 @@ final class PublishHotfixCommand extends PublicationAwareCommand
     }
 
     /**
-     * @param string[] $keys
+     * @param string[]|null $keys
      */
-    private function readyForPublishHotfixes(array $keys): IssueList
+    private function readyForPublishHotfixes(?array $keys): Issue\IssueList
     {
-        $this->phase('Fetching Ready for Publish hotfixes...');
+        $this->phase("Fetching $this->statusReadyForPublish hotfixes...");
 
-        /** @var IssueList $issues */
-        $issues = $this->queryBus->ask(new GetReadyForPublishHotfixesInActiveSprintQuery(...array_map(
-            fn (string $key): Key => Key::fromString($key),
-            $keys,
-        )));
+        /** @var Issue\IssueList $issues */
+        $issues = $this->queryBus->ask(new GetHotfixesInActiveSprintQuery(
+            keys: null === $keys ? null : array_map(
+                fn (string $key): Issue\Key => Issue\Key::fromString($key),
+                $keys,
+            ),
+            statuses: [$this->statusReadyForPublish],
+        ));
 
         if ($issues->empty()) {
-            $text = 'No Ready for Publish hotfixes found in the active sprint';
+            $text = "No $this->statusReadyForPublish hotfixes found in the active sprint";
 
             if (!empty($keys)) {
                 $text .= ' within provided keys';
@@ -222,12 +229,11 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             $this->listIssues($issues);
 
             $issues = $issues->filter(
-                fn (Issue $issue): bool => $this->io->confirm("Add $issue->key to the publication"),
+                fn (Issue\Issue $issue): bool => $this->io->confirm("Add $issue->key to the publication"),
             );
         }
 
         $this->caption('Hotfixes to publish');
-
         $this->listIssues($issues);
 
         return $issues;

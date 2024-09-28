@@ -13,15 +13,10 @@ use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetIssueMergeRe
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetLatestTagToday\GetLatestTagTodayQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetMergeRequestDetails\GetMergeRequestDetailsQuery;
 use Invis1ble\ProjectManagement\Shared\Application\UseCase\Query\GetProjectSupported\GetProjectSupportedQuery;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Details;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequest;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestList;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Status;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -49,8 +44,9 @@ abstract class PublicationAwareCommand extends Command
     public function __construct(
         protected readonly QueryBusInterface $queryBus,
         protected readonly CommandBusInterface $commandBus,
-        protected readonly GuiUrlFactoryInterface $issueGuiUrlFactory,
         protected readonly SerializerInterface $serializer,
+        protected readonly Issue\StatusProviderInterface $issueStatusProvider,
+        protected readonly Issue\GuiUrlFactoryInterface $issueGuiUrlFactory,
         protected readonly \DateInterval $pipelineMaxAwaitingTime,
     ) {
         parent::__construct();
@@ -77,17 +73,20 @@ abstract class PublicationAwareCommand extends Command
         ;
     }
 
-    protected function listIssues(IssueList $issues): void
+    protected function listIssues(Issue\IssueList $issues): void
     {
         $this->listing(iterator_to_array($issues->map(
-            fn (Issue $task): string => "{$this->issueGuiUrlFactory->createGuiUrl($task->key)} | $task->summary",
+            fn (Issue\Issue $task): string => "{$this->issueGuiUrlFactory->createGuiUrl($task->key)} | $task->summary",
         )));
     }
 
-    protected function enrichIssuesWithMergeRequests(IssueList $issues, BasicBranchName $targetBranchName): IssueList
-    {
-        return new IssueList(
-            ...$issues->map(function (Issue $issue) use ($targetBranchName): Issue {
+    protected function enrichIssuesWithMergeRequests(
+        Issue\IssueList $issues,
+        Issue\Status $statusReadyToMerge,
+        BasicBranchName $targetBranchName,
+    ): Issue\IssueList {
+        return new Issue\IssueList(
+            ...$issues->map(function (Issue\Issue $issue) use ($statusReadyToMerge, $targetBranchName): Issue\Issue {
                 $mergeRequests = $this->issueMergeRequests($issue);
 
                 $issue = $issue->withMergeRequests($mergeRequests);
@@ -95,6 +94,10 @@ abstract class PublicationAwareCommand extends Command
                 if (self::NO_MERGE_REQUESTS_ACTION_IDS['CONTINUE'] === $this->userChoices['NO_MERGE_REQUESTS_ACTION']
                     && $issue->mergeRequests->empty()
                 ) {
+                    return $issue;
+                }
+
+                if (!$issue->status->equals($statusReadyToMerge)) {
                     return $issue;
                 }
 
@@ -108,14 +111,14 @@ abstract class PublicationAwareCommand extends Command
         );
     }
 
-    protected function listMergeRequests(MergeRequestList $mergeRequests): void
+    protected function listMergeRequests(MergeRequest\MergeRequestList $mergeRequests): void
     {
         $this->listing(iterator_to_array($mergeRequests->map(
-            function (MergeRequest $mr): string {
+            function (MergeRequest\MergeRequest $mr): string {
                 $fg = match ($mr->status) {
-                    Status::Merged => 'green',
-                    Status::Declined => 'gray',
-                    Status::Open => 'cyan',
+                    MergeRequest\Status::Merged => 'green',
+                    MergeRequest\Status::Declined => 'gray',
+                    MergeRequest\Status::Open => 'cyan',
                 };
 
                 return "<bg=$fg;fg=black;options=bold> {$mr->status->value} </> $mr->guiUrl <options=bold>$mr->sourceBranchName -> $mr->targetBranchName</> | $mr->title";
@@ -228,12 +231,12 @@ abstract class PublicationAwareCommand extends Command
         throw new \RuntimeException($message);
     }
 
-    private function issueMergeRequests(Issue $issue): MergeRequestList
+    private function issueMergeRequests(Issue\Issue $issue): MergeRequest\MergeRequestList
     {
         $this->phase("Fetching Merge Requests for $issue...");
 
         do {
-            /** @var MergeRequestList $mergeRequests */
+            /** @var MergeRequest\MergeRequestList $mergeRequests */
             $mergeRequests = $this->queryBus->ask(new GetIssueMergeRequestsQuery($issue->id));
 
             if (!$mergeRequests->empty()) {
@@ -264,17 +267,22 @@ abstract class PublicationAwareCommand extends Command
         return $mergeRequests;
     }
 
-    private function mergeRequestDetails(MergeRequest $mergeRequest): Details
+    private function mergeRequestDetails(MergeRequest\MergeRequest $mergeRequest): MergeRequest\Details\Details
     {
         $this->phase("Fetching Details for $mergeRequest->projectName!$mergeRequest->iid...");
 
+        $autoRetriesLimit = 3;
+        $retryNumber = 0;
+
         while (true) {
-            /** @var Details $details */
+            /** @var MergeRequest\Details\Details $details */
             $details = $this->queryBus->ask(new GetMergeRequestDetailsQuery($mergeRequest->projectId, $mergeRequest->iid));
 
             if ($details->mergeable()) {
                 break;
             }
+
+            ++$retryNumber;
 
             $this->io->warning([
                 "Merge request $mergeRequest->projectName!$mergeRequest->iid is not mergeable.",
@@ -282,15 +290,26 @@ abstract class PublicationAwareCommand extends Command
                 $mergeRequest->guiUrl,
             ]);
 
+            $start = time();
             $retryTimeout = 10;
 
-            $confirmed = $this->io->confirm(
-                question: "Check merge request $mergeRequest->guiUrl merge status again in $retryTimeout seconds",
-                default: $details->mayBeMergeable(),
-            );
+            if ($retryNumber >= $autoRetriesLimit) {
+                $confirmed = $this->io->confirm(
+                    question: "Check merge request $mergeRequest->guiUrl merge status again in $retryTimeout seconds",
+                    default: $details->mayBeMergeable(),
+                );
+            } else {
+                $confirmed = true;
+            }
 
             if ($confirmed) {
-                sleep($retryTimeout);
+                $passed = time() - $start;
+
+                if ($passed < $retryTimeout) {
+                    sleep($retryTimeout - $passed);
+                }
+
+                $this->phase("Retry #$retryNumber to fetch Details for $mergeRequest->projectName!$mergeRequest->iid...");
             } else {
                 $this->abort();
             }
@@ -300,13 +319,13 @@ abstract class PublicationAwareCommand extends Command
     }
 
     private function issueMergeRequestsToMerge(
-        Issue $issue,
+        Issue\Issue $issue,
         BasicBranchName $targetBranchName,
-    ): MergeRequestList {
+    ): MergeRequest\MergeRequestList {
         $mergeRequests = $issue->mergeRequests
             ->targetToBranch($targetBranchName)
             ->relevantToSourceBranch($issue->canonicalBranchName())
-            ->filter(function (MergeRequest $mr): bool {
+            ->filter(function (MergeRequest\MergeRequest $mr): bool {
                 /** @var bool $supported */
                 $supported = $this->queryBus->ask(new GetProjectSupportedQuery($mr->projectId));
 
@@ -325,7 +344,7 @@ abstract class PublicationAwareCommand extends Command
         $onlyOneMergeRequest = 1 === count($mergeRequests);
 
         $mergeRequests = $mergeRequests->filter(
-            fn (MergeRequest $mr): bool => $this->io->confirm(
+            fn (MergeRequest\MergeRequest $mr): bool => $this->io->confirm(
                 question: "Merge $mr->projectName!$mr->iid: $mr->sourceBranchName -> $mr->targetBranchName | $mr->title",
                 default: $onlyOneMergeRequest || $mr->sourceEquals($issue->canonicalBranchName()),
             ),
@@ -341,8 +360,8 @@ abstract class PublicationAwareCommand extends Command
 
         $this->listMergeRequests($mergeRequests);
 
-        return new MergeRequestList(
-            ...$mergeRequests->map(function (MergeRequest $mr): MergeRequest {
+        return new MergeRequest\MergeRequestList(
+            ...$mergeRequests->map(function (MergeRequest\MergeRequest $mr): MergeRequest\MergeRequest {
                 $details = $this->mergeRequestDetails($mr);
 
                 return $mr->withDetails($details);

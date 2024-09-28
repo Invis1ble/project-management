@@ -16,6 +16,10 @@ services:
             Psr\Http\Message\UriInterface $jiraUrl: '@invis1ble_project_management.jira_url'
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $backendProjectId: '@invis1ble_project_management.gitlab_project.backend'
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId $frontendProjectId: '@invis1ble_project_management.gitlab_project.frontend'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status $statusDone: '@invis1ble_project_management.jira.status_done.name'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status $statusReadyForPublish: '@invis1ble_project_management.jira.status_ready_for_publish.name'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status $statusReadyToMerge: '@invis1ble_project_management.jira.status_ready_to_merge.name'
+            Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status $statusReleaseCandidate: '@invis1ble_project_management.jira.status_release_candidate.name'
             Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name $issueTransitionToReleaseCandidateName: '@invis1ble_project_management.jira.issue_transition_to_release_candidate.name'
             Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name $hotfixTransitionToDoneName: '@invis1ble_project_management.jira.hotfix_transition_to_done.name'
             DateInterval $pipelineMaxAwaitingTime: '@invis1ble_project_management.pipeline_max_awaiting_time'
@@ -107,7 +111,7 @@ services:
 
     infrastructure_layer:
         namespace: Invis1ble\ProjectManagement\
-        resource: '../src/*/Infrastructure/**/*{Bus,Handler,Factory,Repository,Resolver}.php'
+        resource: '../src/*/Infrastructure/**/*{Bus,Handler,Factory,Provider,Repository,Resolver}.php'
     
     
     
@@ -154,11 +158,35 @@ services:
         arguments:
             $duration: '%env(MERGE_REQUEST_TICK_INTERVAL)%'
 
+    invis1ble_project_management.jira.status_done.name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status
+        public: true
+        arguments:
+            $value: '%env(JIRA_STATUS_DONE)%'
+
+    invis1ble_project_management.jira.status_ready_for_publish.name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status
+        public: true
+        arguments:
+            $value: '%env(JIRA_STATUS_READY_FOR_PUBLISH)%'
+
+    invis1ble_project_management.jira.status_ready_to_merge.name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status
+        public: true
+        arguments:
+            $value: '%env(JIRA_STATUS_READY_TO_MERGE)%'
+
+    invis1ble_project_management.jira.status_release_candidate.name:
+        class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status
+        public: true
+        arguments:
+            $value: '%env(JIRA_STATUS_RELEASE_CANDIDATE)%'
+
     invis1ble_project_management.jira.issue_transition_to_release_candidate.name:
         class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name
         public: true
         arguments:
-            $value: '%env(JIRA_ISSUE_TRANSITION_TO_RELEASE_CANDIDATE_NAME)%'
+            $value: '%env(JIRA_ISSUE_TRANSITION_TO_RELEASE_CANDIDATE)%'
 
     invis1ble_project_management.jira.hotfix_transition_to_done.name:
         class: Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\Name
@@ -186,7 +214,6 @@ services:
     Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
         parent: Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker
         arguments:
-            $readyForPublishStatus: 'Ready for Publish'
             $supportedIssueTypes: ['Hotfix']
     
     Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\Model\TaskTracker\TaskTracker:
@@ -225,6 +252,7 @@ services:
     
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\SourceCodeRepository\Branch\ExtraDeploymentBranchNameFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectResolverInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Project\ProjectResolver'
+    Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Issue\StatusProvider'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\VersionFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\BranchFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\JobFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\JobFactory'
