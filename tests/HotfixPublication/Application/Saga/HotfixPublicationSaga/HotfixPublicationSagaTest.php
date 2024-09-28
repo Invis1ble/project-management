@@ -60,7 +60,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Co
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Invis1ble\ProjectManagement\Tests\Shared\Application\Saga\PublicationSagaTestCase;
@@ -77,20 +77,24 @@ class HotfixPublicationSagaTest extends PublicationSagaTestCase
 
         $container = static::getContainer();
 
-        /** @var HotfixPublicationRepositoryInterface $hotfixPublicationRepository */
-        $hotfixPublicationRepository = $container->get(HotfixPublicationRepositoryInterface::class);
-
-        /** @var UriFactoryInterface $uriFactory */
-        $uriFactory = $container->get(UriFactoryInterface::class);
-
         /** @var CommandBusInterface $commandBus */
         $commandBus = $container->get(CommandBusInterface::class);
 
         /** @var TraceableEventBus $eventBus */
         $eventBus = $container->get(TraceableEventBus::class);
 
+        /** @var HotfixPublicationRepositoryInterface $hotfixPublicationRepository */
+        $hotfixPublicationRepository = $container->get(HotfixPublicationRepositoryInterface::class);
+
+        /** @var Issue\StatusProviderInterface $issueStatusProvider */
+        $issueStatusProvider = $container->get(Issue\StatusProviderInterface::class);
+
+        /** @var UriFactoryInterface $uriFactory */
+        $uriFactory = $container->get(UriFactoryInterface::class);
+
         $hotfixes = $this->createIssues(
             uriFactory: $uriFactory,
+            status: 'Ready for Publish',
         );
 
         $developmentBranchName = Branch\Name::fromString('develop');
@@ -752,17 +756,25 @@ CONFIG),
             HotfixPublicationId::fromVersionName($createPublicationCommand->tagName),
         );
 
-        $expectedHotfixes = $this->mapMergeRequestsToMergeToMerged($createPublicationCommand->hotfixes);
+        $expectedHotfixes = $this->mapMergeRequestsToMergeToMerged(
+            issues: $createPublicationCommand->hotfixes,
+            issueTargetStatus: $issueStatusProvider->done(),
+        );
+
+        $expectedHotfixes = $expectedHotfixes->withStatus($issueStatusProvider->done());
+
         $expectedHotfixes = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
             issues: $expectedHotfixes,
             targetBranchName: $productionReleaseBranchName,
             newTargetBranchName: $developmentBranchName,
         );
+
         $expectedHotfixes = $this->addCopiesWithNewTargetBranchToMergeRequestsToMerge(
             issues: $expectedHotfixes,
             targetBranchName: $productionReleaseBranchName,
             newTargetBranchName: $latestReleaseBranchName,
         );
+
         $expectedMrsToMerge = $expectedHotfixes->toArray()[0]->mergeRequestsToMerge->toArray();
 
         $this->assertObjectEquals($createPublicationCommand->tagName, $publication->tagName());
@@ -1638,7 +1650,7 @@ CONFIG),
         object $event,
         StatusInterface $expectedPreviousStatus,
         StatusInterface $expectedStatus,
-        ?IssueList $expectedHotfixes = null,
+        ?Issue\IssueList $expectedHotfixes = null,
     ): void {
         $this->assertInstanceOf(HotfixPublicationStatusChanged::class, $event);
         $this->assertObjectEquals($expectedPreviousStatus, $event->previousStatus);

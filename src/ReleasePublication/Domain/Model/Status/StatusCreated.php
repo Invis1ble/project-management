@@ -11,7 +11,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 final readonly class StatusCreated extends AbstractStatus
 {
@@ -24,18 +24,24 @@ final readonly class StatusCreated extends AbstractStatus
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
-        \DateInterval $pipelineMaxAwaitingTime,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
+        \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $tasks = $context->readyToMergeTasks()
-            ->withoutMergeRequestsToMergeOnly()
+        $tasksToTransition = $context->tasks()
+            ->onlyInStatus($issueStatusProvider->readyToMerge())
+            ->onlyWithoutMergeRequestsToMerge()
         ;
 
         $taskTracker->transitionTasksToReleaseCandidate(
-            ...$tasks->map(fn (Issue\Issue $issue): Issue\Key => $issue->key),
+            ...$tasksToTransition->toKeys(),
         );
 
+        $tasks = $context->tasks()
+            ->replace($tasksToTransition->withStatus($issueStatusProvider->releaseCandidate()));
+
+        $this->setPublicationProperty($context, 'tasks', $tasks);
         $this->setPublicationStatus($context, new StatusTasksWithoutMergeRequestTransitioned());
     }
 

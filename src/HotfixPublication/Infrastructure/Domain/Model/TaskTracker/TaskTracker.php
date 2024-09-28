@@ -33,7 +33,6 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         Project\Key $projectKey,
         Board\BoardId $sprintBoardId,
         int $sprintFieldId,
-        private string $readyForPublishStatus = 'Ready for Publish',
         private Transition\Name $hotfixTransitionToDoneName = new Transition\Name('Close Issue'),
         private array $supportedIssueTypes = ['Hotfix'],
     ) {
@@ -53,18 +52,21 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         );
     }
 
-    public function readyForPublishHotfixes(Issue\Key ...$keys): Issue\IssueList
-    {
-        return $this->issuesFromActiveSprint(
-            $this->readyForPublishStatus,
+    public function readyForPublishHotfixes(
+        ?iterable $keys,
+        ?iterable $statuses = null,
+    ): Issue\IssueList {
+        return $this->issuesInActiveSprint(
+            $statuses,
             $this->supportedIssueTypes,
+            false,
             ...$keys,
         );
     }
 
     public function transitionHotfixesToDone(Issue\Key ...$keys): void
     {
-        foreach ($this->readyForPublishHotfixes(...$keys) as $issue) {
+        foreach ($this->readyForPublishHotfixes(keys: $keys) as $issue) {
             $this->transitionTo($issue->key, $this->hotfixTransitionToDoneName);
         }
     }

@@ -38,7 +38,7 @@ class ReleasePublicationCreatedTest extends SerializationTestCase
             tagName: Tag\VersionName::create(),
             tagMessage: Tag\Message::fromString("Release $branchName."),
             status: new StatusCreated(),
-            readyToMergeTasks: $hotfixes,
+            tasks: $hotfixes,
             createdAt: new \DateTimeImmutable(),
         );
     }
@@ -51,7 +51,7 @@ class ReleasePublicationCreatedTest extends SerializationTestCase
             && (null === $object1->tagMessage ? (null === $object2->tagMessage) : $object1->tagMessage->equals($object2->tagMessage))
             && $object1->tagMessage->equals($object2->tagMessage)
             && $object1->status->equals($object2->status)
-            && $object1->readyToMergeTasks->equals($object2->readyToMergeTasks)
+            && $object1->tasks->equals($object2->tasks)
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning
             && $object1->createdAt == $object2->createdAt
             // phpcs:enable Symfony.ControlStructure.IdenticalComparison.Warning

@@ -8,6 +8,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Key;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Status;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Summary;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\TypeId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Sprint\Sprint;
@@ -25,6 +26,7 @@ final readonly class IssueFactory implements IssueFactoryInterface
         string $key,
         string $typeId,
         bool $subtask,
+        string $status,
         string $summary,
         array $sprints,
     ): Issue {
@@ -33,6 +35,7 @@ final readonly class IssueFactory implements IssueFactoryInterface
             key: Key::fromString($key),
             typeId: TypeId::fromString($typeId),
             subtask: $subtask,
+            status: Status::fromString($status),
             summary: Summary::fromString($summary),
             sprints: new SprintList(
                 ...array_map(

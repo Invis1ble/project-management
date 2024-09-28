@@ -18,7 +18,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeReposi
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\ReleasePublicationAwareCommand;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag\Message;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -32,16 +32,18 @@ final class PublishReleaseCommand extends ReleasePublicationAwareCommand
     public function __construct(
         QueryBusInterface $queryBus,
         CommandBusInterface $commandBus,
-        GuiUrlFactoryInterface $issueGuiUrlFactory,
+        Issue\GuiUrlFactoryInterface $issueGuiUrlFactory,
         SerializerInterface $serializer,
+        Issue\StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         private readonly MessageFactoryInterface $tagMessageFactory,
     ) {
         parent::__construct(
             queryBus: $queryBus,
             commandBus: $commandBus,
-            issueGuiUrlFactory: $issueGuiUrlFactory,
             serializer: $serializer,
+            issueStatusProvider: $issueStatusProvider,
+            issueGuiUrlFactory: $issueGuiUrlFactory,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }

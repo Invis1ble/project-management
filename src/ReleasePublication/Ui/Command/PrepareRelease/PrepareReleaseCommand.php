@@ -4,28 +4,56 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\PrepareRelease;
 
+use Invis1ble\Messenger\Command\CommandBusInterface;
+use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestReleasePublication\GetLatestReleasePublicationQuery;
-use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReadyToMergeTasksInActiveSprint\GetReadyToMergeTasksInActiveSprintQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReleasePublication\GetReleasePublicationQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetTasksInActiveSprint\GetTasksInActiveSprintQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\ReleasePublicationAwareCommand;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\Issue;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version\Version;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:release:prepare', description: 'Prepares a new release')]
 final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
 {
+    private readonly Issue\Status $statusReadyToMerge;
+
+    private readonly Issue\Status $statusReleaseCandidate;
+
+    public function __construct(
+        QueryBusInterface $queryBus,
+        CommandBusInterface $commandBus,
+        GuiUrlFactoryInterface $issueGuiUrlFactory,
+        SerializerInterface $serializer,
+        \DateInterval $pipelineMaxAwaitingTime,
+        Issue\StatusProviderInterface $statusProvider,
+    ) {
+        $this->statusReadyToMerge = $statusProvider->readyToMerge();
+        $this->statusReleaseCandidate = $statusProvider->releaseCandidate();
+
+        parent::__construct(
+            queryBus: $queryBus,
+            commandBus: $commandBus,
+            serializer: $serializer,
+            issueStatusProvider: $statusProvider,
+            issueGuiUrlFactory: $issueGuiUrlFactory,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+        );
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         parent::execute($input, $output);
@@ -35,14 +63,38 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         $resume = $input->getOption('resume');
 
         if (false === $resume) {
-            $newReleaseBranchName = $this->newReleaseBranchName();
-            $tasks = $this->readyToMergeTasks();
+            $latestReleaseBranchName = $this->latestReleaseBranchName();
+
+            $tasks = $this->tasksToRelease();
             $tasks = $this->enrichIssuesWithMergeRequests(
                 issues: $tasks,
+                statusReadyToMerge: $this->statusReadyToMerge,
                 targetBranchName: BasicBranchName::fromString('develop'),
             );
 
+            $this->caption("Latest release branch name: $latestReleaseBranchName");
+
+            $newReleaseBranchName = $this->io->ask(
+                question: 'New release branch name',
+                default: (string) $latestReleaseBranchName->bumpMinorVersion(),
+                validator: function (string $branchName) use ($latestReleaseBranchName): Branch\Name {
+                    $branchName = Branch\Name::fromString($branchName);
+
+                    if (!$branchName->versionNewerThan($latestReleaseBranchName)) {
+                        throw new \InvalidArgumentException("Provided version must be greater than latest release $latestReleaseBranchName version");
+                    }
+
+                    return $branchName;
+                },
+            );
+
             $publicationId = ReleasePublicationId::fromBranchName($newReleaseBranchName);
+
+            if ($tasks->empty()) {
+                $this->caption('No tasks to release in the active sprint');
+
+                return Command::SUCCESS;
+            }
         } else {
             if (is_string($resume)) {
                 $publicationId = ReleasePublicationId::fromString($resume);
@@ -53,7 +105,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
             }
 
             $newReleaseBranchName = $publication->branchName();
-            $tasks = $publication->readyToMergeTasks();
+            $tasks = $publication->tasks();
         }
 
         $this->io->section('Summary');
@@ -61,14 +113,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         $this->caption('New release branch name');
         $this->io->text("<fg=bright-magenta;bg=black;options=bold> $newReleaseBranchName </>");
 
-        $this->caption('Ready to Merge tasks in the active sprint');
-        $this->listIssues($tasks);
-
-        if ($tasks->empty()) {
-            $this->caption('No Ready to Merge tasks in the active sprint');
-
-            return Command::SUCCESS;
-        }
+        $this->listTasksToRelease($tasks);
 
         $mergeRequestsToMerge = $tasks->mergeRequestsToMerge();
 
@@ -92,7 +137,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         if (false === $resume) {
             $this->commandBus->dispatch(new CreateReleasePublicationCommand(
                 branchName: $newReleaseBranchName,
-                readyToMergeTasks: $tasks,
+                tasks: $tasks,
             ));
         } else {
             $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
@@ -104,11 +149,11 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         );
     }
 
-    private function newReleaseBranchName(): Branch\Name
+    private function latestReleaseBranchName(): Branch\Name
     {
         $this->phase('Fetching latest release...');
 
-        /** @var Version $release */
+        /** @var Version\Version $release */
         $release = $this->queryBus->ask(new GetLatestReleaseQuery());
 
         if (null === $release) {
@@ -119,50 +164,57 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
             throw new \UnexpectedValueException("Latest release $release->name not released yet");
         }
 
-        $latestReleaseBranchName = Branch\Name::fromString((string) $release->name);
-
-        $this->caption("Latest release branch name: $latestReleaseBranchName");
-
-        return $this->io->ask(
-            question: 'New release branch name',
-            default: (string) $latestReleaseBranchName->bumpVersion(),
-            validator: function (string $branchName) use ($latestReleaseBranchName): Branch\Name {
-                $branchName = Branch\Name::fromString($branchName);
-
-                if (!$branchName->versionNewerThan($latestReleaseBranchName)) {
-                    throw new \InvalidArgumentException("Provided version must be greater than latest release $latestReleaseBranchName version");
-                }
-
-                return $branchName;
-            },
-        );
+        return Branch\Name::fromString((string) $release->name);
     }
 
-    private function readyToMergeTasks(): IssueList
+    private function tasksToRelease(): Issue\IssueList
     {
-        $this->phase('Fetching Ready to Merge tasks...');
+        $this->phase('Fetching tasks to release...');
 
-        /** @var IssueList $tasks */
-        $tasks = $this->queryBus->ask(new GetReadyToMergeTasksInActiveSprintQuery());
+        /** @var Issue\IssueList $tasks */
+        $tasks = $this->queryBus->ask(new GetTasksInActiveSprintQuery(
+            $this->statusReadyToMerge,
+            $this->statusReleaseCandidate,
+        ));
 
         if ($tasks->empty()) {
-            $this->caption('No Ready to Merge tasks found in the active sprint.');
+            $this->caption('No tasks to release found in the active sprint');
 
             return $tasks;
         }
 
-        $this->caption('Ready to Merge tasks');
+        $this->listTasksToRelease($tasks);
 
-        $this->listIssues($tasks);
-
-        $tasks = $tasks->filter(
-            fn (Issue $task): bool => $this->io->confirm("Add $task->key to the new release"),
+        $tasksToMerge = $tasks->filter(
+            fn (Issue\Issue $task): bool => $task->status->equals($this->statusReadyToMerge)
+                && $this->io->confirm("Merge $task | $task->summary"),
         );
 
+        if ($tasksToMerge->empty()) {
+            $this->caption('No tasks to merge');
+
+            return $tasks;
+        }
+
         $this->caption('Tasks to merge');
+        $this->listIssues($tasksToMerge);
 
-        $this->listIssues($tasks);
+        return $tasksToMerge;
+    }
 
-        return $tasks;
+    private function listTasksToRelease(Issue\IssueList $tasks): void
+    {
+        $releaseCandidateTasks = $tasks->onlyInStatus($this->statusReleaseCandidate);
+        $readyToMergeTasks = $tasks->onlyInStatus($this->statusReadyToMerge);
+
+        if (!$readyToMergeTasks->empty()) {
+            $this->caption("$this->statusReleaseCandidate tasks");
+            $this->listIssues($releaseCandidateTasks);
+        }
+
+        if (!$readyToMergeTasks->empty()) {
+            $this->caption("$this->statusReadyToMerge tasks");
+            $this->listIssues($readyToMergeTasks);
+        }
     }
 }

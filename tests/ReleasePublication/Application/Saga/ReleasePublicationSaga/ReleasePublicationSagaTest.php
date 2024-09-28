@@ -157,7 +157,7 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
             status: new StatusReleaseCandidateCreated(),
             tagName: null,
             tagMessage: null,
-            readyToMergeTasks: $tasks,
+            tasks: $tasks,
             createdAt: $now,
         );
 

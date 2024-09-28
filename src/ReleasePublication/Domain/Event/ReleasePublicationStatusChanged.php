@@ -19,7 +19,7 @@ final readonly class ReleasePublicationStatusChanged extends AbstractReleasePubl
         ?Tag\Message $tagMessage,
         public StatusInterface $previousStatus,
         StatusInterface $status,
-        IssueList $readyToMergeTasks,
+        IssueList $tasks,
         \DateTimeImmutable $createdAt,
     ) {
         parent::__construct(
@@ -28,7 +28,7 @@ final readonly class ReleasePublicationStatusChanged extends AbstractReleasePubl
             $tagName,
             $tagMessage,
             $status,
-            $readyToMergeTasks,
+            $tasks,
             $createdAt,
         );
     }
