@@ -66,6 +66,9 @@
             }
           }
         ],
+        "status": {
+          "name": "Ready to Merge"
+        },
         "description": {
           "type": "doc",
           "version": 1,

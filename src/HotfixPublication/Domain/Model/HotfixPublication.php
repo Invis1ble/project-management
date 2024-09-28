@@ -17,6 +17,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewComm
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 use Psr\Clock\ClockInterface;
 
 class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicationInterface
@@ -70,6 +71,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
         ProjectResolverInterface $projectResolver,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
     ): void {
@@ -83,6 +85,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             updateExtraDeploymentBranchMergeRequestFactory: $updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $taskTracker,
             projectResolver: $projectResolver,
+            issueStatusProvider: $issueStatusProvider,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
             pipelineTickInterval: $pipelineTickInterval,
             context: $this,

@@ -37,7 +37,6 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         Project\Key $projectKey,
         Board\BoardId $sprintBoardId,
         int $sprintFieldId,
-        private string $readyToMergeStatus = 'Ready to Merge',
         private Transition\Name $issueTransitionToReleaseCandidateName = new Transition\Name('Release Candidate'),
         private array $supportedIssueTypes = ['Bug', 'Story', 'Tech Dept'],
     ) {
@@ -224,10 +223,10 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
         return $version;
     }
 
-    public function readyToMergeTasksInActiveSprint(): Issue\IssueList
+    public function tasksInActiveSprint(Issue\Status ...$statuses): Issue\IssueList
     {
-        return $this->issuesFromActiveSprint(
-            status: $this->readyToMergeStatus,
+        return $this->issuesInActiveSprint(
+            statuses: $statuses,
             types: $this->supportedIssueTypes,
         );
     }

@@ -27,6 +27,7 @@ class HotfixPublicationCreatedTest extends SerializationTestCase
 
         $hotfixes = $this->createIssues(
             uriFactory: $uriFactory,
+            status: 'Ready for Publish',
         );
 
         return new HotfixPublicationCreated(

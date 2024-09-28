@@ -25,6 +25,7 @@ class CreateHotfixPublicationCommandTest extends SerializationTestCase
 
         $hotfixes = $this->createIssues(
             uriFactory: $uriFactory,
+            status: 'Ready for Publish',
         );
 
         $hotfixesArray = $hotfixes->toArray();

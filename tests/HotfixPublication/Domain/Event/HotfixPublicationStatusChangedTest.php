@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HotfixPublication\Domain\Event;
+namespace Invis1ble\ProjectManagement\Tests\HotfixPublication\Domain\Event;
 
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\HotfixPublicationStatusChanged;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
@@ -28,6 +28,7 @@ class HotfixPublicationStatusChangedTest extends SerializationTestCase
 
         $hotfixes = $this->createIssues(
             uriFactory: $uriFactory,
+            status: 'Ready for Publish',
         );
 
         return new HotfixPublicationStatusChanged(

@@ -14,17 +14,20 @@ trait MapMergeRequestsToMergeToMergedTrait
 {
     use MapMergeRequestsToMergedTrait;
 
-    public function mapMergeRequestsToMergeToMerged(Issue\IssueList $issues): Issue\IssueList
-    {
+    public function mapMergeRequestsToMergeToMerged(
+        Issue\IssueList $issues,
+        Issue\Status $issueTargetStatus,
+    ): Issue\IssueList {
         return new Issue\IssueList(...$issues->map(
-            function (Issue\Issue $issue): Issue\Issue {
+            function (Issue\Issue $issue) use ($issueTargetStatus): Issue\Issue {
                 if (null === $issue->mergeRequestsToMerge) {
                     return $issue;
                 }
 
-                return $issue->withMergeRequestsToMerge(
-                    $this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge),
-                );
+                return $issue
+                    ->withMergeRequestsToMerge($this->mapMergeRequestsToMerged($issue->mergeRequestsToMerge))
+                    ->withStatus($issueTargetStatus)
+                ;
             },
         ));
     }

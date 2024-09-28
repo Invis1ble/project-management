@@ -11,6 +11,8 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 final readonly class StatusTasksWithoutMergeRequestTransitioned extends AbstractStatus
 {
@@ -23,14 +25,22 @@ final readonly class StatusTasksWithoutMergeRequestTransitioned extends Abstract
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
-        \DateInterval $pipelineMaxAwaitingTime,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
+        \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $tasks = $context->readyToMergeTasks()
-            ->mergeMergeRequests($mergeRequestManager);
+        $mergedTasks = new IssueList(
+            ...$context->tasks()
+                ->onlyInStatus($issueStatusProvider->readyToMerge())
+                ->mergeMergeRequests($mergeRequestManager)
+                ->withStatus($issueStatusProvider->releaseCandidate()),
+        );
 
-        $this->setPublicationProperty($context, 'readyToMergeTasks', $tasks);
+        $tasks = $context->tasks()
+            ->replace($mergedTasks);
+
+        $this->setPublicationProperty($context, 'tasks', $tasks);
         $this->setPublicationStatus($context, new StatusMergeRequestsIntoDevelopmentBranchMerged());
     }
 

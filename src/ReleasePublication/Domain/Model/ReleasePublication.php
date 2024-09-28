@@ -18,6 +18,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewComm
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 use Psr\Clock\ClockInterface;
 
 class ReleasePublication extends AbstractAggregateRoot implements ReleasePublicationInterface
@@ -28,14 +29,14 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         private StatusInterface $status,
         private ?Tag\VersionName $tagName,
         private ?Tag\Message $tagMessage,
-        private IssueList $readyToMergeTasks,
+        private IssueList $tasks,
         private \DateTimeImmutable $createdAt,
     ) {
     }
 
     public static function create(
         Name $branchName,
-        IssueList $readyToMergeTasks,
+        IssueList $tasks,
         ClockInterface $clock,
     ): self {
         $publication = new self(
@@ -44,7 +45,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             status: new StatusCreated(),
             tagName: null,
             tagMessage: null,
-            readyToMergeTasks: $readyToMergeTasks,
+            tasks: $tasks,
             createdAt: $clock->now(),
         );
 
@@ -54,7 +55,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             tagName: null,
             tagMessage: null,
             status: $publication->status,
-            readyToMergeTasks: $readyToMergeTasks,
+            tasks: $tasks,
             createdAt: $publication->createdAt,
         ));
 
@@ -72,6 +73,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
     ): void {
@@ -84,7 +86,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             tagName: $this->tagName,
             tagMessage: $this->tagMessage,
             status: $this->status,
-            readyToMergeTasks: $this->readyToMergeTasks,
+            tasks: $this->tasks,
             createdAt: $this->createdAt,
         ));
 
@@ -97,9 +99,10 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
             updateExtraDeploymentBranchMergeRequestFactory: $updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $taskTracker,
-            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+            issueStatusProvider: $issueStatusProvider,
             pipelineTickInterval: $pipelineTickInterval,
             context: $this,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }
 
@@ -112,6 +115,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
     ): void {
@@ -124,9 +128,10 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             setFrontendApplicationBranchNameCommitFactory: $setFrontendApplicationBranchNameCommitFactory,
             updateExtraDeploymentBranchMergeRequestFactory: $updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $taskTracker,
-            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
+            issueStatusProvider: $issueStatusProvider,
             pipelineTickInterval: $pipelineTickInterval,
             context: $this,
+            pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }
 
@@ -170,8 +175,8 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
         return $this->createdAt;
     }
 
-    public function readyToMergeTasks(): IssueList
+    public function tasks(): IssueList
     {
-        return $this->readyToMergeTasks;
+        return $this->tasks;
     }
 }

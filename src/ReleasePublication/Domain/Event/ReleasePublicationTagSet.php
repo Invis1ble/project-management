@@ -18,9 +18,9 @@ final readonly class ReleasePublicationTagSet extends AbstractReleasePublication
         Tag\Name $tagName,
         Tag\Message $tagMessage,
         StatusInterface $status,
-        IssueList $readyToMergeTasks,
+        IssueList $tasks,
         \DateTimeImmutable $createdAt,
     ) {
-        parent::__construct($id, $branchName, $tagName, $tagMessage, $status, $readyToMergeTasks, $createdAt);
+        parent::__construct($id, $branchName, $tagName, $tagMessage, $status, $tasks, $createdAt);
     }
 }

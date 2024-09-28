@@ -130,27 +130,25 @@ readonly class TaskTracker implements TaskTrackerInterface
         );
     }
 
-    public function issuesFromActiveSprint(
-        ?string $status = null,
-        ?array $types = null,
+    public function issuesInActiveSprint(
+        ?iterable $statuses = null,
+        ?iterable $types = null,
+        bool $includeSubtasks = false,
         Issue\Key ...$keys,
     ): Issue\IssueList {
-        $jqlAnd = ["project=\"$this->projectKey\""];
+        $issues = new Issue\IssueList();
 
-        if (0 !== iterator_count($keys)) {
-            $jqlAnd[] = 'issueKey IN (' . implode(',', iterator_to_array($keys)) . ')';
-        }
+        $jqlAnd = [
+            "project=\"$this->projectKey\"",
+            $this->buildJqlIn('issueKey', $keys),
+            $this->buildJqlIn('status', $statuses ?? []),
+            $this->buildJqlIn('issuetype', $types ?? []),
+        ];
 
-        if (null !== $status) {
-            $jqlAnd[] = "status=\"$status\"";
-        }
-
-        if (null !== $types) {
-            $jqlTypes = implode(',', array_map(fn (string $type): string => '"' . $type . '"', $types));
-            $jqlAnd[] = "issuetype IN ($jqlTypes)";
-        }
-
-        $jql = implode(' AND ', $jqlAnd);
+        $jql = implode(' AND ', array_filter(
+            array: $jqlAnd,
+            callback: fn (string $jql): bool => '' !== $jql,
+        ));
 
         $request = $this->requestFactory->createRequest(
             'GET',
@@ -174,19 +172,18 @@ readonly class TaskTracker implements TaskTrackerInterface
             ));
         }
 
-        $issues = new Issue\IssueList();
-
         foreach ($data['issues'] as $issue) {
             $issue = $this->issueFactory->createIssue(
                 id: (int) $issue['id'],
                 key: $issue['key'],
                 typeId: $issue['fields']['issuetype']['id'],
                 subtask: $issue['fields']['issuetype']['subtask'],
+                status: $issue['fields']['status']['name'],
                 summary: $issue['fields']['summary'],
                 sprints: $issue['fields']["customfield_$this->sprintFieldId"] ?? [],
             );
 
-            if (!$issue->subtask && $issue->inActiveSprintOnBoard($this->sprintBoardId)) {
+            if (($includeSubtasks || !$issue->subtask) && $issue->inActiveSprintOnBoard($this->sprintBoardId)) {
                 $issues = $issues->append($issue);
             }
         }
@@ -267,5 +264,25 @@ readonly class TaskTracker implements TaskTrackerInterface
                 }
             })($data),
         );
+    }
+
+    private function buildJqlIn(string $property, iterable $values): string
+    {
+        if (0 === iterator_count($values)) {
+            return '';
+        }
+
+        $jqlValues = implode(',', array_map(
+            callback: function (int|string|\Stringable $value): int|string {
+                if (is_string($value) || $value instanceof \Stringable) {
+                    return "\"$value\"";
+                }
+
+                return $value;
+            },
+            array: iterator_to_array($values),
+        ));
+
+        return "$property IN ($jqlValues)";
     }
 }

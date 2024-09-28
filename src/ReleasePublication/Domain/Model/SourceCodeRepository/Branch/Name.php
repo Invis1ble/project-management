@@ -35,11 +35,11 @@ final readonly class Name extends BasicName
         return version_compare($this->value, $name->value);
     }
 
-    public function bumpVersion(): self
+    public function bumpMinorVersion(): self
     {
-        $patch = $this->patch + 1;
+        $minorVersion = $this->minorVersion + 1;
 
-        return new self("v-$this->majorVersion-$this->minorVersion-$patch");
+        return new self("v-$this->majorVersion-$minorVersion-$this->patch");
     }
 
     protected function validate(string $value): void

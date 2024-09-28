@@ -12,7 +12,7 @@ final readonly class CreateReleasePublicationCommand implements CommandInterface
 {
     public function __construct(
         public Name $branchName,
-        public IssueList $readyToMergeTasks,
+        public IssueList $tasks,
     ) {
     }
 }

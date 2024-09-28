@@ -11,6 +11,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 final readonly class StatusFrontendProductionReleaseBranchPipelineSuccess extends AbstractStatus
 {
@@ -23,9 +24,10 @@ final readonly class StatusFrontendProductionReleaseBranchPipelineSuccess extend
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
-        \DateInterval $pipelineMaxAwaitingTime,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
+        \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $sourceBranchName = $context->branchName();
         $targetBranchName = Branch\Name::fromString('master');

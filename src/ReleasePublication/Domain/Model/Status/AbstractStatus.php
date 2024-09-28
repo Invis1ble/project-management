@@ -54,7 +54,7 @@ abstract readonly class AbstractStatus implements StatusInterface
             tagMessage: $publication->tagMessage(),
             previousStatus: $previousStatus,
             status: $publication->status(),
-            readyToMergeTasks: $publication->readyToMergeTasks(),
+            tasks: $publication->tasks(),
             createdAt: $publication->createdAt(),
         ));
     }

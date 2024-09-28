@@ -12,6 +12,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 final readonly class ProceedToNextStatusCommandHandler extends ReleasePublicationRepositoryAwareCommandHandler
 {
@@ -25,6 +26,7 @@ final readonly class ProceedToNextStatusCommandHandler extends ReleasePublicatio
         private SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         private UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         private TaskTrackerInterface $taskTracker,
+        private StatusProviderInterface $issueStatusProvider,
         private \DateInterval $pipelineMaxAwaitingTime,
         private \DateInterval $pipelineTickInterval,
     ) {
@@ -44,6 +46,7 @@ final readonly class ProceedToNextStatusCommandHandler extends ReleasePublicatio
             setFrontendApplicationBranchNameCommitFactory: $this->setFrontendApplicationBranchNameCommitFactory,
             updateExtraDeploymentBranchMergeRequestFactory: $this->updateExtraDeploymentBranchMergeRequestFactory,
             taskTracker: $this->taskTracker,
+            issueStatusProvider: $this->issueStatusProvider,
             pipelineMaxAwaitingTime: $this->pipelineMaxAwaitingTime,
             pipelineTickInterval: $this->pipelineTickInterval,
         );

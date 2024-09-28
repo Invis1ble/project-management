@@ -11,6 +11,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeli
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\NewCommit\SetFrontendApplicationBranchNameCommitFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\SourceCodeRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProviderInterface;
 
 abstract readonly class StatusFrontendReleaseBranchPipelineAwaitable extends AbstractStatus
 {
@@ -23,9 +24,10 @@ abstract readonly class StatusFrontendReleaseBranchPipelineAwaitable extends Abs
         SetFrontendApplicationBranchNameCommitFactoryInterface $setFrontendApplicationBranchNameCommitFactory,
         MergeRequest\UpdateExtraDeploymentBranchMergeRequestFactoryInterface $updateExtraDeploymentBranchMergeRequestFactory,
         TaskTrackerInterface $taskTracker,
-        \DateInterval $pipelineMaxAwaitingTime,
+        StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
         ReleasePublicationInterface $context,
+        \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $pipeline = $frontendCiClient->awaitLatestPipeline(
             ref: $context->branchName(),

@@ -15,9 +15,14 @@ interface TaskTrackerInterface
 
     public function latestRelease(): ?Version\Version;
 
-    public function issuesFromActiveSprint(
-        ?string $status = null,
-        ?array $types = null,
+    /**
+     * @param iterable<Issue\Status>|null $statuses
+     * @param iterable<string>|null       $types
+     */
+    public function issuesInActiveSprint(
+        ?iterable $statuses = null,
+        ?iterable $types = null,
+        bool $includeSubtasks = false,
         Issue\Key ...$keys,
     ): Issue\IssueList;
 

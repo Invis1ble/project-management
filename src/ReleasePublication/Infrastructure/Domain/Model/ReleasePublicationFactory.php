@@ -19,11 +19,11 @@ final readonly class ReleasePublicationFactory implements ReleasePublicationFact
 
     public function createReleasePublication(
         Name $branchName,
-        IssueList $readyToMergeTasks,
+        IssueList $tasks,
     ): ReleasePublicationInterface {
         return ReleasePublication::create(
             $branchName,
-            $readyToMergeTasks,
+            $tasks,
             $this->clock,
         );
     }

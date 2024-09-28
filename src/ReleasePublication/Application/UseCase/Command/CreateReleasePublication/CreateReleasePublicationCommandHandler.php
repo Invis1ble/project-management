@@ -26,7 +26,7 @@ final readonly class CreateReleasePublicationCommandHandler extends ReleasePubli
 
         $releasePublication = $this->factory->createReleasePublication(
             $command->branchName,
-            $command->readyToMergeTasks,
+            $command->tasks,
         );
 
         $this->storeReleasePublication($releasePublication);
