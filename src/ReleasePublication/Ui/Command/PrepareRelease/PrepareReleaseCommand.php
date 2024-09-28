@@ -63,13 +63,30 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         $resume = $input->getOption('resume');
 
         if (false === $resume) {
+            $latestReleaseBranchName = $this->latestReleaseBranchName();
+
             $tasks = $this->tasksToRelease();
             $tasks = $this->enrichIssuesWithMergeRequests(
                 issues: $tasks,
                 statusReadyToMerge: $this->statusReadyToMerge,
                 targetBranchName: BasicBranchName::fromString('develop'),
             );
-            $newReleaseBranchName = $this->newReleaseBranchName();
+
+            $this->caption("Latest release branch name: $latestReleaseBranchName");
+
+            $newReleaseBranchName = $this->io->ask(
+                question: 'New release branch name',
+                default: (string) $latestReleaseBranchName->bumpMinorVersion(),
+                validator: function (string $branchName) use ($latestReleaseBranchName): Branch\Name {
+                    $branchName = Branch\Name::fromString($branchName);
+
+                    if (!$branchName->versionNewerThan($latestReleaseBranchName)) {
+                        throw new \InvalidArgumentException("Provided version must be greater than latest release $latestReleaseBranchName version");
+                    }
+
+                    return $branchName;
+                },
+            );
 
             $publicationId = ReleasePublicationId::fromBranchName($newReleaseBranchName);
 
@@ -132,7 +149,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         );
     }
 
-    private function newReleaseBranchName(): Branch\Name
+    private function latestReleaseBranchName(): Branch\Name
     {
         $this->phase('Fetching latest release...');
 
@@ -147,23 +164,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
             throw new \UnexpectedValueException("Latest release $release->name not released yet");
         }
 
-        $latestReleaseBranchName = Branch\Name::fromString((string) $release->name);
-
-        $this->caption("Latest release branch name: $latestReleaseBranchName");
-
-        return $this->io->ask(
-            question: 'New release branch name',
-            default: (string) $latestReleaseBranchName->bumpVersion(),
-            validator: function (string $branchName) use ($latestReleaseBranchName): Branch\Name {
-                $branchName = Branch\Name::fromString($branchName);
-
-                if (!$branchName->versionNewerThan($latestReleaseBranchName)) {
-                    throw new \InvalidArgumentException("Provided version must be greater than latest release $latestReleaseBranchName version");
-                }
-
-                return $branchName;
-            },
-        );
+        return Branch\Name::fromString((string) $release->name);
     }
 
     private function tasksToRelease(): Issue\IssueList
