@@ -60,7 +60,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
             $statuses,
             $this->supportedIssueTypes,
             false,
-            ...$keys,
+            ...($keys ?? []),
         );
     }
 
