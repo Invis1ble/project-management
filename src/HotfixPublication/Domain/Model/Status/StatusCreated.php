@@ -29,15 +29,15 @@ final readonly class StatusCreated extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
-        $hotfixes = $context->hotfixes()
+        $hotfixes = $publication->hotfixes()
             ->mergeMergeRequests($mergeRequestManager)
             ->withStatus($issueStatusProvider->done())
         ;
 
-        $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
-        $this->setPublicationStatus($context, new StatusMergeRequestsMerged());
+        $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
+        $this->setPublicationStatus($publication, new StatusMergeRequestsMerged());
     }
 
     public function __toString(): string

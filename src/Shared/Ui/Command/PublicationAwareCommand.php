@@ -82,11 +82,10 @@ abstract class PublicationAwareCommand extends Command
 
     protected function enrichIssuesWithMergeRequests(
         Issue\IssueList $issues,
-        Issue\Status $statusReadyToMerge,
         BasicBranchName $targetBranchName,
     ): Issue\IssueList {
         return new Issue\IssueList(
-            ...$issues->map(function (Issue\Issue $issue) use ($statusReadyToMerge, $targetBranchName): Issue\Issue {
+            ...$issues->map(function (Issue\Issue $issue) use ($targetBranchName): Issue\Issue {
                 $mergeRequests = $this->issueMergeRequests($issue);
 
                 $issue = $issue->withMergeRequests($mergeRequests);
@@ -94,10 +93,6 @@ abstract class PublicationAwareCommand extends Command
                 if (self::NO_MERGE_REQUESTS_ACTION_IDS['CONTINUE'] === $this->userChoices['NO_MERGE_REQUESTS_ACTION']
                     && $issue->mergeRequests->empty()
                 ) {
-                    return $issue;
-                }
-
-                if (!$issue->status->equals($statusReadyToMerge)) {
                     return $issue;
                 }
 
@@ -326,6 +321,10 @@ abstract class PublicationAwareCommand extends Command
             ->targetToBranch($targetBranchName)
             ->relevantToSourceBranch($issue->canonicalBranchName())
             ->filter(function (MergeRequest\MergeRequest $mr): bool {
+                if (!$mr->open()) {
+                    return false;
+                }
+
                 /** @var bool $supported */
                 $supported = $this->queryBus->ask(new GetProjectSupportedQuery($mr->projectId));
 

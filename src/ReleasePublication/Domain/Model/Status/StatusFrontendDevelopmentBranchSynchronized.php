@@ -26,10 +26,10 @@ final readonly class StatusFrontendDevelopmentBranchSynchronized extends Abstrac
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $releaseBranchName = $context->branchName();
+        $releaseBranchName = $publication->branchName();
         $developmentBranchName = Branch\Name::fromString('develop');
 
         $mergeRequest = $mergeRequestManager->createMergeRequest(
@@ -39,7 +39,7 @@ final readonly class StatusFrontendDevelopmentBranchSynchronized extends Abstrac
             targetBranchName: $developmentBranchName,
         );
 
-        $this->setPublicationStatus($context, new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
+        $this->setPublicationStatus($publication, new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
             'project_id' => $mergeRequest->projectId->value(),
             'merge_request_iid' => $mergeRequest->iid->value(),
         ]));

@@ -29,7 +29,7 @@ abstract readonly class StatusFrontendReleaseBranchPipelineRetryable extends Sta
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $statusContext = $this->context->toArray();
@@ -57,7 +57,7 @@ abstract readonly class StatusFrontendReleaseBranchPipelineRetryable extends Sta
         };
 
         $this->setPublicationStatus(
-            publication: $context,
+            publication: $publication,
             status: $next,
         );
     }

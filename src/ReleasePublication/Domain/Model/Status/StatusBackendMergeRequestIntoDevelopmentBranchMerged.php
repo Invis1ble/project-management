@@ -26,7 +26,7 @@ final readonly class StatusBackendMergeRequestIntoDevelopmentBranchMerged extend
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
@@ -35,7 +35,7 @@ final readonly class StatusBackendMergeRequestIntoDevelopmentBranchMerged extend
 
         $newCommit?->commit($backendSourceCodeRepository);
 
-        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSetToDevelopment());
+        $this->setPublicationStatus($publication, new StatusFrontendApplicationBranchSetToDevelopment());
     }
 
     public function __toString(): string

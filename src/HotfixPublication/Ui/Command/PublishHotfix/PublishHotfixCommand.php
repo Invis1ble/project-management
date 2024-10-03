@@ -88,7 +88,6 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             $tagMessage = $this->newTagMessage($hotfixes);
             $hotfixes = $this->enrichIssuesWithMergeRequests(
                 issues: $hotfixes,
-                statusReadyToMerge: $this->statusReadyForPublish,
                 targetBranchName: Branch\Name::fromString('master'),
             );
         } else {

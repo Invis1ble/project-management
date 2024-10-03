@@ -27,12 +27,12 @@ abstract readonly class StatusFrontendProductionReleaseBranchPipelineAwaitable e
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $pipeline = $frontendCiClient->awaitLatestPipeline(
             ref: Branch\Name::fromString('master'),
-            createdAfter: $context->createdAt(),
+            createdAfter: $publication->createdAt(),
             maxAwaitingTime: $pipelineMaxAwaitingTime,
             tickInterval: $pipelineTickInterval,
         );
@@ -58,6 +58,6 @@ abstract readonly class StatusFrontendProductionReleaseBranchPipelineAwaitable e
             };
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 }

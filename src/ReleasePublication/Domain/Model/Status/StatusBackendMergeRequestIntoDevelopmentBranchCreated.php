@@ -26,7 +26,7 @@ final readonly class StatusBackendMergeRequestIntoDevelopmentBranchCreated exten
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $statusContext = $this->context->toArray();
@@ -36,7 +36,7 @@ final readonly class StatusBackendMergeRequestIntoDevelopmentBranchCreated exten
             mergeRequestIid: MergeRequest\MergeRequestIid::from($statusContext['merge_request_iid']),
         );
 
-        $this->setPublicationStatus($context, new StatusBackendMergeRequestIntoDevelopmentBranchMerged());
+        $this->setPublicationStatus($publication, new StatusBackendMergeRequestIntoDevelopmentBranchMerged());
     }
 
     public function __toString(): string

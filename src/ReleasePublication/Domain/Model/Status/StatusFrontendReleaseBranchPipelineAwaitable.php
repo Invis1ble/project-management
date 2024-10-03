@@ -26,12 +26,12 @@ abstract readonly class StatusFrontendReleaseBranchPipelineAwaitable extends Abs
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $pipeline = $frontendCiClient->awaitLatestPipeline(
-            ref: $context->branchName(),
-            createdAfter: $context->createdAt(),
+            ref: $publication->branchName(),
+            createdAfter: $publication->createdAt(),
             maxAwaitingTime: $pipelineMaxAwaitingTime,
             tickInterval: $pipelineTickInterval,
         );
@@ -57,6 +57,6 @@ abstract readonly class StatusFrontendReleaseBranchPipelineAwaitable extends Abs
             };
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 }

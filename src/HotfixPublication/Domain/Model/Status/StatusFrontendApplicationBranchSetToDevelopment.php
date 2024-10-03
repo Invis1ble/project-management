@@ -29,12 +29,12 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $extraDeploymentBranchName = $updateExtraDeploymentBranchMergeRequestFactory->extraDeploymentBranchName();
 
         if (null === $extraDeploymentBranchName) {
-            $this->setStatusDone($context);
+            $this->setStatusDone($publication);
 
             return;
         }
@@ -45,7 +45,7 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         );
 
         if ($compareResult->diffsEmpty()) {
-            $this->setStatusDone($context);
+            $this->setStatusDone($publication);
 
             return;
         }
@@ -53,7 +53,7 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         $mergeRequest = $updateExtraDeploymentBranchMergeRequestFactory->createMergeRequest();
 
         if (null === $mergeRequest) {
-            $this->setStatusDone($context);
+            $this->setStatusDone($publication);
 
             return;
         }
@@ -63,7 +63,7 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
             'merge_request_iid' => $mergeRequest->iid->value(),
         ]);
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 
     public function __toString(): string

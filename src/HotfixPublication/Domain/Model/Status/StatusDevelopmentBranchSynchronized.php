@@ -34,19 +34,19 @@ final readonly class StatusDevelopmentBranchSynchronized extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $release = $taskTracker->latestRelease();
         $hasNewMergeRequestToMerge = false;
 
         if (null === $release || $release->released) {
-            $this->setPublicationStatus($context, new StatusReleaseBranchSynchronized());
+            $this->setPublicationStatus($publication, new StatusReleaseBranchSynchronized());
 
             return;
         }
 
         $hotfixes = new IssueList(
-            ...$context->hotfixes()
+            ...$publication->hotfixes()
                 ->map(function (Issue $hotfix) use ($frontendSourceCodeRepository, $projectResolver, $backendSourceCodeRepository, $mergeRequestManager, $release, &$hasNewMergeRequestToMerge): Issue {
                     $releaseBranchName = Branch\Name::fromString((string) $release->name);
                     $productionReleaseBranchName = Branch\Name::fromString('master');
@@ -79,13 +79,13 @@ final readonly class StatusDevelopmentBranchSynchronized extends AbstractStatus
         );
 
         if ($hasNewMergeRequestToMerge) {
-            $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
+            $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
             $next = new StatusMergeRequestsIntoReleaseBranchCreated();
         } else {
             $next = new StatusReleaseBranchSynchronized();
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 
     public function __toString(): string

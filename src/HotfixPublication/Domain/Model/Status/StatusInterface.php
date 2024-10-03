@@ -29,7 +29,7 @@ interface StatusInterface extends \Stringable
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void;
 
     public function published(): bool;

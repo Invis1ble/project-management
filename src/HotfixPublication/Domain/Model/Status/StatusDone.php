@@ -29,7 +29,7 @@ final readonly class StatusDone extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         // do nothing
     }

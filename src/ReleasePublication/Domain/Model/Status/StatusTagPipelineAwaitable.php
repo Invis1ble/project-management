@@ -26,12 +26,12 @@ abstract readonly class StatusTagPipelineAwaitable extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $pipeline = $backendCiClient->awaitLatestPipeline(
-            ref: $context->tagName(),
-            createdAfter: $context->createdAt(),
+            ref: $publication->tagName(),
+            createdAfter: $publication->createdAt(),
             maxAwaitingTime: $pipelineMaxAwaitingTime,
             tickInterval: $pipelineTickInterval,
         );
@@ -57,6 +57,6 @@ abstract readonly class StatusTagPipelineAwaitable extends AbstractStatus
             };
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 }

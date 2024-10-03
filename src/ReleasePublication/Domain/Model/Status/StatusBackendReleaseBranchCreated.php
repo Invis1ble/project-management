@@ -26,16 +26,16 @@ final readonly class StatusBackendReleaseBranchCreated extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
-            branchName: $context->branchName(),
+            branchName: $publication->branchName(),
         );
 
         $newCommit?->commit($backendSourceCodeRepository);
 
-        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSetToRelease());
+        $this->setPublicationStatus($publication, new StatusFrontendApplicationBranchSetToRelease());
     }
 
     public function __toString(): string

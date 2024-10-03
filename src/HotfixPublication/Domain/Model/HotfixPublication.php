@@ -88,7 +88,7 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             issueStatusProvider: $issueStatusProvider,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
             pipelineTickInterval: $pipelineTickInterval,
-            context: $this,
+            publication: $this,
         );
     }
 

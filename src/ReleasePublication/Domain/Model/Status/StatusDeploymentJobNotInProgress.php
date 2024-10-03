@@ -25,7 +25,7 @@ abstract readonly class StatusDeploymentJobNotInProgress extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         throw new \RuntimeException('Not implemented yet');

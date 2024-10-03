@@ -31,10 +31,10 @@ final readonly class StatusReleaseCandidateCreated extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $sourceBranchName = $context->branchName();
+        $sourceBranchName = $publication->branchName();
         $targetBranchName = Branch\Name::fromString('master');
 
         $mergeRequest = $mergeRequestManager->createMergeRequest(
@@ -44,7 +44,7 @@ final readonly class StatusReleaseCandidateCreated extends AbstractStatus
             targetBranchName: $targetBranchName,
         );
 
-        $this->setPublicationStatus($context, new StatusFrontendMergeRequestIntoProductionReleaseBranchCreated([
+        $this->setPublicationStatus($publication, new StatusFrontendMergeRequestIntoProductionReleaseBranchCreated([
             'project_id' => $mergeRequest->projectId->value(),
             'merge_request_iid' => $mergeRequest->iid->value(),
         ]));

@@ -29,13 +29,13 @@ final readonly class StatusTagPipelineSuccess extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $job = $backendCiClient->deployOnProduction(
-            tagName: $context->tagName(),
+            tagName: $publication->tagName(),
         );
 
-        $this->setPublicationStatus($context, new StatusDeploymentJobInited([
+        $this->setPublicationStatus($publication, new StatusDeploymentJobInited([
             'job_id' => $job->id->value(),
         ]));
     }

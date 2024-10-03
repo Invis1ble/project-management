@@ -27,7 +27,7 @@ final readonly class StatusMergeRequestIntoExtraDeploymentBranchCreated extends 
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $statusContext = $this->context->toArray();
@@ -37,7 +37,7 @@ final readonly class StatusMergeRequestIntoExtraDeploymentBranchCreated extends 
             mergeRequestIid: MergeRequestIid::from($statusContext['merge_request_iid']),
         );
 
-        $this->setPublicationStatus($context, new StatusDone());
+        $this->setPublicationStatus($publication, new StatusDone());
     }
 
     public function __toString(): string
