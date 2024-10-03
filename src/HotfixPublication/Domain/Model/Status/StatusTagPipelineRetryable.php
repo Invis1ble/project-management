@@ -32,7 +32,7 @@ abstract readonly class StatusTagPipelineRetryable extends StatusTagPipelineNotI
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $statusContext = $this->context->toArray();
         $retryCounter = $statusContext['retry_counter'] ?? 0;
@@ -59,7 +59,7 @@ abstract readonly class StatusTagPipelineRetryable extends StatusTagPipelineNotI
         };
 
         $this->setPublicationStatus(
-            publication: $context,
+            publication: $publication,
             status: $next,
         );
     }

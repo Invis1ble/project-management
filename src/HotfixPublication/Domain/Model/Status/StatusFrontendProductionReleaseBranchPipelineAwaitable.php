@@ -31,12 +31,12 @@ abstract readonly class StatusFrontendProductionReleaseBranchPipelineAwaitable e
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
-        if ($context->containsFrontendMergeRequestToMerge($projectResolver)) {
+        if ($publication->containsFrontendMergeRequestToMerge($projectResolver)) {
             $pipeline = $frontendCiClient->awaitLatestPipeline(
                 ref: Branch\Name::fromString('master'),
-                createdAfter: $context->createdAt(),
+                createdAfter: $publication->createdAt(),
                 maxAwaitingTime: $pipelineMaxAwaitingTime,
                 tickInterval: $pipelineTickInterval,
             );
@@ -65,6 +65,6 @@ abstract readonly class StatusFrontendProductionReleaseBranchPipelineAwaitable e
             $next = new StatusFrontendProductionReleaseBranchPipelineSuccess();
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 }

@@ -26,15 +26,15 @@ final readonly class StatusMergeRequestsIntoDevelopmentBranchMerged extends Abst
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $frontendSourceCodeRepository->createBranch(
-            name: $context->branchName(),
+            name: $publication->branchName(),
             ref: Name::fromString('develop'),
         );
 
-        $this->setPublicationStatus($context, new StatusFrontendReleaseBranchCreated());
+        $this->setPublicationStatus($publication, new StatusFrontendReleaseBranchCreated());
     }
 
     public function __toString(): string

@@ -68,7 +68,6 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
             $tasks = $this->tasksToRelease();
             $tasks = $this->enrichIssuesWithMergeRequests(
                 issues: $tasks,
-                statusReadyToMerge: $this->statusReadyToMerge,
                 targetBranchName: BasicBranchName::fromString('develop'),
             );
 

@@ -30,11 +30,11 @@ abstract readonly class StatusTagPipelineAwaitable extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $pipeline = $backendCiClient->awaitLatestPipeline(
-            ref: $context->tagName(),
-            createdAfter: $context->createdAt(),
+            ref: $publication->tagName(),
+            createdAfter: $publication->createdAt(),
             maxAwaitingTime: $pipelineMaxAwaitingTime,
             tickInterval: $pipelineTickInterval,
         );
@@ -60,6 +60,6 @@ abstract readonly class StatusTagPipelineAwaitable extends AbstractStatus
             };
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 }

@@ -29,7 +29,7 @@ abstract readonly class StatusTagPipelineNotInProgress extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         throw new \RuntimeException('Not implemented yet');
     }

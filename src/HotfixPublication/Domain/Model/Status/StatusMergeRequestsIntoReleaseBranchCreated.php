@@ -31,10 +31,10 @@ final readonly class StatusMergeRequestsIntoReleaseBranchCreated extends Abstrac
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $hotfixes = new IssueList(
-            ...$context->hotfixes()
+            ...$publication->hotfixes()
                 ->map(function (Issue $hotfix) use ($mergeRequestManager): Issue {
                     $mergeRequests = $hotfix->mergeRequestsToMerge->mergeMergeRequests($mergeRequestManager);
 
@@ -42,8 +42,8 @@ final readonly class StatusMergeRequestsIntoReleaseBranchCreated extends Abstrac
                 }),
         );
 
-        $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
-        $this->setPublicationStatus($context, new StatusReleaseBranchSynchronized());
+        $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
+        $this->setPublicationStatus($publication, new StatusReleaseBranchSynchronized());
     }
 
     public function __toString(): string

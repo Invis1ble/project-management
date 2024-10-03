@@ -29,11 +29,11 @@ final readonly class StatusDeploymentJobSuccess extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
-        $taskTracker->transitionHotfixesToDone(...$context->hotfixes()->toKeys());
+        $taskTracker->transitionHotfixesToDone(...$publication->hotfixes()->toKeys());
 
-        $this->setPublicationStatus($context, new StatusHotfixesTransitionedToDone());
+        $this->setPublicationStatus($publication, new StatusHotfixesTransitionedToDone());
     }
 
     public function __toString(): string

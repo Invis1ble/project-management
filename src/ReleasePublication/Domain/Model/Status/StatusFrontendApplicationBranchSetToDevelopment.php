@@ -25,13 +25,13 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $extraDeploymentBranchName = $updateExtraDeploymentBranchMergeRequestFactory->extraDeploymentBranchName();
 
         if (null === $extraDeploymentBranchName) {
-            $this->setPublicationStatus($context, new StatusDone());
+            $this->setPublicationStatus($publication, new StatusDone());
 
             return;
         }
@@ -42,7 +42,7 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         );
 
         if ($compareResult->diffsEmpty()) {
-            $this->setPublicationStatus($context, new StatusDone());
+            $this->setPublicationStatus($publication, new StatusDone());
 
             return;
         }
@@ -58,7 +58,7 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
             ]);
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 
     public function __toString(): string

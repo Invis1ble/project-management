@@ -26,10 +26,10 @@ final readonly class StatusCreated extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $tasksToTransition = $context->tasks()
+        $tasksToTransition = $publication->tasks()
             ->onlyInStatus($issueStatusProvider->readyToMerge())
             ->onlyWithoutMergeRequestsToMerge()
         ;
@@ -38,11 +38,11 @@ final readonly class StatusCreated extends AbstractStatus
             ...$tasksToTransition->toKeys(),
         );
 
-        $tasks = $context->tasks()
+        $tasks = $publication->tasks()
             ->replace($tasksToTransition->withStatus($issueStatusProvider->releaseCandidate()));
 
-        $this->setPublicationProperty($context, 'tasks', $tasks);
-        $this->setPublicationStatus($context, new StatusTasksWithoutMergeRequestTransitioned());
+        $this->setPublicationProperty($publication, 'tasks', $tasks);
+        $this->setPublicationStatus($publication, new StatusTasksWithoutMergeRequestTransitioned());
     }
 
     public function __toString(): string

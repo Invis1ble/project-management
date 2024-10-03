@@ -25,12 +25,12 @@ final readonly class StatusDeploymentJobSuccess extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $taskTracker->releaseVersion($context->branchName());
+        $taskTracker->releaseVersion($publication->branchName());
 
-        $this->setPublicationStatus($context, new StatusVersionReleased());
+        $this->setPublicationStatus($publication, new StatusVersionReleased());
     }
 
     public function __toString(): string

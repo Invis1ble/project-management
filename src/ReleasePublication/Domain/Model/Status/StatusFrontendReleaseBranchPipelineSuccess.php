@@ -26,15 +26,15 @@ final readonly class StatusFrontendReleaseBranchPipelineSuccess extends Abstract
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $backendSourceCodeRepository->createBranch(
-            name: $context->branchName(),
+            name: $publication->branchName(),
             ref: Name::fromString('develop'),
         );
 
-        $this->setPublicationStatus($context, new StatusBackendReleaseBranchCreated());
+        $this->setPublicationStatus($publication, new StatusBackendReleaseBranchCreated());
     }
 
     public function __toString(): string

@@ -30,7 +30,7 @@ final readonly class StatusReleaseBranchSynchronized extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
             branchName: Name::fromString('develop'),
@@ -38,7 +38,7 @@ final readonly class StatusReleaseBranchSynchronized extends AbstractStatus
 
         $newCommit?->commit($backendSourceCodeRepository);
 
-        $this->setPublicationStatus($context, new StatusFrontendApplicationBranchSetToDevelopment());
+        $this->setPublicationStatus($publication, new StatusFrontendApplicationBranchSetToDevelopment());
     }
 
     public function __toString(): string

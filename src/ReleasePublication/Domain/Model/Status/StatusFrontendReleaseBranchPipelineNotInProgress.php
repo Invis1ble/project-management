@@ -25,7 +25,7 @@ abstract readonly class StatusFrontendReleaseBranchPipelineNotInProgress extends
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         throw new \RuntimeException('Not implemented yet');

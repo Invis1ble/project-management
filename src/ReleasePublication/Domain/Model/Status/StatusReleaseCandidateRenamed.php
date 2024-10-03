@@ -25,12 +25,12 @@ final readonly class StatusReleaseCandidateRenamed extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $taskTracker->createReleaseCandidate();
 
-        $this->setPublicationStatus($context, new StatusReleaseCandidateCreated());
+        $this->setPublicationStatus($publication, new StatusReleaseCandidateCreated());
     }
 
     public function __toString(): string

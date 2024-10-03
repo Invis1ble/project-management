@@ -34,12 +34,12 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $hasNewMergeRequestToMerge = false;
 
         $hotfixes = new IssueList(
-            ...$context->hotfixes()
+            ...$publication->hotfixes()
                 ->map(function (Issue $hotfix) use ($backendSourceCodeRepository, $projectResolver, $mergeRequestManager, $frontendSourceCodeRepository, &$hasNewMergeRequestToMerge): Issue {
                     $developmentBranchName = Branch\Name::fromString('develop');
                     $productionReleaseBranchName = Branch\Name::fromString('master');
@@ -72,13 +72,13 @@ final readonly class StatusHotfixesTransitionedToDone extends AbstractStatus
         );
 
         if ($hasNewMergeRequestToMerge) {
-            $this->setPublicationProperty($context, 'hotfixes', $hotfixes);
+            $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
             $next = new StatusMergeRequestsIntoDevelopmentBranchCreated();
         } else {
             $next = new StatusDevelopmentBranchSynchronized();
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 
     public function __toString(): string

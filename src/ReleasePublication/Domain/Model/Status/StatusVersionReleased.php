@@ -26,10 +26,10 @@ final readonly class StatusVersionReleased extends AbstractStatus
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $releaseBranchName = $context->branchName();
+        $releaseBranchName = $publication->branchName();
         $developmentBranchName = Branch\Name::fromString('develop');
 
         $compareResult = $frontendSourceCodeRepository->compare(
@@ -53,7 +53,7 @@ final readonly class StatusVersionReleased extends AbstractStatus
             ]);
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 
     public function __toString(): string

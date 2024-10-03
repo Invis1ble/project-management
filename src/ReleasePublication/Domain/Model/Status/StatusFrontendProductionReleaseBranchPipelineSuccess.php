@@ -26,10 +26,10 @@ final readonly class StatusFrontendProductionReleaseBranchPipelineSuccess extend
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $sourceBranchName = $context->branchName();
+        $sourceBranchName = $publication->branchName();
         $targetBranchName = Branch\Name::fromString('master');
 
         $mergeRequest = $mergeRequestManager->createMergeRequest(
@@ -39,7 +39,7 @@ final readonly class StatusFrontendProductionReleaseBranchPipelineSuccess extend
             targetBranchName: $targetBranchName,
         );
 
-        $this->setPublicationStatus($context, new StatusBackendMergeRequestIntoProductionReleaseBranchCreated([
+        $this->setPublicationStatus($publication, new StatusBackendMergeRequestIntoProductionReleaseBranchCreated([
             'project_id' => $mergeRequest->projectId->value(),
             'merge_request_iid' => $mergeRequest->iid->value(),
         ]));

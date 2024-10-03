@@ -26,7 +26,7 @@ final readonly class StatusFrontendMergeRequestIntoProductionReleaseBranchCreate
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $statusContext = $this->context->toArray();
@@ -36,7 +36,11 @@ final readonly class StatusFrontendMergeRequestIntoProductionReleaseBranchCreate
             mergeRequestIid: MergeRequest\MergeRequestIid::from($statusContext['merge_request_iid']),
         );
 
-        $this->setPublicationStatus($context, new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged());
+        $tasks = $publication->tasks()
+            ->withStatus($issueStatusProvider->readyForPublish());
+
+        $this->setPublicationProperty($publication, 'tasks', $tasks);
+        $this->setPublicationStatus($publication, new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged());
     }
 
     public function __toString(): string

@@ -101,7 +101,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             taskTracker: $taskTracker,
             issueStatusProvider: $issueStatusProvider,
             pipelineTickInterval: $pipelineTickInterval,
-            context: $this,
+            publication: $this,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }
@@ -130,7 +130,7 @@ class ReleasePublication extends AbstractAggregateRoot implements ReleasePublica
             taskTracker: $taskTracker,
             issueStatusProvider: $issueStatusProvider,
             pipelineTickInterval: $pipelineTickInterval,
-            context: $this,
+            publication: $this,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }

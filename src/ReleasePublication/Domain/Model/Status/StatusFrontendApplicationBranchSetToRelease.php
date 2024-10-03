@@ -25,12 +25,12 @@ final readonly class StatusFrontendApplicationBranchSetToRelease extends Abstrac
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
-        $taskTracker->renameReleaseCandidate($context->branchName());
+        $taskTracker->renameReleaseCandidate($publication->branchName());
 
-        $this->setPublicationStatus($context, new StatusReleaseCandidateRenamed());
+        $this->setPublicationStatus($publication, new StatusReleaseCandidateRenamed());
     }
 
     public function __toString(): string

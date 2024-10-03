@@ -27,21 +27,21 @@ final readonly class StatusTasksWithoutMergeRequestTransitioned extends Abstract
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $mergedTasks = new IssueList(
-            ...$context->tasks()
+            ...$publication->tasks()
                 ->onlyInStatus($issueStatusProvider->readyToMerge())
                 ->mergeMergeRequests($mergeRequestManager)
                 ->withStatus($issueStatusProvider->releaseCandidate()),
         );
 
-        $tasks = $context->tasks()
+        $tasks = $publication->tasks()
             ->replace($mergedTasks);
 
-        $this->setPublicationProperty($context, 'tasks', $tasks);
-        $this->setPublicationStatus($context, new StatusMergeRequestsIntoDevelopmentBranchMerged());
+        $this->setPublicationProperty($publication, 'tasks', $tasks);
+        $this->setPublicationStatus($publication, new StatusMergeRequestsIntoDevelopmentBranchMerged());
     }
 
     public function __toString(): string

@@ -26,16 +26,16 @@ final readonly class StatusBackendMergeRequestIntoProductionReleaseBranchMerged 
         TaskTrackerInterface $taskTracker,
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineTickInterval,
-        ReleasePublicationInterface $context,
+        ReleasePublicationInterface $publication,
         \DateInterval $pipelineMaxAwaitingTime,
     ): void {
         $backendSourceCodeRepository->createTag(
-            name: $context->tagName(),
+            name: $publication->tagName(),
             ref: Branch\Name::fromString('master'),
-            message: $context->tagMessage(),
+            message: $publication->tagMessage(),
         );
 
-        $this->setPublicationStatus($context, new StatusTagCreated());
+        $this->setPublicationStatus($publication, new StatusTagCreated());
     }
 
     public function __toString(): string

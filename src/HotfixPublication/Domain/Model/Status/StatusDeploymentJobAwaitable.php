@@ -30,7 +30,7 @@ abstract readonly class StatusDeploymentJobAwaitable extends AbstractStatus
         StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         \DateInterval $pipelineTickInterval,
-        HotfixPublicationInterface $context,
+        HotfixPublicationInterface $publication,
     ): void {
         $statusContext = $this->context->toArray();
 
@@ -57,6 +57,6 @@ abstract readonly class StatusDeploymentJobAwaitable extends AbstractStatus
             };
         }
 
-        $this->setPublicationStatus($context, $next);
+        $this->setPublicationStatus($publication, $next);
     }
 }
