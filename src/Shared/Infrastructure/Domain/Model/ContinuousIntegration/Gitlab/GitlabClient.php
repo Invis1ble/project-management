@@ -666,6 +666,10 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                 mergeRequestIid: $mergeRequestIid,
             );
 
+            if ($mergeRequest->merged()) {
+                return $mergeRequest;
+            }
+
             if (null !== $previousStatus && !$mergeRequest->details->status->equals($previousStatus)) {
                 $this->eventBus->dispatch(new MergeRequestStatusChanged(
                     projectId: $mergeRequest->projectId,
