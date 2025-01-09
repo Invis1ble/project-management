@@ -289,11 +289,10 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri(
-                "/api/v4/projects/$pipeline->projectId/pipelines/$pipeline->id/jobs?" . http_build_query([
+            $this->uriFactory->createUri("/api/v4/projects/$pipeline->projectId/pipelines/$pipeline->id/jobs")
+                ->withQuery(http_build_query([
                     'scope' => 'manual',
-                ]),
-            ),
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -366,10 +365,11 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
     ): Branch\Branch {
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/branches?" . http_build_query([
-                'branch' => (string) $name,
-                'ref' => (string) $ref,
-            ])),
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/branches")
+                ->withQuery(http_build_query([
+                    'branch' => (string) $name,
+                    'ref' => (string) $ref,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -414,10 +414,11 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/tags?" . http_build_query([
-                'tag_name' => (string) $name,
-                'ref' => (string) $ref,
-            ])),
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/tags")
+                ->withQuery(http_build_query([
+                    'tag_name' => (string) $name,
+                    'ref' => (string) $ref,
+                ])),
         )
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode($data)))
@@ -500,10 +501,11 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
     ): Diff\CompareResult {
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/compare?" . http_build_query([
-                'from' => (string) $from,
-                'to' => (string) $to,
-            ])),
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/compare")
+                ->withQuery(http_build_query([
+                    'from' => (string) $from,
+                    'to' => (string) $to,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -528,9 +530,10 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/tags?" . http_build_query([
-                'search' => '^v.' . $now->format('y-m-d') . '.',
-            ])),
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/tags")
+                ->withQuery(http_build_query([
+                    'search' => '^v.' . $now->format('y-m-d') . '.',
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -584,9 +587,10 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/files/$encodedFilePath?" . http_build_query([
-                'ref' => (string) $branchName,
-            ])),
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/repository/files/$encodedFilePath")
+                ->withQuery(http_build_query([
+                    'ref' => (string) $branchName,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -850,9 +854,10 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
     {
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/pipelines/latest?" . http_build_query([
-                'ref' => (string) $ref,
-            ])),
+            $this->uriFactory->createUri("/api/v4/projects/$this->projectId/pipelines/latest")
+                ->withQuery(http_build_query([
+                    'ref' => (string) $ref,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)

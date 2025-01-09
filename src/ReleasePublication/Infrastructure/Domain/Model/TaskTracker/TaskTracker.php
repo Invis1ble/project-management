@@ -67,12 +67,13 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
     {
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
-                'query' => 'Release Candidate',
-                'orderBy' => 'name',
-                'status' => 'unreleased',
-                'maxResults' => 1,
-            ])),
+            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version")
+                ->withQuery(http_build_query([
+                    'query' => 'Release Candidate',
+                    'orderBy' => 'name',
+                    'status' => 'unreleased',
+                    'maxResults' => 1,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -172,12 +173,13 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
     {
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
-                'query' => (string) $branchName,
-                'orderBy' => '-name',
-                'status' => 'unreleased',
-                'maxResults' => 1,
-            ])),
+            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version")
+                ->withQuery(http_build_query([
+                    'query' => (string) $branchName,
+                    'orderBy' => '-name',
+                    'status' => 'unreleased',
+                    'maxResults' => 1,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
