@@ -183,17 +183,6 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 sourceBranchName: $frontendMrToMerge->sourceBranchName,
                 targetBranchName: $frontendMrToMerge->targetBranchName,
                 status: MergeRequest\Status::Open,
-                detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
-                guiUrl: $frontendMrToMerge->guiUrl,
-            ),
-            $this->createMergeRequestResponse(
-                mergeRequestIid: $frontendMrToMerge->iid,
-                projectId: $frontendMrToMerge->projectId,
-                projectName: $frontendMrToMerge->projectName,
-                title: $frontendMrToMerge->title,
-                sourceBranchName: $frontendMrToMerge->sourceBranchName,
-                targetBranchName: $frontendMrToMerge->targetBranchName,
-                status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Preparing,
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
@@ -542,17 +531,6 @@ class ReleasePublicationSagaTest extends ReleaseSagaTestCase
                 sourceBranchName: $frontendMrToMerge->sourceBranchName,
                 targetBranchName: $developmentBranchName,
                 status: MergeRequest\Status::Open,
-                detailedStatus: MergeRequest\Details\Status\Dictionary::NotOpen,
-                guiUrl: $frontendMrToMerge->guiUrl,
-            ),
-            $this->createMergeRequestResponse(
-                mergeRequestIid: $frontendMrToMerge->iid,
-                projectId: $frontendMrToMerge->projectId,
-                projectName: $frontendMrToMerge->projectName,
-                title: $frontendMrToMerge->title,
-                sourceBranchName: $frontendMrToMerge->sourceBranchName,
-                targetBranchName: $developmentBranchName,
-                status: MergeRequest\Status::Open,
                 detailedStatus: MergeRequest\Details\Status\Dictionary::Preparing,
                 guiUrl: $frontendMrToMerge->guiUrl,
             ),
@@ -727,7 +705,7 @@ CONFIG),
 
         $dispatchedEvents = $eventBus->getDispatchedEvents();
 
-        $this->assertCount(101, $dispatchedEvents);
+        $this->assertCount(97, $dispatchedEvents);
 
         $this->assertArrayHasKey(0, $dispatchedEvents);
         $event = $dispatchedEvents[0]->event;
@@ -763,7 +741,7 @@ CONFIG),
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
         $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
         $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusNotOpen()), $event->details);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
 
         $this->assertArrayHasKey(4, $dispatchedEvents);
         $event = $dispatchedEvents[4]->event;
@@ -773,7 +751,7 @@ CONFIG),
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
         $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
         $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
 
         $this->assertArrayHasKey(5, $dispatchedEvents);
         $event = $dispatchedEvents[5]->event;
@@ -783,7 +761,7 @@ CONFIG),
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
         $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
         $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
 
         $this->assertArrayHasKey(6, $dispatchedEvents);
         $event = $dispatchedEvents[6]->event;
@@ -793,30 +771,10 @@ CONFIG),
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
         $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
         $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusMergeable()), $event->details);
 
         $this->assertArrayHasKey(7, $dispatchedEvents);
         $event = $dispatchedEvents[7]->event;
-        $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
-        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
-        $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
-
-        $this->assertArrayHasKey(8, $dispatchedEvents);
-        $event = $dispatchedEvents[8]->event;
-        $this->assertInstanceOf(MergeRequestStatusChanged::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
-        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
-        $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusMergeable()), $event->details);
-
-        $this->assertArrayHasKey(9, $dispatchedEvents);
-        $event = $dispatchedEvents[9]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
@@ -825,9 +783,9 @@ CONFIG),
         $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
         $this->assertObjectEquals($frontendMrToMerge->details, $event->details);
 
-        $this->assertArrayHasKey(10, $dispatchedEvents);
+        $this->assertArrayHasKey(8, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[10]->event,
+            event: $dispatchedEvents[8]->event,
             expectedPreviousStatus: new StatusFrontendMergeRequestIntoProductionReleaseBranchCreated([
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
@@ -835,103 +793,103 @@ CONFIG),
             expectedStatus: new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged(),
         );
 
-        $this->assertArrayHasKey(11, $dispatchedEvents);
-        $event = $dispatchedEvents[11]->event;
+        $this->assertArrayHasKey(9, $dispatchedEvents);
+        $event = $dispatchedEvents[9]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertNull($event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Created, $event->status);
         $pipelineId = $event->pipelineId;
 
-        $this->assertArrayHasKey(12, $dispatchedEvents);
-        $event = $dispatchedEvents[12]->event;
+        $this->assertArrayHasKey(10, $dispatchedEvents);
+        $event = $dispatchedEvents[10]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Pipeline\Status::Created, $event->status);
 
-        $this->assertArrayHasKey(13, $dispatchedEvents);
-        $event = $dispatchedEvents[13]->event;
+        $this->assertArrayHasKey(11, $dispatchedEvents);
+        $event = $dispatchedEvents[11]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Pipeline\Status::Created, $event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->status);
+
+        $this->assertArrayHasKey(12, $dispatchedEvents);
+        $event = $dispatchedEvents[12]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->status);
+
+        $this->assertArrayHasKey(13, $dispatchedEvents);
+        $event = $dispatchedEvents[13]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
 
         $this->assertArrayHasKey(14, $dispatchedEvents);
         $event = $dispatchedEvents[14]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
 
         $this->assertArrayHasKey(15, $dispatchedEvents);
         $event = $dispatchedEvents[15]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
 
         $this->assertArrayHasKey(16, $dispatchedEvents);
         $event = $dispatchedEvents[16]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
 
         $this->assertArrayHasKey(17, $dispatchedEvents);
         $event = $dispatchedEvents[17]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(18, $dispatchedEvents);
         $event = $dispatchedEvents[18]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(19, $dispatchedEvents);
         $event = $dispatchedEvents[19]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(20, $dispatchedEvents);
-        $event = $dispatchedEvents[20]->event;
-        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(21, $dispatchedEvents);
-        $event = $dispatchedEvents[21]->event;
-        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Pipeline\Status::Running, $event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Failed, $event->status);
 
-        $this->assertArrayHasKey(22, $dispatchedEvents);
+        $this->assertArrayHasKey(20, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[22]->event,
+            event: $dispatchedEvents[20]->event,
             expectedPreviousStatus: new StatusFrontendMergeRequestIntoProductionReleaseBranchMerged(),
             expectedStatus: new StatusFrontendProductionReleaseBranchPipelineFailed([
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
         );
 
-        $this->assertArrayHasKey(23, $dispatchedEvents);
-        $event = $dispatchedEvents[23]->event;
+        $this->assertArrayHasKey(21, $dispatchedEvents);
+        $event = $dispatchedEvents[21]->event;
         $this->assertInstanceOf(PipelineRetried::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($frontendPipelineId, $event->pipelineId);
         $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
 
-        $this->assertArrayHasKey(24, $dispatchedEvents);
+        $this->assertArrayHasKey(22, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[24]->event,
+            event: $dispatchedEvents[22]->event,
             expectedPreviousStatus: new StatusFrontendProductionReleaseBranchPipelineFailed([
                 'pipeline_id' => $frontendPipelineId->value(),
             ]),
@@ -941,44 +899,44 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(25, $dispatchedEvents);
-        $event = $dispatchedEvents[25]->event;
+        $this->assertArrayHasKey(23, $dispatchedEvents);
+        $event = $dispatchedEvents[23]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertNull($event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+
+        $this->assertArrayHasKey(24, $dispatchedEvents);
+        $event = $dispatchedEvents[24]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+
+        $this->assertArrayHasKey(25, $dispatchedEvents);
+        $event = $dispatchedEvents[25]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(26, $dispatchedEvents);
         $event = $dispatchedEvents[26]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(27, $dispatchedEvents);
         $event = $dispatchedEvents[27]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(28, $dispatchedEvents);
-        $event = $dispatchedEvents[28]->event;
-        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(29, $dispatchedEvents);
-        $event = $dispatchedEvents[29]->event;
-        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals(Pipeline\Status::Running, $event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Success, $event->status);
 
-        $this->assertArrayHasKey(30, $dispatchedEvents);
+        $this->assertArrayHasKey(28, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[30]->event,
+            event: $dispatchedEvents[28]->event,
             expectedPreviousStatus: new StatusFrontendProductionReleaseBranchPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
@@ -989,8 +947,8 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(31, $dispatchedEvents);
-        $event = $dispatchedEvents[31]->event;
+        $this->assertArrayHasKey(29, $dispatchedEvents);
+        $event = $dispatchedEvents[29]->event;
         $this->assertInstanceOf(MergeRequestCreated::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($backendMrToMerge->title, $event->title);
@@ -998,9 +956,9 @@ CONFIG),
         $this->assertObjectEquals($productionReleaseBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusMergeable(), $event->details->status);
 
-        $this->assertArrayHasKey(32, $dispatchedEvents);
+        $this->assertArrayHasKey(30, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[32]->event,
+            event: $dispatchedEvents[30]->event,
             expectedPreviousStatus: new StatusFrontendProductionReleaseBranchPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $frontendPipelineId->value(),
@@ -1011,8 +969,8 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(33, $dispatchedEvents);
-        $event = $dispatchedEvents[33]->event;
+        $this->assertArrayHasKey(31, $dispatchedEvents);
+        $event = $dispatchedEvents[31]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($backendMrToMerge->iid, $event->mergeRequestIid);
@@ -1021,9 +979,9 @@ CONFIG),
         $this->assertObjectEquals($backendMrToMerge->targetBranchName, $event->targetBranchName);
         $this->assertObjectEquals($backendMrToMerge->details, $event->details);
 
-        $this->assertArrayHasKey(34, $dispatchedEvents);
+        $this->assertArrayHasKey(32, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[34]->event,
+            event: $dispatchedEvents[32]->event,
             expectedPreviousStatus: new StatusBackendMergeRequestIntoProductionReleaseBranchCreated([
                 'project_id' => $backendProjectId->value(),
                 'merge_request_iid' => $backendMrToMerge->iid->value(),
@@ -1031,117 +989,117 @@ CONFIG),
             expectedStatus: new StatusBackendMergeRequestIntoProductionReleaseBranchMerged(),
         );
 
-        $this->assertArrayHasKey(35, $dispatchedEvents);
-        $event = $dispatchedEvents[35]->event;
+        $this->assertArrayHasKey(33, $dispatchedEvents);
+        $event = $dispatchedEvents[33]->event;
         $this->assertInstanceOf(TagCreated::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($tagName, $event->name);
         $this->assertObjectEquals($tagMessage, $event->message);
 
-        $this->assertArrayHasKey(36, $dispatchedEvents);
+        $this->assertArrayHasKey(34, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[36]->event,
+            event: $dispatchedEvents[34]->event,
             expectedPreviousStatus: new StatusBackendMergeRequestIntoProductionReleaseBranchMerged(),
             expectedStatus: new StatusTagCreated(),
         );
 
-        $this->assertArrayHasKey(37, $dispatchedEvents);
-        $event = $dispatchedEvents[37]->event;
+        $this->assertArrayHasKey(35, $dispatchedEvents);
+        $event = $dispatchedEvents[35]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertNull($event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Created, $event->status);
         $pipelineId = $event->pipelineId;
 
-        $this->assertArrayHasKey(38, $dispatchedEvents);
-        $event = $dispatchedEvents[38]->event;
+        $this->assertArrayHasKey(36, $dispatchedEvents);
+        $event = $dispatchedEvents[36]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
         $this->assertObjectEquals(Pipeline\Status::Created, $event->status);
 
-        $this->assertArrayHasKey(39, $dispatchedEvents);
-        $event = $dispatchedEvents[39]->event;
+        $this->assertArrayHasKey(37, $dispatchedEvents);
+        $event = $dispatchedEvents[37]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals(Pipeline\Status::Created, $event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->status);
+
+        $this->assertArrayHasKey(38, $dispatchedEvents);
+        $event = $dispatchedEvents[38]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->status);
+
+        $this->assertArrayHasKey(39, $dispatchedEvents);
+        $event = $dispatchedEvents[39]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
 
         $this->assertArrayHasKey(40, $dispatchedEvents);
         $event = $dispatchedEvents[40]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
 
         $this->assertArrayHasKey(41, $dispatchedEvents);
         $event = $dispatchedEvents[41]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::WaitingForResource, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
 
         $this->assertArrayHasKey(42, $dispatchedEvents);
         $event = $dispatchedEvents[42]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
 
         $this->assertArrayHasKey(43, $dispatchedEvents);
         $event = $dispatchedEvents[43]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::Preparing, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(44, $dispatchedEvents);
         $event = $dispatchedEvents[44]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(45, $dispatchedEvents);
         $event = $dispatchedEvents[45]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(46, $dispatchedEvents);
-        $event = $dispatchedEvents[46]->event;
-        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(47, $dispatchedEvents);
-        $event = $dispatchedEvents[47]->event;
-        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals(Pipeline\Status::Running, $event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Failed, $event->status);
 
-        $this->assertArrayHasKey(48, $dispatchedEvents);
+        $this->assertArrayHasKey(46, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[48]->event,
+            event: $dispatchedEvents[46]->event,
             expectedPreviousStatus: new StatusTagCreated(),
             expectedStatus: new StatusTagPipelineFailed([
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
         );
 
-        $this->assertArrayHasKey(49, $dispatchedEvents);
-        $event = $dispatchedEvents[49]->event;
+        $this->assertArrayHasKey(47, $dispatchedEvents);
+        $event = $dispatchedEvents[47]->event;
         $this->assertInstanceOf(PipelineRetried::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($tagPipelineId, $event->pipelineId);
         $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
 
-        $this->assertArrayHasKey(50, $dispatchedEvents);
+        $this->assertArrayHasKey(48, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[50]->event,
+            event: $dispatchedEvents[48]->event,
             expectedPreviousStatus: new StatusTagPipelineFailed([
                 'pipeline_id' => $tagPipelineId->value(),
             ]),
@@ -1151,44 +1109,44 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(51, $dispatchedEvents);
-        $event = $dispatchedEvents[51]->event;
+        $this->assertArrayHasKey(49, $dispatchedEvents);
+        $event = $dispatchedEvents[49]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertNull($event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+
+        $this->assertArrayHasKey(50, $dispatchedEvents);
+        $event = $dispatchedEvents[50]->event;
+        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+
+        $this->assertArrayHasKey(51, $dispatchedEvents);
+        $event = $dispatchedEvents[51]->event;
+        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(52, $dispatchedEvents);
         $event = $dispatchedEvents[52]->event;
         $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->status);
+        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
 
         $this->assertArrayHasKey(53, $dispatchedEvents);
         $event = $dispatchedEvents[53]->event;
         $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(Pipeline\Status::Pending, $event->previousStatus);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(54, $dispatchedEvents);
-        $event = $dispatchedEvents[54]->event;
-        $this->assertInstanceOf(LatestPipelineAwaitingTick::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(Pipeline\Status::Running, $event->status);
-
-        $this->assertArrayHasKey(55, $dispatchedEvents);
-        $event = $dispatchedEvents[55]->event;
-        $this->assertInstanceOf(LatestPipelineStatusChanged::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals(Pipeline\Status::Running, $event->previousStatus);
         $this->assertObjectEquals(Pipeline\Status::Success, $event->status);
 
-        $this->assertArrayHasKey(56, $dispatchedEvents);
+        $this->assertArrayHasKey(54, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[56]->event,
+            event: $dispatchedEvents[54]->event,
             expectedPreviousStatus: new StatusTagPipelinePending([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
@@ -1199,16 +1157,16 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(57, $dispatchedEvents);
-        $event = $dispatchedEvents[57]->event;
+        $this->assertArrayHasKey(55, $dispatchedEvents);
+        $event = $dispatchedEvents[55]->event;
         $this->assertInstanceOf(JobRan::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($deploymentJobId, $event->jobId);
         $this->assertObjectEquals($deploymentJobName, $event->name);
 
-        $this->assertArrayHasKey(58, $dispatchedEvents);
+        $this->assertArrayHasKey(56, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[58]->event,
+            event: $dispatchedEvents[56]->event,
             expectedPreviousStatus: new StatusTagPipelineSuccess([
                 'retry_counter' => 1,
                 'pipeline_id' => $tagPipelineId->value(),
@@ -1218,72 +1176,72 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(59, $dispatchedEvents);
-        $event = $dispatchedEvents[59]->event;
+        $this->assertArrayHasKey(57, $dispatchedEvents);
+        $event = $dispatchedEvents[57]->event;
         $this->assertInstanceOf(JobStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertNull($event->previousStatus);
         $this->assertObjectEquals(new Job\Status\StatusWaitingForResource(), $event->status);
+
+        $this->assertArrayHasKey(58, $dispatchedEvents);
+        $event = $dispatchedEvents[58]->event;
+        $this->assertInstanceOf(JobAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(new Job\Status\StatusWaitingForResource(), $event->status);
+
+        $this->assertArrayHasKey(59, $dispatchedEvents);
+        $event = $dispatchedEvents[59]->event;
+        $this->assertInstanceOf(JobStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(new Job\Status\StatusWaitingForResource(), $event->previousStatus);
+        $this->assertObjectEquals(new Job\Status\StatusPreparing(), $event->status);
 
         $this->assertArrayHasKey(60, $dispatchedEvents);
         $event = $dispatchedEvents[60]->event;
         $this->assertInstanceOf(JobAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(new Job\Status\StatusWaitingForResource(), $event->status);
+        $this->assertObjectEquals(new Job\Status\StatusPreparing(), $event->status);
 
         $this->assertArrayHasKey(61, $dispatchedEvents);
         $event = $dispatchedEvents[61]->event;
         $this->assertInstanceOf(JobStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(new Job\Status\StatusWaitingForResource(), $event->previousStatus);
-        $this->assertObjectEquals(new Job\Status\StatusPreparing(), $event->status);
+        $this->assertObjectEquals(new Job\Status\StatusPreparing(), $event->previousStatus);
+        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
 
         $this->assertArrayHasKey(62, $dispatchedEvents);
         $event = $dispatchedEvents[62]->event;
         $this->assertInstanceOf(JobAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(new Job\Status\StatusPreparing(), $event->status);
+        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
 
         $this->assertArrayHasKey(63, $dispatchedEvents);
         $event = $dispatchedEvents[63]->event;
         $this->assertInstanceOf(JobStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(new Job\Status\StatusPreparing(), $event->previousStatus);
-        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
+        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->previousStatus);
+        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
 
         $this->assertArrayHasKey(64, $dispatchedEvents);
         $event = $dispatchedEvents[64]->event;
         $this->assertInstanceOf(JobAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
+        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
 
         $this->assertArrayHasKey(65, $dispatchedEvents);
         $event = $dispatchedEvents[65]->event;
         $this->assertInstanceOf(JobStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->previousStatus);
-        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
-
-        $this->assertArrayHasKey(66, $dispatchedEvents);
-        $event = $dispatchedEvents[66]->event;
-        $this->assertInstanceOf(JobAwaitingTick::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
-
-        $this->assertArrayHasKey(67, $dispatchedEvents);
-        $event = $dispatchedEvents[67]->event;
-        $this->assertInstanceOf(JobStatusChanged::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->previousStatus);
         $this->assertObjectEquals(new Job\Status\StatusFailed(), $event->status);
 
-        $this->assertArrayHasKey(68, $dispatchedEvents);
+        $this->assertArrayHasKey(66, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[68]->event,
+            event: $dispatchedEvents[66]->event,
             expectedPreviousStatus: new StatusDeploymentJobInited([
                 'job_id' => $deploymentJobId->value(),
             ]),
@@ -1292,17 +1250,17 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(69, $dispatchedEvents);
-        $event = $dispatchedEvents[69]->event;
+        $this->assertArrayHasKey(67, $dispatchedEvents);
+        $event = $dispatchedEvents[67]->event;
         $this->assertInstanceOf(JobRetried::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($deploymentJobId, $event->jobId);
         $this->assertObjectEquals($deploymentJobName, $event->name);
         $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
 
-        $this->assertArrayHasKey(70, $dispatchedEvents);
+        $this->assertArrayHasKey(68, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[70]->event,
+            event: $dispatchedEvents[68]->event,
             expectedPreviousStatus: new StatusDeploymentJobFailed([
                 'job_id' => $deploymentJobId->value(),
             ]),
@@ -1312,44 +1270,44 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(71, $dispatchedEvents);
-        $event = $dispatchedEvents[71]->event;
+        $this->assertArrayHasKey(69, $dispatchedEvents);
+        $event = $dispatchedEvents[69]->event;
         $this->assertInstanceOf(JobStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertNull($event->previousStatus);
         $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
+
+        $this->assertArrayHasKey(70, $dispatchedEvents);
+        $event = $dispatchedEvents[70]->event;
+        $this->assertInstanceOf(JobAwaitingTick::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals($pipelineId, $event->pipelineId);
+        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
+
+        $this->assertArrayHasKey(71, $dispatchedEvents);
+        $event = $dispatchedEvents[71]->event;
+        $this->assertInstanceOf(JobStatusChanged::class, $event);
+        $this->assertObjectEquals($backendProjectId, $event->projectId);
+        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->previousStatus);
+        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
 
         $this->assertArrayHasKey(72, $dispatchedEvents);
         $event = $dispatchedEvents[72]->event;
         $this->assertInstanceOf(JobAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->status);
+        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
 
         $this->assertArrayHasKey(73, $dispatchedEvents);
         $event = $dispatchedEvents[73]->event;
         $this->assertInstanceOf(JobStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals(new Job\Status\StatusPending(), $event->previousStatus);
-        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
-
-        $this->assertArrayHasKey(74, $dispatchedEvents);
-        $event = $dispatchedEvents[74]->event;
-        $this->assertInstanceOf(JobAwaitingTick::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
-        $this->assertObjectEquals($pipelineId, $event->pipelineId);
-        $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->status);
-
-        $this->assertArrayHasKey(75, $dispatchedEvents);
-        $event = $dispatchedEvents[75]->event;
-        $this->assertInstanceOf(JobStatusChanged::class, $event);
-        $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals(new Job\Status\StatusRunning(), $event->previousStatus);
         $this->assertObjectEquals(new Job\Status\StatusSuccess(), $event->status);
 
-        $this->assertArrayHasKey(76, $dispatchedEvents);
+        $this->assertArrayHasKey(74, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[76]->event,
+            event: $dispatchedEvents[74]->event,
             expectedPreviousStatus: new StatusDeploymentJobPending([
                 'retry_counter' => 1,
                 'job_id' => $deploymentJobId->value(),
@@ -1360,15 +1318,15 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(77, $dispatchedEvents);
-        $event = $dispatchedEvents[77]->event;
+        $this->assertArrayHasKey(75, $dispatchedEvents);
+        $event = $dispatchedEvents[75]->event;
         $this->assertInstanceOf(ReleaseReleased::class, $event);
         $this->assertObjectEquals(Version\Name::fromString((string) $releaseBranchName), $event->name);
         $this->assertTrue($event->released);
 
-        $this->assertArrayHasKey(78, $dispatchedEvents);
+        $this->assertArrayHasKey(76, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[78]->event,
+            event: $dispatchedEvents[76]->event,
             expectedPreviousStatus: new StatusDeploymentJobSuccess([
                 'retry_counter' => 1,
                 'job_id' => $deploymentJobId->value(),
@@ -1376,8 +1334,8 @@ CONFIG),
             expectedStatus: new StatusVersionReleased(),
         );
 
-        $this->assertArrayHasKey(79, $dispatchedEvents);
-        $event = $dispatchedEvents[79]->event;
+        $this->assertArrayHasKey(77, $dispatchedEvents);
+        $event = $dispatchedEvents[77]->event;
         $this->assertInstanceOf(MergeRequestCreated::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
@@ -1385,15 +1343,35 @@ CONFIG),
         $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusNotOpen(), $event->details->status);
 
-        $this->assertArrayHasKey(80, $dispatchedEvents);
+        $this->assertArrayHasKey(78, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[80]->event,
+            event: $dispatchedEvents[78]->event,
             expectedPreviousStatus: new StatusVersionReleased(),
             expectedStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
             ]),
         );
+
+        $this->assertArrayHasKey(79, $dispatchedEvents);
+        $event = $dispatchedEvents[79]->event;
+        $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
+        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
+        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
+        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
+
+        $this->assertArrayHasKey(80, $dispatchedEvents);
+        $event = $dispatchedEvents[80]->event;
+        $this->assertInstanceOf(MergeRequestStatusChanged::class, $event);
+        $this->assertObjectEquals($frontendProjectId, $event->projectId);
+        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
+        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
+        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
+        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
 
         $this->assertArrayHasKey(81, $dispatchedEvents);
         $event = $dispatchedEvents[81]->event;
@@ -1403,7 +1381,7 @@ CONFIG),
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
         $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
         $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusNotOpen()), $event->details);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
 
         $this->assertArrayHasKey(82, $dispatchedEvents);
         $event = $dispatchedEvents[82]->event;
@@ -1413,50 +1391,10 @@ CONFIG),
         $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
         $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
         $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
+        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusMergeable()), $event->details);
 
         $this->assertArrayHasKey(83, $dispatchedEvents);
         $event = $dispatchedEvents[83]->event;
-        $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
-        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
-        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
-
-        $this->assertArrayHasKey(84, $dispatchedEvents);
-        $event = $dispatchedEvents[84]->event;
-        $this->assertInstanceOf(MergeRequestStatusChanged::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
-        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
-        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
-
-        $this->assertArrayHasKey(85, $dispatchedEvents);
-        $event = $dispatchedEvents[85]->event;
-        $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
-        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
-        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusCiStillRunning()), $event->details);
-
-        $this->assertArrayHasKey(86, $dispatchedEvents);
-        $event = $dispatchedEvents[86]->event;
-        $this->assertInstanceOf(MergeRequestStatusChanged::class, $event);
-        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-        $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
-        $this->assertObjectEquals($frontendMrToMerge->title, $event->title);
-        $this->assertObjectEquals(Branch\Name::fromString((string) $releaseBranchName), $event->sourceBranchName);
-        $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
-        $this->assertObjectEquals($frontendMrToMerge->details->withStatus(new MergeRequest\Details\Status\StatusMergeable()), $event->details);
-
-        $this->assertArrayHasKey(87, $dispatchedEvents);
-        $event = $dispatchedEvents[87]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($frontendProjectId, $event->projectId);
         $this->assertObjectEquals($frontendMrToMerge->iid, $event->mergeRequestIid);
@@ -1465,9 +1403,9 @@ CONFIG),
         $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
         $this->assertObjectEquals($frontendMrToMerge->details, $event->details);
 
-        $this->assertArrayHasKey(88, $dispatchedEvents);
+        $this->assertArrayHasKey(84, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[88]->event,
+            event: $dispatchedEvents[84]->event,
             expectedPreviousStatus: new StatusFrontendMergeRequestIntoDevelopmentBranchCreated([
                 'project_id' => $frontendProjectId->value(),
                 'merge_request_iid' => $frontendMrToMerge->iid->value(),
@@ -1475,8 +1413,8 @@ CONFIG),
             expectedStatus: new StatusFrontendDevelopmentBranchSynchronized(),
         );
 
-        $this->assertArrayHasKey(89, $dispatchedEvents);
-        $event = $dispatchedEvents[89]->event;
+        $this->assertArrayHasKey(85, $dispatchedEvents);
+        $event = $dispatchedEvents[85]->event;
         $this->assertInstanceOf(MergeRequestCreated::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($backendMrToMerge->title, $event->title);
@@ -1484,9 +1422,9 @@ CONFIG),
         $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusNotOpen(), $event->details->status);
 
-        $this->assertArrayHasKey(90, $dispatchedEvents);
+        $this->assertArrayHasKey(86, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[90]->event,
+            event: $dispatchedEvents[86]->event,
             expectedPreviousStatus: new StatusFrontendDevelopmentBranchSynchronized(),
             expectedStatus: new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
                 'project_id' => $backendProjectId->value(),
@@ -1494,8 +1432,8 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(91, $dispatchedEvents);
-        $event = $dispatchedEvents[91]->event;
+        $this->assertArrayHasKey(87, $dispatchedEvents);
+        $event = $dispatchedEvents[87]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($backendMrToMerge->iid, $event->mergeRequestIid);
@@ -1504,9 +1442,9 @@ CONFIG),
         $this->assertObjectEquals($developmentBranchName, $event->targetBranchName);
         $this->assertObjectEquals($backendMrToMerge->details, $event->details);
 
-        $this->assertArrayHasKey(92, $dispatchedEvents);
+        $this->assertArrayHasKey(88, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[92]->event,
+            event: $dispatchedEvents[88]->event,
             expectedPreviousStatus: new StatusBackendMergeRequestIntoDevelopmentBranchCreated([
                 'project_id' => $backendProjectId->value(),
                 'merge_request_iid' => $backendMrToMerge->iid->value(),
@@ -1514,8 +1452,8 @@ CONFIG),
             expectedStatus: new StatusBackendMergeRequestIntoDevelopmentBranchMerged(),
         );
 
-        $this->assertArrayHasKey(93, $dispatchedEvents);
-        $event = $dispatchedEvents[93]->event;
+        $this->assertArrayHasKey(89, $dispatchedEvents);
+        $event = $dispatchedEvents[89]->event;
         $this->assertInstanceOf(CommitCreated::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($developmentBranchName, $event->branchName);
@@ -1525,15 +1463,15 @@ CONFIG),
             $event->message,
         );
 
-        $this->assertArrayHasKey(94, $dispatchedEvents);
+        $this->assertArrayHasKey(90, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[94]->event,
+            event: $dispatchedEvents[90]->event,
             expectedPreviousStatus: new StatusBackendMergeRequestIntoDevelopmentBranchMerged(),
             expectedStatus: new StatusFrontendApplicationBranchSetToDevelopment(),
         );
 
-        $this->assertArrayHasKey(95, $dispatchedEvents);
-        $event = $dispatchedEvents[95]->event;
+        $this->assertArrayHasKey(91, $dispatchedEvents);
+        $event = $dispatchedEvents[91]->event;
         $this->assertInstanceOf(MergeRequestCreated::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($updateExtraDeploymentMrTitle, $event->title);
@@ -1541,9 +1479,9 @@ CONFIG),
         $this->assertObjectEquals($updateExtraDeploymentMrTargetBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Status\StatusNotOpen(), $event->details->status);
 
-        $this->assertArrayHasKey(96, $dispatchedEvents);
+        $this->assertArrayHasKey(92, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[96]->event,
+            event: $dispatchedEvents[92]->event,
             expectedPreviousStatus: new StatusFrontendApplicationBranchSetToDevelopment(),
             expectedStatus: new StatusMergeRequestIntoExtraDeploymentBranchCreated([
                 'project_id' => $backendProjectId->value(),
@@ -1551,8 +1489,8 @@ CONFIG),
             ]),
         );
 
-        $this->assertArrayHasKey(97, $dispatchedEvents);
-        $event = $dispatchedEvents[97]->event;
+        $this->assertArrayHasKey(93, $dispatchedEvents);
+        $event = $dispatchedEvents[93]->event;
         $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($updateExtraDeploymentMrIid, $event->mergeRequestIid);
@@ -1561,8 +1499,8 @@ CONFIG),
         $this->assertObjectEquals($updateExtraDeploymentMrTargetBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Details(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
 
-        $this->assertArrayHasKey(98, $dispatchedEvents);
-        $event = $dispatchedEvents[98]->event;
+        $this->assertArrayHasKey(94, $dispatchedEvents);
+        $event = $dispatchedEvents[94]->event;
         $this->assertInstanceOf(MergeRequestStatusChanged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($updateExtraDeploymentMrIid, $event->mergeRequestIid);
@@ -1571,8 +1509,8 @@ CONFIG),
         $this->assertObjectEquals($updateExtraDeploymentMrTargetBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Details(new MergeRequest\Details\Status\StatusMergeable()), $event->details);
 
-        $this->assertArrayHasKey(99, $dispatchedEvents);
-        $event = $dispatchedEvents[99]->event;
+        $this->assertArrayHasKey(95, $dispatchedEvents);
+        $event = $dispatchedEvents[95]->event;
         $this->assertInstanceOf(MergeRequestMerged::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($updateExtraDeploymentMrIid, $event->mergeRequestIid);
@@ -1581,9 +1519,9 @@ CONFIG),
         $this->assertObjectEquals($updateExtraDeploymentMrTargetBranchName, $event->targetBranchName);
         $this->assertObjectEquals(new MergeRequest\Details\Details(new MergeRequest\Details\Status\StatusNotOpen()), $event->details);
 
-        $this->assertArrayHasKey(100, $dispatchedEvents);
+        $this->assertArrayHasKey(96, $dispatchedEvents);
         $this->assertReleasePublicationStatusChanged(
-            event: $dispatchedEvents[100]->event,
+            event: $dispatchedEvents[96]->event,
             expectedPreviousStatus: new StatusMergeRequestIntoExtraDeploymentBranchCreated([
                 'project_id' => $backendProjectId->value(),
                 'merge_request_iid' => $updateExtraDeploymentMrIid->value(),
