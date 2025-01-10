@@ -1323,27 +1323,6 @@ CONFIG),
             expectedStatus: new StatusMergeRequestsIntoDevelopmentBranchCreated(),
         );
 
-//        $this->assertArrayHasKey(71, $dispatchedEvents);
-//        $event = $dispatchedEvents[71]->event;
-//        $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
-//        $this->assertObjectEquals($backendProjectId, $event->projectId);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->iid, $event->mergeRequestIid);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
-//        dump($event->details);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->details->withStatus(new MergeRequest\Details\Status\StatusNotOpen()), $event->details);
-//
-//        $this->assertArrayHasKey(72, $dispatchedEvents);
-//        $event = $dispatchedEvents[72]->event;
-//        $this->assertInstanceOf(MergeRequestStatusChanged::class, $event);
-//        $this->assertObjectEquals($backendProjectId, $event->projectId);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->iid, $event->mergeRequestIid);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
-
         $this->assertArrayHasKey(71, $dispatchedEvents);
         $event = $dispatchedEvents[71]->event;
         $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
@@ -1393,26 +1372,6 @@ CONFIG),
         $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
         $this->assertObjectEquals($expectedMrsToMerge[2]->details, $event->details);
-
-//        $this->assertArrayHasKey(78, $dispatchedEvents);
-//        $event = $dispatchedEvents[78]->event;
-//        $this->assertInstanceOf(MergeRequestAwaitingTick::class, $event);
-//        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->iid, $event->mergeRequestIid);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->details->withStatus(new MergeRequest\Details\Status\StatusNotOpen()), $event->details);
-//
-//        $this->assertArrayHasKey(79, $dispatchedEvents);
-//        $event = $dispatchedEvents[79]->event;
-//        $this->assertInstanceOf(MergeRequestStatusChanged::class, $event);
-//        $this->assertObjectEquals($frontendProjectId, $event->projectId);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->iid, $event->mergeRequestIid);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->title, $event->title);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->sourceBranchName, $event->sourceBranchName);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->targetBranchName, $event->targetBranchName);
-//        $this->assertObjectEquals($expectedMrsToMerge[2]->details->withStatus(new MergeRequest\Details\Status\StatusPreparing()), $event->details);
 
         $this->assertArrayHasKey(76, $dispatchedEvents);
         $event = $dispatchedEvents[76]->event;
