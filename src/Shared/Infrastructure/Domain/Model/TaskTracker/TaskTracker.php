@@ -80,10 +80,11 @@ readonly class TaskTracker implements TaskTrackerInterface
     {
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version?" . http_build_query([
-                'query' => 'v-',
-                'orderBy' => '-releaseDate',
-            ])),
+            $this->uriFactory->createUri("/rest/api/3/project/$this->projectKey/version")
+                ->withQuery(http_build_query([
+                    'query' => 'v-',
+                    'orderBy' => '-releaseDate',
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -152,11 +153,12 @@ readonly class TaskTracker implements TaskTrackerInterface
 
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri('/rest/api/3/search?' . http_build_query([
-                'jql' => $jql,
-                'fields' => '*all',
-                'maxResults' => 5000,
-            ])),
+            $this->uriFactory->createUri('/rest/api/3/search')
+                ->withQuery(http_build_query([
+                    'jql' => $jql,
+                    'fields' => '*all',
+                    'maxResults' => 5000,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
@@ -195,9 +197,10 @@ readonly class TaskTracker implements TaskTrackerInterface
     {
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->uriFactory->createUri('/rest/dev-status/1.0/issue/details?' . http_build_query([
-                'issueId' => (string) $issueId,
-            ])),
+            $this->uriFactory->createUri('/rest/dev-status/1.0/issue/details')
+                ->withQuery(http_build_query([
+                    'issueId' => (string) $issueId,
+                ])),
         );
 
         $content = $this->httpClient->sendRequest($request)
