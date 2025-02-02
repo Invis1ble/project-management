@@ -136,5 +136,5 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
      * @param T $element1
      * @param T $element2
      */
-    abstract protected function elementsEquals($element1, $element2): bool;
+    abstract protected function elementsEquals(mixed $element1, mixed $element2): bool;
 }

@@ -21,6 +21,7 @@
         <exclude name="Symfony.Commenting.License" />
         <exclude name="Symfony.Functions.Arguments.Invalid" />
         <exclude name="Symfony.NamingConventions.ValidClassName.InvalidAbstractName" />
+        <exclude name="Symfony.Objects.ObjectInstantiation" />
     </rule>
 
     <rule ref="Generic.PHP.RequireStrictTypes" />

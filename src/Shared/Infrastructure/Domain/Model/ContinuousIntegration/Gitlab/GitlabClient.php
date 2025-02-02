@@ -540,7 +540,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             ->getBody()
             ->getContents();
 
-        $heap = new class() extends \SplMaxHeap {
+        $heap = new class extends \SplMaxHeap {
             /**
              * @param array $value1
              * @param array $value2

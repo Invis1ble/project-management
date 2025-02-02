@@ -21,7 +21,7 @@ final readonly class IssueList extends AbstractList
 
     public function __construct(Issue ...$issues)
     {
-        $this->storage = new class() extends \SplObjectStorage {
+        $this->storage = new class extends \SplObjectStorage {
             public function getHash(object $object): string
             {
                 if (!$object instanceof Key) {
