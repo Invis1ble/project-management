@@ -93,7 +93,7 @@ readonly class TaskTracker implements TaskTrackerInterface
 
         $versions = json_decode($content, true)['values'];
 
-        $heap = new class() extends \SplMaxHeap {
+        $heap = new class extends \SplMaxHeap {
             /**
              * @param array $value1
              * @param array $value2
