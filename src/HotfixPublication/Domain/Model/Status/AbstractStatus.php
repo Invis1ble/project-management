@@ -17,6 +17,14 @@ abstract readonly class AbstractStatus implements StatusInterface
         $this->context = new Context($context);
     }
 
+    /**
+     * @todo remove this method
+     */
+    public function reset(HotfixPublicationInterface $publication): void
+    {
+        $this->setPublicationStatus($publication, new StatusCreated());
+    }
+
     public function published(): bool
     {
         return false;
@@ -44,6 +52,8 @@ abstract readonly class AbstractStatus implements StatusInterface
         $reflection = new \ReflectionMethod($publication, 'raiseDomainEvent');
         $reflection->invoke($publication, new HotfixPublicationStatusChanged(
             id: $publication->id(),
+            tagName: $publication->tagName(),
+            tagMessage: $publication->tagMessage(),
             status: $publication->status(),
             previousStatus: $previousStatus,
             hotfixes: $publication->hotfixes(),

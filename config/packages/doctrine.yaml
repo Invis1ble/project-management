@@ -44,7 +44,7 @@ doctrine:
                 prefix: Invis1ble\ProjectManagement\HotfixPublication\Domain\Model
                 alias: HotfixPublication
         controller_resolver:
-            auto_mapping: true
+            auto_mapping: false
 
 when@test:
     doctrine:

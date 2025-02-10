@@ -12,16 +12,13 @@ class StringNormalizerTest extends SerializerAwareTestCase
     {
         $serializer = static::getSerializer();
 
-        $string1 = new TestString('string 1');
-        $string2 = new TestString('string 2');
-
-        $dto = new StringAwareDto($string1, $string2);
+        $string = new TestString('Lorem ipsum');
+        $dto = new StringAwareDto($string);
 
         $normalized = $serializer->normalize($dto);
         $denormalized = $serializer->denormalize($normalized, StringAwareDto::class);
 
         $this->assertInstanceOf(StringAwareDto::class, $denormalized);
-        $this->assertObjectEquals($string1, $denormalized->abstract);
-        $this->assertObjectEquals($string2, $denormalized->concrete);
+        $this->assertObjectEquals($string, $denormalized->string);
     }
 }

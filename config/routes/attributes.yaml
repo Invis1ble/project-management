@@ -1,0 +1,5 @@
+controllers:
+    resource:
+        path: ../../src/Shared/Ui/Http/
+        namespace: Invis1ble\ProjectManagement\Shared\Ui\Http
+    type: attribute

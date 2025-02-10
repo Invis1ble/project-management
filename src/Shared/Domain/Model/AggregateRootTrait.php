@@ -9,7 +9,7 @@ use Invis1ble\Messenger\Event\EventInterface;
 trait AggregateRootTrait
 {
     /**
-     * @var EventInterface[]
+     * @var EventInterface[]|array
      */
     protected array $domainEvents = [];
 

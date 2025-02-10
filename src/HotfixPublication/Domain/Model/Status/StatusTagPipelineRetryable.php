@@ -34,29 +34,40 @@ abstract readonly class StatusTagPipelineRetryable extends StatusTagPipelineNotI
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
+        // TODO uncomment this
+//        $statusContext = $this->context->toArray();
+//        $retryCounter = $statusContext['retry_counter'] ?? 0;
+//
+//        if (self::MAX_RETRIES === $retryCounter) {
+//            return; // failed
+//        }
+//
+//        $pipeline = $backendCiClient->retryPipeline(Pipeline\PipelineId::from($statusContext['pipeline_id']));
+//        $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
+//
+//        $next = match ($pipeline->status) {
+//            Pipeline\Status::Created => new StatusTagPipelineCreated($statusContext),
+//            Pipeline\Status::WaitingForResource => new StatusTagPipelineWaitingForResource($statusContext),
+//            Pipeline\Status::Preparing => new StatusTagPipelinePreparing($statusContext),
+//            Pipeline\Status::Pending => new StatusTagPipelinePending($statusContext),
+//            Pipeline\Status::Running => new StatusTagPipelineRunning($statusContext),
+//            Pipeline\Status::Success => new StatusTagPipelineSuccess($statusContext),
+//            Pipeline\Status::Failed => new StatusTagPipelineFailed($statusContext),
+//            Pipeline\Status::Canceled => new StatusTagPipelineCanceled($statusContext),
+//            Pipeline\Status::Skipped => new StatusTagPipelineSkipped($statusContext),
+//            Pipeline\Status::Manual => new StatusTagPipelineManual($statusContext),
+//            Pipeline\Status::Scheduled => new StatusTagPipelineScheduled($statusContext),
+//        };
+        // end of TODO
+
+
+        // TODO remove this
         $statusContext = $this->context->toArray();
         $retryCounter = $statusContext['retry_counter'] ?? 0;
-
-        if (self::MAX_RETRIES === $retryCounter) {
-            return; // failed
-        }
-
-        $pipeline = $backendCiClient->retryPipeline(Pipeline\PipelineId::from($statusContext['pipeline_id']));
         $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
-
-        $next = match ($pipeline->status) {
-            Pipeline\Status::Created => new StatusTagPipelineCreated($statusContext),
-            Pipeline\Status::WaitingForResource => new StatusTagPipelineWaitingForResource($statusContext),
-            Pipeline\Status::Preparing => new StatusTagPipelinePreparing($statusContext),
-            Pipeline\Status::Pending => new StatusTagPipelinePending($statusContext),
-            Pipeline\Status::Running => new StatusTagPipelineRunning($statusContext),
-            Pipeline\Status::Success => new StatusTagPipelineSuccess($statusContext),
-            Pipeline\Status::Failed => new StatusTagPipelineFailed($statusContext),
-            Pipeline\Status::Canceled => new StatusTagPipelineCanceled($statusContext),
-            Pipeline\Status::Skipped => new StatusTagPipelineSkipped($statusContext),
-            Pipeline\Status::Manual => new StatusTagPipelineManual($statusContext),
-            Pipeline\Status::Scheduled => new StatusTagPipelineScheduled($statusContext),
-        };
+        $next = new StatusTagPipelineSuccess($statusContext);
+        sleep(3);
+        // end of TODO
 
         $this->setPublicationStatus(
             publication: $publication,

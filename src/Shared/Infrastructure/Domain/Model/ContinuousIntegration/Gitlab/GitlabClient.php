@@ -459,7 +459,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         $data = [
             'branch' => (string) $branchName,
             'commit_message' => (string) $message,
-            'actions' => iterator_to_array($actions->map(fn (NewCommit\Action\AbstractAction $action): array => $action->toArray())),
+            'actions' => iterator_to_array($actions->map(fn (NewCommit\Action\Action $action): array => $action->toArray())),
         ];
 
         $request = $this->requestFactory->createRequest(

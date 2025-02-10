@@ -31,5 +31,7 @@ final readonly class CreateHotfixPublicationCommandHandler extends HotfixPublica
         );
 
         $this->storeHotfixPublication($hotfixPublication);
+
+        sleep(3);
     }
 }

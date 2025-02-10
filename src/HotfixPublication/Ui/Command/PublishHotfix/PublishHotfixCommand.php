@@ -12,20 +12,29 @@ use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\Pr
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixesInActiveSprint\GetHotfixesInActiveSprintQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixPublication\GetHotfixPublicationQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublication\GetLatestHotfixPublicationQuery;
-use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublicationByTag\GetLatestHotfixPublicationByTagQuery;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\AbstractHotfixPublicationEvent;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Repository\HotfixPublicationRepositoryInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\EventLog;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpClient\Chunk\ServerSentEvent;
+use Symfony\Component\HttpClient\EventSourceHttpClient;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:hotfix:publish', description: 'Publish hotfixes')]
@@ -41,6 +50,10 @@ final class PublishHotfixCommand extends PublicationAwareCommand
         Issue\StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         private readonly MessageFactoryInterface $tagMessageFactory,
+        private readonly HubInterface $hub,
+        private readonly HotfixPublicationRepositoryInterface $hotfixPublicationRepository,
+        private readonly EventNameReducerInterface $eventNameSimplifier,
+        private readonly EventLog\FormatterInterface $eventLogFormatter,
     ) {
         $this->statusReadyForPublish = $issueStatusProvider->readyForPublish();
 
@@ -128,11 +141,33 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             return Command::SUCCESS;
         }
 
-        $confirmed = $this->io->confirm('OK', !empty($keys));
+        $confirmed = $this->io->confirm('OK', !empty($keys) || is_string($resume));
 
         if (!$confirmed) {
             $this->abort();
         }
+
+        $format = <<<FORMAT
+
+ <fg=blue>[%time%] Publication status: %status%</>
+
+ %current%/%max% [%bar%] %percent:3s%%  |  %elapsed:6s%/%estimated:-6s%  |  %memory:6s%
+
+   <fg=gray>%event_log_tail%</>
+FORMAT;
+
+        ProgressBar::setFormatDefinition('custom', $format);
+
+        $progressBar = $this->io->createProgressBar(15);
+        $progressBar->setFormat('custom');
+        $progressBar->maxSecondsBetweenRedraws(0.1);
+
+        $progressBar->setMessage($this->time(), 'time');
+        $progressBar->setMessage('inited', 'status');
+        $progressBar->setMessage('', 'event_log_tail');
+        $eventLog = [];
+
+        $progressBar->start();
 
         if (false === $resume) {
             $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
@@ -140,17 +175,88 @@ final class PublishHotfixCommand extends PublicationAwareCommand
                 tagMessage: $tagMessage,
                 hotfixes: $hotfixes,
             ));
-
-            $publication = $this->getPublication(new GetLatestHotfixPublicationByTagQuery($tagName));
-            $publicationId = $publication->id();
         } else {
+            // TODO: remove this
+            $publication->resetStatus();
+            $this->hotfixPublicationRepository->store($publication);
+            // END OF TODO
+
             $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
         }
 
-        return $this->showProgressLog(
-            query: new GetHotfixPublicationQuery($publicationId),
-            inFinalState: fn (HotfixPublicationInterface $publication): bool => $publication->published(),
-        );
+        $topics = ['/api/events'];
+
+        $url = $this->hub->getPublicUrl();
+
+        if (null !== $topics) {
+            // We cannot use http_build_query() because this method doesn't support generating multiple query parameters with the same name without the [] suffix
+            $separator = '?';
+            foreach ((array) $topics as $topic) {
+                $url .= $separator . 'topic=' . rawurlencode($topic);
+                if ('?' === $separator) {
+                    $separator = '&';
+                }
+            }
+        }
+
+        $client = HttpClient::create();
+        $client = new EventSourceHttpClient($client, 10);
+        $source = $client->connect($url);
+
+        while ($source) {
+            foreach ($client->stream($source, 1) as $response => $chunk) {
+                if ($chunk->isTimeout()) {
+                    continue;
+                }
+
+                if ($chunk->isLast()) {
+                    break 2;
+                }
+
+                if ($chunk instanceof ServerSentEvent) {
+                    $data = $chunk->getArrayData();
+                    $eventName = $this->eventNameSimplifier->expand($data['name']);
+
+                    if (is_subclass_of($eventName, AbstractHotfixPublicationEvent::class)) {
+                        /** @var HotfixPublication $publication */
+                        $publication = $this->serializer->denormalize($data['context'], HotfixPublication::class);
+
+                        $progressBar->setMessage($this->time(), 'time');
+                        $progressBar->setMessage((string) $publication->status(), 'status');
+
+                        $progressBar->advance();
+
+                        if ($publication->published()) {
+                            $response->cancel();
+                            $source->cancel();
+                            $source = null;
+
+                            break 2;
+                        }
+                    } else {
+                        $event = $this->serializer->denormalize($data['context'], $eventName);
+                        $eventLog[] = $this->eventLogFormatter->format($event);
+
+                        $progressBar->setMessage(
+                            message: join("\n    ", array_slice($eventLog, -5)) . "\n",
+                            name: 'event_log_tail',
+                        );
+
+                        $progressBar->display();
+                    }
+                }
+            }
+        }
+
+        $progressBar->finish();
+        $this->io->newLine();
+
+        return Command::SUCCESS;
+
+//        return $this->showProgressLog(
+//            query: new GetHotfixPublicationQuery($publicationId),
+//            inFinalState: fn (HotfixPublicationInterface $publication): bool => $publication->published(),
+//        );
     }
 
     protected function getPublication(QueryInterface $query): HotfixPublicationInterface

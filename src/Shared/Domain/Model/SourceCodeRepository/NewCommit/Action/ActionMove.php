@@ -7,7 +7,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\N
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Content;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Path;
 
-final readonly class ActionMove extends AbstractAction
+final readonly class ActionMove extends Action
 {
     public function __construct(
         Path $filePath,

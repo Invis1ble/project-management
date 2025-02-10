@@ -6,10 +6,10 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\N
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\File\Path;
 
-abstract readonly class AbstractAction
+abstract readonly class Action
 {
     public function __construct(
-        public Dictionary $action,
+        public Dictionary $name,
         public Path $filePath,
     ) {
     }
@@ -17,15 +17,13 @@ abstract readonly class AbstractAction
     public function toArray(): array
     {
         return [
-            'action' => $this->action->value,
+            'name' => $this->name->value,
             'file_path' => (string) $this->filePath,
         ];
     }
 
     public function equals(self $other): bool
     {
-        return $this->action->equals($other->action)
-            && $this->filePath->equals($other->filePath)
-        ;
+        return $this->toArray() === $other->toArray();
     }
 }

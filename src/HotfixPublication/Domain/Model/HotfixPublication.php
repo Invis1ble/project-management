@@ -53,6 +53,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
 
         $publication->raiseDomainEvent(new HotfixPublicationCreated(
             id: $publication->id(),
+            tagName: $tagName,
+            tagMessage: $tagMessage,
             status: $publication->status(),
             hotfixes: $hotfixes,
             createdAt: $publication->createdAt(),
@@ -90,6 +92,14 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
             pipelineTickInterval: $pipelineTickInterval,
             publication: $this,
         );
+    }
+
+    /**
+     * @todo remove this method
+     */
+    public function resetStatus(): void
+    {
+        $this->status->reset($this);
     }
 
     public function containsBackendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool

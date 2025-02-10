@@ -33,28 +33,37 @@ abstract readonly class StatusDeploymentJobRetryable extends StatusDeploymentJob
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
+        // TODO uncomment this
+//        $statusContext = $this->context->toArray();
+//        $retryCounter = $statusContext['retry_counter'] ?? 0;
+//
+//        if (self::MAX_RETRIES === $retryCounter) {
+//            return; // failed
+//        }
+//
+//        $job = $backendCiClient->retryJob(Job\JobId::from($statusContext['job_id']));
+//        $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
+//
+//        $next = match (Job\Status\Dictionary::from((string) $job->status)) {
+//            Job\Status\Dictionary::Created => new StatusDeploymentJobCreated($statusContext),
+//            Job\Status\Dictionary::WaitingForResource => new StatusDeploymentJobWaitingForResource($statusContext),
+//            Job\Status\Dictionary::Preparing => new StatusDeploymentJobPreparing($statusContext),
+//            Job\Status\Dictionary::Pending => new StatusDeploymentJobPending($statusContext),
+//            Job\Status\Dictionary::Running => new StatusDeploymentJobRunning($statusContext),
+//            Job\Status\Dictionary::Success => new StatusDeploymentJobSuccess($statusContext),
+//            Job\Status\Dictionary::Failed => new StatusDeploymentJobFailed($statusContext),
+//            Job\Status\Dictionary::Canceled => new StatusDeploymentJobCanceled($statusContext),
+//            Job\Status\Dictionary::Skipped => new StatusDeploymentJobSkipped($statusContext),
+//            Job\Status\Dictionary::Manual => new StatusDeploymentJobManual($statusContext),
+//        };
+        // end of TODO
+
+
+        // TODO remove this
         $statusContext = $this->context->toArray();
-        $retryCounter = $statusContext['retry_counter'] ?? 0;
-
-        if (self::MAX_RETRIES === $retryCounter) {
-            return; // failed
-        }
-
-        $job = $backendCiClient->retryJob(Job\JobId::from($statusContext['job_id']));
-        $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
-
-        $next = match (Job\Status\Dictionary::from((string) $job->status)) {
-            Job\Status\Dictionary::Created => new StatusDeploymentJobCreated($statusContext),
-            Job\Status\Dictionary::WaitingForResource => new StatusDeploymentJobWaitingForResource($statusContext),
-            Job\Status\Dictionary::Preparing => new StatusDeploymentJobPreparing($statusContext),
-            Job\Status\Dictionary::Pending => new StatusDeploymentJobPending($statusContext),
-            Job\Status\Dictionary::Running => new StatusDeploymentJobRunning($statusContext),
-            Job\Status\Dictionary::Success => new StatusDeploymentJobSuccess($statusContext),
-            Job\Status\Dictionary::Failed => new StatusDeploymentJobFailed($statusContext),
-            Job\Status\Dictionary::Canceled => new StatusDeploymentJobCanceled($statusContext),
-            Job\Status\Dictionary::Skipped => new StatusDeploymentJobSkipped($statusContext),
-            Job\Status\Dictionary::Manual => new StatusDeploymentJobManual($statusContext),
-        };
+        $next = new StatusDeploymentJobSuccess($statusContext);
+        sleep(3);
+        // end of TODO
 
         $this->setPublicationStatus(
             publication: $publication,

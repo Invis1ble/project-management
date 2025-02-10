@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\DevelopmentCollaboration\MergeRequest\Details\Status;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\Details\Status;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\AbstractValueObjectNormalizer;

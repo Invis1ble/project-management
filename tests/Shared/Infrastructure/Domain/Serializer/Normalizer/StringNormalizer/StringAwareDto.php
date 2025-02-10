@@ -7,8 +7,7 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Seriali
 final readonly class StringAwareDto
 {
     public function __construct(
-        public AbstractTestString $abstract,
-        public TestString $concrete,
+        public TestString $string,
     ) {
     }
 }

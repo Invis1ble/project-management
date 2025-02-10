@@ -32,30 +32,39 @@ abstract readonly class StatusDeploymentJobAwaitable extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
+        // TODO uncomment this
+//        $statusContext = $this->context->toArray();
+//
+//        $job = $backendCiClient->awaitJob(
+//            jobId: Job\JobId::from($statusContext['job_id']),
+//            maxAwaitingTime: $pipelineMaxAwaitingTime,
+//            tickInterval: $pipelineTickInterval,
+//        );
+//
+//        if (null === $job) {
+//            $next = new StatusDeploymentJobStuck();
+//        } else {
+//            $next = match (Job\Status\Dictionary::from((string) $job->status)) {
+//                Job\Status\Dictionary::Created => new StatusDeploymentJobCreated($statusContext),
+//                Job\Status\Dictionary::WaitingForResource => new StatusDeploymentJobWaitingForResource($statusContext),
+//                Job\Status\Dictionary::Preparing => new StatusDeploymentJobPreparing($statusContext),
+//                Job\Status\Dictionary::Pending => new StatusDeploymentJobPending($statusContext),
+//                Job\Status\Dictionary::Running => new StatusDeploymentJobRunning($statusContext),
+//                Job\Status\Dictionary::Success => new StatusDeploymentJobSuccess($statusContext),
+//                Job\Status\Dictionary::Failed => new StatusDeploymentJobFailed($statusContext),
+//                Job\Status\Dictionary::Canceled => new StatusDeploymentJobCanceled($statusContext),
+//                Job\Status\Dictionary::Skipped => new StatusDeploymentJobSkipped($statusContext),
+//                Job\Status\Dictionary::Manual => new StatusDeploymentJobManual($statusContext),
+//            };
+//        }
+        // end of TODO
+
+
+        // TODO remove this
         $statusContext = $this->context->toArray();
-
-        $job = $backendCiClient->awaitJob(
-            jobId: Job\JobId::from($statusContext['job_id']),
-            maxAwaitingTime: $pipelineMaxAwaitingTime,
-            tickInterval: $pipelineTickInterval,
-        );
-
-        if (null === $job) {
-            $next = new StatusDeploymentJobStuck();
-        } else {
-            $next = match (Job\Status\Dictionary::from((string) $job->status)) {
-                Job\Status\Dictionary::Created => new StatusDeploymentJobCreated($statusContext),
-                Job\Status\Dictionary::WaitingForResource => new StatusDeploymentJobWaitingForResource($statusContext),
-                Job\Status\Dictionary::Preparing => new StatusDeploymentJobPreparing($statusContext),
-                Job\Status\Dictionary::Pending => new StatusDeploymentJobPending($statusContext),
-                Job\Status\Dictionary::Running => new StatusDeploymentJobRunning($statusContext),
-                Job\Status\Dictionary::Success => new StatusDeploymentJobSuccess($statusContext),
-                Job\Status\Dictionary::Failed => new StatusDeploymentJobFailed($statusContext),
-                Job\Status\Dictionary::Canceled => new StatusDeploymentJobCanceled($statusContext),
-                Job\Status\Dictionary::Skipped => new StatusDeploymentJobSkipped($statusContext),
-                Job\Status\Dictionary::Manual => new StatusDeploymentJobManual($statusContext),
-            };
-        }
+        $next = new StatusDeploymentJobSuccess($statusContext);
+        sleep(3);
+        // end of TODO
 
         $this->setPublicationStatus($publication, $next);
     }

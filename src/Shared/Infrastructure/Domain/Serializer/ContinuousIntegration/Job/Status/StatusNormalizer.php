@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\ContinuousIntegration\Job\Status;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\ContinuousIntegration\Job\Status;
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\Status;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Serializer\AbstractValueObjectNormalizer;

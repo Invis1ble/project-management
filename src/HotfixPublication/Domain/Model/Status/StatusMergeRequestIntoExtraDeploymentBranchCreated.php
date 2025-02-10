@@ -33,12 +33,19 @@ final readonly class StatusMergeRequestIntoExtraDeploymentBranchCreated extends 
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        $statusContext = $this->context->toArray();
+        // TODO uncomment this
+//        $statusContext = $this->context->toArray();
+//
+//        $mergeRequestManager->mergeMergeRequest(
+//            projectId: ProjectId::from($statusContext['project_id']),
+//            mergeRequestIid: MergeRequestIid::from($statusContext['merge_request_iid']),
+//        );
+        // end of TODO
 
-        $mergeRequestManager->mergeMergeRequest(
-            projectId: ProjectId::from($statusContext['project_id']),
-            mergeRequestIid: MergeRequestIid::from($statusContext['merge_request_iid']),
-        );
+
+        // TODO remove this
+        sleep(3);
+        // end of TODO
 
         $this->setPublicationStatus($publication, new StatusDone());
     }

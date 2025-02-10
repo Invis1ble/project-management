@@ -32,6 +32,8 @@ class HotfixPublicationCreatedTest extends SerializationTestCase
 
         return new HotfixPublicationCreated(
             id: HotfixPublicationId::fromVersionName(Tag\VersionName::create()),
+            tagName: Tag\VersionName::fromString('v-1-0-0'),
+            tagMessage: Tag\Message::fromString('Fix terrible bug'),
             status: new StatusCreated(),
             hotfixes: $hotfixes,
             createdAt: new \DateTimeImmutable(),
@@ -41,6 +43,8 @@ class HotfixPublicationCreatedTest extends SerializationTestCase
     protected function objectsEquals(object $object1, object $object2): bool
     {
         return $object1->id->equals($object2->id)
+            && $object1->tagName->equals($object2->tagName)
+            && $object1->tagMessage->equals($object2->tagMessage)
             && $object1->status->equals($object2->status)
             && $object1->hotfixes->equals($object2->hotfixes)
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning

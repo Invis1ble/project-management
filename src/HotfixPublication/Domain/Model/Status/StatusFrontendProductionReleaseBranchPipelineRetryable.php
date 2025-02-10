@@ -35,29 +35,38 @@ abstract readonly class StatusFrontendProductionReleaseBranchPipelineRetryable e
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
+        // TODO uncomment this
+//        $statusContext = $this->context->toArray();
+//        $retryCounter = $statusContext['retry_counter'] ?? 0;
+//
+//        if (self::MAX_RETRIES === $retryCounter) {
+//            return; // failed
+//        }
+//
+//        $pipeline = $frontendCiClient->retryPipeline(PipelineId::from($statusContext['pipeline_id']));
+//        $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
+//
+//        $next = match ($pipeline->status) {
+//            Status::Created => new StatusFrontendProductionReleaseBranchPipelineCreated($statusContext),
+//            Status::WaitingForResource => new StatusFrontendProductionReleaseBranchPipelineWaitingForResource($statusContext),
+//            Status::Preparing => new StatusFrontendProductionReleaseBranchPipelinePreparing($statusContext),
+//            Status::Pending => new StatusFrontendProductionReleaseBranchPipelinePending($statusContext),
+//            Status::Running => new StatusFrontendProductionReleaseBranchPipelineRunning($statusContext),
+//            Status::Success => new StatusFrontendProductionReleaseBranchPipelineSuccess($statusContext),
+//            Status::Failed => new StatusFrontendProductionReleaseBranchPipelineFailed($statusContext),
+//            Status::Canceled => new StatusFrontendProductionReleaseBranchPipelineCanceled($statusContext),
+//            Status::Skipped => new StatusFrontendProductionReleaseBranchPipelineSkipped($statusContext),
+//            Status::Manual => new StatusFrontendProductionReleaseBranchPipelineManual($statusContext),
+//            Status::Scheduled => new StatusFrontendProductionReleaseBranchPipelineScheduled($statusContext),
+//        };
+        // end of TODO
+
+
+        // TODO remove this
         $statusContext = $this->context->toArray();
-        $retryCounter = $statusContext['retry_counter'] ?? 0;
-
-        if (self::MAX_RETRIES === $retryCounter) {
-            return; // failed
-        }
-
-        $pipeline = $frontendCiClient->retryPipeline(PipelineId::from($statusContext['pipeline_id']));
-        $statusContext = ['retry_counter' => $retryCounter + 1] + $statusContext;
-
-        $next = match ($pipeline->status) {
-            Status::Created => new StatusFrontendProductionReleaseBranchPipelineCreated($statusContext),
-            Status::WaitingForResource => new StatusFrontendProductionReleaseBranchPipelineWaitingForResource($statusContext),
-            Status::Preparing => new StatusFrontendProductionReleaseBranchPipelinePreparing($statusContext),
-            Status::Pending => new StatusFrontendProductionReleaseBranchPipelinePending($statusContext),
-            Status::Running => new StatusFrontendProductionReleaseBranchPipelineRunning($statusContext),
-            Status::Success => new StatusFrontendProductionReleaseBranchPipelineSuccess($statusContext),
-            Status::Failed => new StatusFrontendProductionReleaseBranchPipelineFailed($statusContext),
-            Status::Canceled => new StatusFrontendProductionReleaseBranchPipelineCanceled($statusContext),
-            Status::Skipped => new StatusFrontendProductionReleaseBranchPipelineSkipped($statusContext),
-            Status::Manual => new StatusFrontendProductionReleaseBranchPipelineManual($statusContext),
-            Status::Scheduled => new StatusFrontendProductionReleaseBranchPipelineScheduled($statusContext),
-        };
+        $next = new StatusFrontendProductionReleaseBranchPipelineSuccess($statusContext);
+        sleep(3);
+        // end of TODO
 
         $this->setPublicationStatus(
             publication: $publication,
