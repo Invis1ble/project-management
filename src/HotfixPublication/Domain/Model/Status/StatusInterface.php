@@ -16,11 +16,6 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\StatusProv
 
 interface StatusInterface extends \Stringable
 {
-    /**
-     * @todo remove this method
-     */
-    public function reset(HotfixPublicationInterface $publication): void;
-
     public function proceedToNext(
         MergeRequestManagerInterface $mergeRequestManager,
         SourceCodeRepositoryInterface $frontendSourceCodeRepository,

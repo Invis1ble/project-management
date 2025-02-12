@@ -187,7 +187,7 @@ abstract class PublicationAwareCommand extends Command
 
             sleep($tickInterval);
 
-            if (isset($statusChanged) && $statusChanged) {
+            if ($statusChanged) {
                 $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
             }
         }

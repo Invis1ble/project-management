@@ -31,20 +31,12 @@ final readonly class StatusCreated extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $hotfixes = $publication->hotfixes()
-//            ->mergeMergeRequests($mergeRequestManager)
-//            ->withStatus($issueStatusProvider->done())
-//        ;
-//
-//        $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
-        // end of TODO
+        $hotfixes = $publication->hotfixes()
+            ->mergeMergeRequests($mergeRequestManager)
+            ->withStatus($issueStatusProvider->done())
+        ;
 
-
-        // TODO remove this
-        sleep(3);
-        // end of TODO
-
+        $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
         $this->setPublicationStatus($publication, new StatusMergeRequestsMerged());
     }
 

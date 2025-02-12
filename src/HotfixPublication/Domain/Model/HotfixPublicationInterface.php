@@ -51,5 +51,4 @@ interface HotfixPublicationInterface extends AggregateRootInterface
     public function hotfixes(): IssueList;
 
     public function createdAt(): \DateTimeImmutable;
-
 }

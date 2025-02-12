@@ -32,18 +32,11 @@ final readonly class StatusFrontendProductionReleaseBranchPipelineSuccess extend
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $backendSourceCodeRepository->createTag(
-//            name: $publication->tagName(),
-//            ref: Branch\Name::fromString('master'),
-//            message: $publication->tagMessage(),
-//        );
-        // end of TODO
-
-
-        // TODO remove this
-        sleep(3);
-        // end of TODO
+        $backendSourceCodeRepository->createTag(
+            name: $publication->tagName(),
+            ref: Branch\Name::fromString('master'),
+            message: $publication->tagMessage(),
+        );
 
         $this->setPublicationStatus($publication, new StatusTagCreated());
     }

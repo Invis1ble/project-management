@@ -32,7 +32,7 @@ class HotfixPublicationCreatedTest extends SerializationTestCase
 
         return new HotfixPublicationCreated(
             id: HotfixPublicationId::fromVersionName(Tag\VersionName::create()),
-            tagName: Tag\VersionName::fromString('v-1-0-0'),
+            tagName: Tag\VersionName::fromString('v.25-02-13.0'),
             tagMessage: Tag\Message::fromString('Fix terrible bug'),
             status: new StatusCreated(),
             hotfixes: $hotfixes,

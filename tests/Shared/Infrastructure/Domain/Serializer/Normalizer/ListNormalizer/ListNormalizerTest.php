@@ -13,16 +13,13 @@ class ListNormalizerTest extends SerializerAwareTestCase
     {
         $serializer = static::getSerializer();
 
-        $list1 = new TestList(TestId::from(1), TestId::from(2));
-        $list2 = new TestList(TestId::from(3), TestId::from(4));
-
-        $dto = new ListAwareDto($list1, $list2);
+        $list = new TestList(TestId::from(1), TestId::from(2));
+        $dto = new ListAwareDto($list);
 
         $normalized = $serializer->normalize($dto);
         $denormalized = $serializer->denormalize($normalized, ListAwareDto::class);
 
         $this->assertInstanceOf(ListAwareDto::class, $denormalized);
-        $this->assertObjectEquals($list1, $denormalized->abstract);
-        $this->assertObjectEquals($list2, $denormalized->concrete);
+        $this->assertObjectEquals($list, $denormalized->list);
     }
 }

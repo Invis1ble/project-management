@@ -31,14 +31,7 @@ final readonly class StatusDeploymentJobSuccess extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $taskTracker->transitionHotfixesToDone(...$publication->hotfixes()->toKeys());
-        // end of TODO
-
-
-        // TODO remove this
-        sleep(3);
-        // end of TODO
+        $taskTracker->transitionHotfixesToDone(...$publication->hotfixes()->toKeys());
 
         $this->setPublicationStatus($publication, new StatusHotfixesTransitionedToDone());
     }

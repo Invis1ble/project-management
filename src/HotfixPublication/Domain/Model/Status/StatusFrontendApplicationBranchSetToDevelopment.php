@@ -31,48 +31,37 @@ final readonly class StatusFrontendApplicationBranchSetToDevelopment extends Abs
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $extraDeploymentBranchName = $updateExtraDeploymentBranchMergeRequestFactory->extraDeploymentBranchName();
-//
-//        if (null === $extraDeploymentBranchName) {
-//            $this->setStatusDone($publication);
-//
-//            return;
-//        }
-//
-//        $compareResult = $backendSourceCodeRepository->compare(
-//            from: $extraDeploymentBranchName,
-//            to: $updateExtraDeploymentBranchMergeRequestFactory->developmentBranchName(),
-//        );
-//
-//        if ($compareResult->diffsEmpty()) {
-//            $this->setStatusDone($publication);
-//
-//            return;
-//        }
-//
-//        $mergeRequest = $updateExtraDeploymentBranchMergeRequestFactory->createMergeRequest();
-//
-//        if (null === $mergeRequest) {
-//            $this->setStatusDone($publication);
-//
-//            return;
-//        }
-//
-//        $next = new StatusMergeRequestIntoExtraDeploymentBranchCreated([
-//            'project_id' => $mergeRequest->projectId->value(),
-//            'merge_request_iid' => $mergeRequest->iid->value(),
-//        ]);
-        // end of TODO
+        $extraDeploymentBranchName = $updateExtraDeploymentBranchMergeRequestFactory->extraDeploymentBranchName();
 
+        if (null === $extraDeploymentBranchName) {
+            $this->setStatusDone($publication);
 
-        // TODO remove this
+            return;
+        }
+
+        $compareResult = $backendSourceCodeRepository->compare(
+            from: $extraDeploymentBranchName,
+            to: $updateExtraDeploymentBranchMergeRequestFactory->developmentBranchName(),
+        );
+
+        if ($compareResult->diffsEmpty()) {
+            $this->setStatusDone($publication);
+
+            return;
+        }
+
+        $mergeRequest = $updateExtraDeploymentBranchMergeRequestFactory->createMergeRequest();
+
+        if (null === $mergeRequest) {
+            $this->setStatusDone($publication);
+
+            return;
+        }
+
         $next = new StatusMergeRequestIntoExtraDeploymentBranchCreated([
-            'project_id' => 42,
-            'merge_request_iid' => 37,
+            'project_id' => $mergeRequest->projectId->value(),
+            'merge_request_iid' => $mergeRequest->iid->value(),
         ]);
-        sleep(3);
-        // end of TODO
 
         $this->setPublicationStatus($publication, $next);
     }

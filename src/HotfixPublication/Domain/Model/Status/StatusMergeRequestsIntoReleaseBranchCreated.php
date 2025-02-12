@@ -33,24 +33,16 @@ final readonly class StatusMergeRequestsIntoReleaseBranchCreated extends Abstrac
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $hotfixes = new IssueList(
-//            ...$publication->hotfixes()
-//                ->map(function (Issue $hotfix) use ($mergeRequestManager): Issue {
-//                    $mergeRequests = $hotfix->mergeRequestsToMerge->mergeMergeRequests($mergeRequestManager);
-//
-//                    return $hotfix->withMergeRequestsToMerge($mergeRequests);
-//                }),
-//        );
-//
-//        $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
-        // end of TODO
+        $hotfixes = new IssueList(
+            ...$publication->hotfixes()
+                ->map(function (Issue $hotfix) use ($mergeRequestManager): Issue {
+                    $mergeRequests = $hotfix->mergeRequestsToMerge->mergeMergeRequests($mergeRequestManager);
 
+                    return $hotfix->withMergeRequestsToMerge($mergeRequests);
+                }),
+        );
 
-        // TODO remove this
-        sleep(3);
-        // end of TODO
-
+        $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
         $this->setPublicationStatus($publication, new StatusReleaseBranchSynchronized());
     }
 

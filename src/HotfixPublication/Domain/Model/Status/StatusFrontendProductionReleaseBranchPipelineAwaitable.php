@@ -33,47 +33,37 @@ abstract readonly class StatusFrontendProductionReleaseBranchPipelineAwaitable e
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        if ($publication->containsFrontendMergeRequestToMerge($projectResolver)) {
-//            $pipeline = $frontendCiClient->awaitLatestPipeline(
-//                ref: Branch\Name::fromString('master'),
-//                createdAfter: $publication->createdAt(),
-//                maxAwaitingTime: $pipelineMaxAwaitingTime,
-//                tickInterval: $pipelineTickInterval,
-//            );
-//
-//            $statusContext = $this->context->toArray();
-//            $statusContext['pipeline_id'] = $pipeline->id->value();
-//
-//            if (null === $pipeline) {
-//                $next = new StatusFrontendProductionReleaseBranchPipelineStuck();
-//            } else {
-//                $next = match ($pipeline->status) {
-//                    Status::Created => new StatusFrontendProductionReleaseBranchPipelineCreated($statusContext),
-//                    Status::WaitingForResource => new StatusFrontendProductionReleaseBranchPipelineWaitingForResource($statusContext),
-//                    Status::Preparing => new StatusFrontendProductionReleaseBranchPipelinePreparing($statusContext),
-//                    Status::Pending => new StatusFrontendProductionReleaseBranchPipelinePending($statusContext),
-//                    Status::Running => new StatusFrontendProductionReleaseBranchPipelineRunning($statusContext),
-//                    Status::Success => new StatusFrontendProductionReleaseBranchPipelineSuccess($statusContext),
-//                    Status::Failed => new StatusFrontendProductionReleaseBranchPipelineFailed($statusContext),
-//                    Status::Canceled => new StatusFrontendProductionReleaseBranchPipelineCanceled($statusContext),
-//                    Status::Skipped => new StatusFrontendProductionReleaseBranchPipelineSkipped($statusContext),
-//                    Status::Manual => new StatusFrontendProductionReleaseBranchPipelineManual($statusContext),
-//                    Status::Scheduled => new StatusFrontendProductionReleaseBranchPipelineScheduled($statusContext),
-//                };
-//            }
-//        } else {
-//            $next = new StatusFrontendProductionReleaseBranchPipelineSuccess();
-//        }
-        // end of TODO
+        if ($publication->containsFrontendMergeRequestToMerge($projectResolver)) {
+            $pipeline = $frontendCiClient->awaitLatestPipeline(
+                ref: Branch\Name::fromString('master'),
+                createdAfter: $publication->createdAt(),
+                maxAwaitingTime: $pipelineMaxAwaitingTime,
+                tickInterval: $pipelineTickInterval,
+            );
 
+            $statusContext = $this->context->toArray();
+            $statusContext['pipeline_id'] = $pipeline->id->value();
 
-        // TODO remove this
-        $statusContext = $this->context->toArray();
-        $statusContext['pipeline_id'] = 333;
-        $next = new StatusFrontendProductionReleaseBranchPipelineSuccess($statusContext);
-        sleep(3);
-        // end of TODO
+            if (null === $pipeline) {
+                $next = new StatusFrontendProductionReleaseBranchPipelineStuck();
+            } else {
+                $next = match ($pipeline->status) {
+                    Status::Created => new StatusFrontendProductionReleaseBranchPipelineCreated($statusContext),
+                    Status::WaitingForResource => new StatusFrontendProductionReleaseBranchPipelineWaitingForResource($statusContext),
+                    Status::Preparing => new StatusFrontendProductionReleaseBranchPipelinePreparing($statusContext),
+                    Status::Pending => new StatusFrontendProductionReleaseBranchPipelinePending($statusContext),
+                    Status::Running => new StatusFrontendProductionReleaseBranchPipelineRunning($statusContext),
+                    Status::Success => new StatusFrontendProductionReleaseBranchPipelineSuccess($statusContext),
+                    Status::Failed => new StatusFrontendProductionReleaseBranchPipelineFailed($statusContext),
+                    Status::Canceled => new StatusFrontendProductionReleaseBranchPipelineCanceled($statusContext),
+                    Status::Skipped => new StatusFrontendProductionReleaseBranchPipelineSkipped($statusContext),
+                    Status::Manual => new StatusFrontendProductionReleaseBranchPipelineManual($statusContext),
+                    Status::Scheduled => new StatusFrontendProductionReleaseBranchPipelineScheduled($statusContext),
+                };
+            }
+        } else {
+            $next = new StatusFrontendProductionReleaseBranchPipelineSuccess();
+        }
 
         $this->setPublicationStatus($publication, $next);
     }

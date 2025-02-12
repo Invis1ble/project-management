@@ -32,18 +32,11 @@ final readonly class StatusReleaseBranchSynchronized extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
-//            branchName: Name::fromString('develop'),
-//        );
-//
-//        $newCommit?->commit($backendSourceCodeRepository);
-        // end of TODO
+        $newCommit = $setFrontendApplicationBranchNameCommitFactory->createSetFrontendApplicationBranchNameCommit(
+            branchName: Name::fromString('develop'),
+        );
 
-
-        // TODO remove this
-        sleep(3);
-        // end of TODO
+        $newCommit?->commit($backendSourceCodeRepository);
 
         $this->setPublicationStatus($publication, new StatusFrontendApplicationBranchSetToDevelopment());
     }

@@ -36,62 +36,54 @@ final readonly class StatusDevelopmentBranchSynchronized extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $release = $taskTracker->latestRelease();
-//        $hasNewMergeRequestToMerge = false;
-//
-//        if (null === $release || $release->released) {
-//            $this->setPublicationStatus($publication, new StatusReleaseBranchSynchronized());
-//
-//            return;
-//        }
-//
-//        $hotfixes = new IssueList(
-//            ...$publication->hotfixes()
-//                ->map(function (Issue $hotfix) use ($frontendSourceCodeRepository, $projectResolver, $backendSourceCodeRepository, $mergeRequestManager, $release, &$hasNewMergeRequestToMerge): Issue {
-//                    $releaseBranchName = Branch\Name::fromString((string) $release->name);
-//                    $productionReleaseBranchName = Branch\Name::fromString('master');
-//
-//                    $mergeRequestsToMerge = new MergeRequestList(
-//                        ...$hotfix->mergeRequestsToMerge
-//                            ->targetToBranch($productionReleaseBranchName)
-//                            ->onlyShouldBeCopiedWithNewTargetBranch(
-//                                projectResolver: $projectResolver,
-//                                frontendSourceCodeRepository: $frontendSourceCodeRepository,
-//                                backendSourceCodeRepository: $backendSourceCodeRepository,
-//                                branchName: $releaseBranchName,
-//                            )
-//                            ->map(fn (MergeRequest $mergeRequest): MergeRequest => $mergeRequestManager->createMergeRequest(
-//                                projectId: $mergeRequest->projectId,
-//                                title: $mergeRequest->title,
-//                                sourceBranchName: $mergeRequest->sourceBranchName,
-//                                targetBranchName: $releaseBranchName,
-//                            )),
-//                    );
-//
-//                    if (!$mergeRequestsToMerge->empty()) {
-//                        $hasNewMergeRequestToMerge = true;
-//                    }
-//
-//                    return $hotfix->withMergeRequestsToMerge(
-//                        $hotfix->mergeRequestsToMerge->concat($mergeRequestsToMerge),
-//                    );
-//                }),
-//        );
-//
-//        if ($hasNewMergeRequestToMerge) {
-//            $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
-//            $next = new StatusMergeRequestsIntoReleaseBranchCreated();
-//        } else {
-//            $next = new StatusReleaseBranchSynchronized();
-//        }
-        // end of TODO
+        $release = $taskTracker->latestRelease();
+        $hasNewMergeRequestToMerge = false;
 
+        if (null === $release || $release->released) {
+            $this->setPublicationStatus($publication, new StatusReleaseBranchSynchronized());
 
-        // TODO remove this
-        $next = new StatusMergeRequestsIntoReleaseBranchCreated();
-        sleep(3);
-        // end of TODO
+            return;
+        }
+
+        $hotfixes = new IssueList(
+            ...$publication->hotfixes()
+                ->map(function (Issue $hotfix) use ($frontendSourceCodeRepository, $projectResolver, $backendSourceCodeRepository, $mergeRequestManager, $release, &$hasNewMergeRequestToMerge): Issue {
+                    $releaseBranchName = Branch\Name::fromString((string) $release->name);
+                    $productionReleaseBranchName = Branch\Name::fromString('master');
+
+                    $mergeRequestsToMerge = new MergeRequestList(
+                        ...$hotfix->mergeRequestsToMerge
+                            ->targetToBranch($productionReleaseBranchName)
+                            ->onlyShouldBeCopiedWithNewTargetBranch(
+                                projectResolver: $projectResolver,
+                                frontendSourceCodeRepository: $frontendSourceCodeRepository,
+                                backendSourceCodeRepository: $backendSourceCodeRepository,
+                                branchName: $releaseBranchName,
+                            )
+                            ->map(fn (MergeRequest $mergeRequest): MergeRequest => $mergeRequestManager->createMergeRequest(
+                                projectId: $mergeRequest->projectId,
+                                title: $mergeRequest->title,
+                                sourceBranchName: $mergeRequest->sourceBranchName,
+                                targetBranchName: $releaseBranchName,
+                            )),
+                    );
+
+                    if (!$mergeRequestsToMerge->empty()) {
+                        $hasNewMergeRequestToMerge = true;
+                    }
+
+                    return $hotfix->withMergeRequestsToMerge(
+                        $hotfix->mergeRequestsToMerge->concat($mergeRequestsToMerge),
+                    );
+                }),
+        );
+
+        if ($hasNewMergeRequestToMerge) {
+            $this->setPublicationProperty($publication, 'hotfixes', $hotfixes);
+            $next = new StatusMergeRequestsIntoReleaseBranchCreated();
+        } else {
+            $next = new StatusReleaseBranchSynchronized();
+        }
 
         $this->setPublicationStatus($publication, $next);
     }

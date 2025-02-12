@@ -94,14 +94,6 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
         );
     }
 
-    /**
-     * @todo remove this method
-     */
-    public function resetStatus(): void
-    {
-        $this->status->reset($this);
-    }
-
     public function containsBackendMergeRequestToMerge(ProjectResolverInterface $projectResolver): bool
     {
         return $this->hotfixes->containsBackendMergeRequestToMerge($projectResolver);

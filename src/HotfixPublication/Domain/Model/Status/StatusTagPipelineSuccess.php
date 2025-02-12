@@ -31,23 +31,12 @@ final readonly class StatusTagPipelineSuccess extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $job = $backendCiClient->deployOnProduction(
-//            tagName: $publication->tagName(),
-//        );
-//
-//        $this->setPublicationStatus($publication, new StatusDeploymentJobInited([
-//            'job_id' => $job->id->value(),
-//        ]));
-        // end of TODO
-
-
-        // TODO remove this
-        sleep(3);
-        // end of TODO
+        $job = $backendCiClient->deployOnProduction(
+            tagName: $publication->tagName(),
+        );
 
         $this->setPublicationStatus($publication, new StatusDeploymentJobInited([
-            'job_id' => 777,
+            'job_id' => $job->id->value(),
         ]));
     }
 

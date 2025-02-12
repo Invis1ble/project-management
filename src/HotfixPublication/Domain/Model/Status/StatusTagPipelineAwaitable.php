@@ -32,43 +32,33 @@ abstract readonly class StatusTagPipelineAwaitable extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO uncomment this
-//        $pipeline = $backendCiClient->awaitLatestPipeline(
-//            ref: $publication->tagName(),
-//            createdAfter: $publication->createdAt(),
-//            maxAwaitingTime: $pipelineMaxAwaitingTime,
-//            tickInterval: $pipelineTickInterval,
-//        );
-//
-//        $statusContext = $this->context->toArray();
-//        $statusContext['pipeline_id'] = $pipeline->id->value();
-//
-//        if (null === $pipeline) {
-//            $next = new StatusTagPipelineStuck($statusContext);
-//        } else {
-//            $next = match ($pipeline->status) {
-//                Status::Created => new StatusTagPipelineCreated($statusContext),
-//                Status::WaitingForResource => new StatusTagPipelineWaitingForResource($statusContext),
-//                Status::Preparing => new StatusTagPipelinePreparing($statusContext),
-//                Status::Pending => new StatusTagPipelinePending($statusContext),
-//                Status::Running => new StatusTagPipelineRunning($statusContext),
-//                Status::Success => new StatusTagPipelineSuccess($statusContext),
-//                Status::Failed => new StatusTagPipelineFailed($statusContext),
-//                Status::Canceled => new StatusTagPipelineCanceled($statusContext),
-//                Status::Skipped => new StatusTagPipelineSkipped($statusContext),
-//                Status::Manual => new StatusTagPipelineManual($statusContext),
-//                Status::Scheduled => new StatusTagPipelineScheduled($statusContext),
-//            };
-//        }
-        // end of TODO
+        $pipeline = $backendCiClient->awaitLatestPipeline(
+            ref: $publication->tagName(),
+            createdAfter: $publication->createdAt(),
+            maxAwaitingTime: $pipelineMaxAwaitingTime,
+            tickInterval: $pipelineTickInterval,
+        );
 
-
-        // TODO remove this
         $statusContext = $this->context->toArray();
-        $statusContext['pipeline_id'] = 555;
-        $next = new StatusTagPipelineSuccess($statusContext);
-        sleep(3);
-        // end of TODO
+        $statusContext['pipeline_id'] = $pipeline->id->value();
+
+        if (null === $pipeline) {
+            $next = new StatusTagPipelineStuck($statusContext);
+        } else {
+            $next = match ($pipeline->status) {
+                Status::Created => new StatusTagPipelineCreated($statusContext),
+                Status::WaitingForResource => new StatusTagPipelineWaitingForResource($statusContext),
+                Status::Preparing => new StatusTagPipelinePreparing($statusContext),
+                Status::Pending => new StatusTagPipelinePending($statusContext),
+                Status::Running => new StatusTagPipelineRunning($statusContext),
+                Status::Success => new StatusTagPipelineSuccess($statusContext),
+                Status::Failed => new StatusTagPipelineFailed($statusContext),
+                Status::Canceled => new StatusTagPipelineCanceled($statusContext),
+                Status::Skipped => new StatusTagPipelineSkipped($statusContext),
+                Status::Manual => new StatusTagPipelineManual($statusContext),
+                Status::Scheduled => new StatusTagPipelineScheduled($statusContext),
+            };
+        }
 
         $this->setPublicationStatus($publication, $next);
     }

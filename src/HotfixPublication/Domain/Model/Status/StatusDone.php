@@ -31,9 +31,6 @@ final readonly class StatusDone extends AbstractStatus
         \DateInterval $pipelineTickInterval,
         HotfixPublicationInterface $publication,
     ): void {
-        // TODO remove this
-        sleep(3);
-        // end of TODO
         // do nothing
     }
 
