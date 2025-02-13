@@ -9,7 +9,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @template T
+ * @template T of EventInterface
  */
 abstract class EventFormatterTestCase extends TestCase
 {

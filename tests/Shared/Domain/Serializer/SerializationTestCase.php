@@ -7,7 +7,7 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer;
 use Invis1ble\ProjectManagement\Tests\Shared\SerializerAwareTestCase;
 
 /**
- * @template T
+ * @template T of object
  */
 abstract class SerializationTestCase extends SerializerAwareTestCase
 {
