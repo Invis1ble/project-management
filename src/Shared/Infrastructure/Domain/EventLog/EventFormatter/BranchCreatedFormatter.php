@@ -7,6 +7,9 @@ namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\Even
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Branch\BranchCreated;
 
+/**
+ * @extends AbstractFormatter<BranchCreated>
+ */
 final readonly class BranchCreatedFormatter extends AbstractFormatter
 {
     public function supports(EventInterface $event): bool
@@ -14,9 +17,6 @@ final readonly class BranchCreatedFormatter extends AbstractFormatter
         return $event instanceof BranchCreated;
     }
 
-    /**
-     * @param BranchCreated $event
-     */
     public function format(EventInterface $event): string
     {
         return "Branch `$event->name` created ($event->guiUrl)";

@@ -6,6 +6,11 @@ namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\Even
 
 use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface;
 
+/**
+ * @template T
+ *
+ * @extends EventFormatterInterface<T>
+ */
 abstract readonly class AbstractFormatter implements EventFormatterInterface
 {
 }
