@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer\Normalizer\UuidNormalizer;
 
-use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializerAwareTestCase;
+use Invis1ble\ProjectManagement\Tests\Shared\SerializerAwareTestCase;
 use Symfony\Component\Uid\Uuid;
 
 class UuidNormalizerTest extends SerializerAwareTestCase
