@@ -51,7 +51,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
         private readonly MessageFactoryInterface $tagMessageFactory,
         private readonly HubInterface $hub,
         private readonly EventNameReducerInterface $eventNameReducer,
-        private readonly EventLog\FormatterInterface $eventLogFormatter,
+        private readonly EventLog\EventFormatterStackInterface $eventLogFormatter,
     ) {
         $this->statusReadyForPublish = $issueStatusProvider->readyForPublish();
 

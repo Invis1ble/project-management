@@ -6,16 +6,17 @@ namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog;
 
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\EventLog\FormatterInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface;
 use Psr\Clock\ClockInterface;
 
-final class Formatter implements FormatterInterface
+final class EventFormatterStack implements EventFormatterStackInterface
 {
     /**
-     * @param iterable<FormatterInterface> $messageFormatters
+     * @param iterable<EventFormatterInterface> $eventFormatters
      */
     public function __construct(
-        private readonly iterable $messageFormatters,
+        private readonly iterable $eventFormatters,
         private readonly EventNameReducerInterface $eventNameReducer,
         private readonly ClockInterface $clock,
         private string $format = '[%time%] %message%',
@@ -35,7 +36,7 @@ final class Formatter implements FormatterInterface
 
     public function format(EventInterface $event): string
     {
-        foreach ($this->messageFormatters as $formatter) {
+        foreach ($this->eventFormatters as $formatter) {
             if ($formatter->supports($event)) {
                 $message = $formatter->format($event);
             }

@@ -1,0 +1,11 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter;
+
+use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface;
+
+abstract readonly class AbstractFormatter implements EventFormatterInterface
+{
+}

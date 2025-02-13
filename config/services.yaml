@@ -35,8 +35,8 @@ services:
     _instanceof:
         Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestManagerInterface:
             tags: ['invis1ble_project_management.development_collaboration.merge_request_manager']
-        Invis1ble\ProjectManagement\Shared\Domain\EventLog\MessageFormatterInterface:
-            tags: ['invis1ble_project_management.event_log.message_formatter']
+        Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface:
+            tags: ['invis1ble_project_management.event_log.event_formatter']
 
 
 
@@ -212,9 +212,9 @@ services:
         bind:
             Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId: '@invis1ble_project_management.gitlab_project.backend'
     
-    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\Formatter:
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatterStack:
         arguments:
-            $messageFormatters: !tagged_iterator invis1ble_project_management.event_log.message_formatter
+            $eventFormatters: !tagged_iterator invis1ble_project_management.event_log.event_formatters
 
 
 
@@ -260,4 +260,4 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\TaskTrackerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\TaskTracker'
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\TransitionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Transition\TransitionFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Event\EventNameReducer'
-    Invis1ble\ProjectManagement\Shared\Domain\EventLog\FormatterInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\Formatter'
+    Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatterStack'
