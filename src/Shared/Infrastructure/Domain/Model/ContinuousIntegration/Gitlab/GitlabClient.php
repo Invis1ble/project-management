@@ -547,8 +547,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
              */
             protected function compare(mixed $value1, mixed $value2): int
             {
-                return VersionName::fromString($value1['name'])
-                    ->versionCompare(VersionName::fromString($value2['name']));
+                return new \DateTimeImmutable($value1['created_at']) <=> new \DateTimeImmutable($value2['created_at']);
             }
         };
 

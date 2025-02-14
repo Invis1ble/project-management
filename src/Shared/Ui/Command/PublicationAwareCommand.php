@@ -146,23 +146,12 @@ abstract class PublicationAwareCommand extends Command
 
         $this->io->block((string) $tagName);
 
-        return $this->io->ask(
+        $tagName = $this->io->ask(
             question: 'New tag',
             default: (string) $tagName,
-            validator: function (string $answer) use ($latestTagToday): Tag\VersionName {
-                $tagName = Tag\VersionName::fromString($answer);
-
-                if (null === $latestTagToday) {
-                    return $tagName;
-                }
-
-                if (!$tagName->versionNewerThan(Tag\VersionName::fromRef($latestTagToday->name))) {
-                    throw new \InvalidArgumentException("Provided version must be greater than latest tag $latestTagToday->name version");
-                }
-
-                return $tagName;
-            },
         );
+
+        return Tag\VersionName::fromString($tagName);
     }
 
     protected function showProgressLog(QueryInterface $query, callable $inFinalState): int
