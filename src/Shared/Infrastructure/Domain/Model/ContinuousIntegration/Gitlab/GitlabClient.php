@@ -125,7 +125,9 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         $this->eventBus->dispatch(new LatestPipelineStuck(
             projectId: $this->projectId,
             ref: $ref,
-            guiUrl: $pipeline->guiUrl,
+            pipelineId: isset($pipeline) ? $pipeline->id : null,
+            status: isset($pipeline) ? $pipeline->status : null,
+            guiUrl: isset($pipeline) ? $pipeline->guiUrl : null,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 

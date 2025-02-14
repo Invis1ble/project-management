@@ -20,6 +20,9 @@ abstract readonly class AbstractPipelineEvent extends RefAwareEvent
         public Status $status,
         public ?UriInterface $guiUrl,
     ) {
-        parent::__construct($projectId, $ref);
+        parent::__construct(
+            projectId: $projectId,
+            ref: $ref,
+        );
     }
 }
