@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLog\EventFormatter;
+namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLog\EventFormatter\SourceCodeRepository\Branch;
 
 use GuzzleHttp\Psr7\Uri;
 use Invis1ble\Messenger\Event\EventInterface;
@@ -11,7 +11,8 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Projec
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
-use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter\BranchCreatedFormatter;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter\SourceCodeRepository\Branch\BranchCreatedFormatter;
+use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLog\EventFormatter\EventFormatterTestCase;
 
 /**
  * @extends EventFormatterTestCase<BranchCreated>

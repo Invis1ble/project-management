@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Tests\ReleasePublication\Infrastructure\Domain\EventLog\EventFormatter;
+namespace Invis1ble\ProjectManagement\Tests\ReleasePublication\Infrastructure\Domain\EventLog\EventFormatter\TaskTracker;
 
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\VersionReleased;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
-use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter\BranchCreatedFormatter;
+use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter\SourceCodeRepository\Branch\BranchCreatedFormatter;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLog\EventFormatter\EventFormatterTestCase;
 
 /**
