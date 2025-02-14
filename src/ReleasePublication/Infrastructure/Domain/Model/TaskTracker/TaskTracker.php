@@ -7,7 +7,7 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\M
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseCandidateRenamed;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseReleased;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\VersionReleased;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\TaskTracker\TaskTrackerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest\MergeRequestFactoryInterface;
@@ -213,7 +213,7 @@ final readonly class TaskTracker extends BasicTaskTracker implements TaskTracker
             isset($release['releaseDate']) ? new \DateTimeImmutable($release['releaseDate']) : null,
         );
 
-        $this->eventBus->dispatch(new ReleaseReleased(
+        $this->eventBus->dispatch(new VersionReleased(
             id: $version->id,
             name: $version->name,
             description: $version->description,

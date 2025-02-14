@@ -12,7 +12,7 @@ use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Event\TraceableEventBus;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\PublishRelease\PublishReleaseCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationTagSet;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseReleased;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\VersionReleased;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch as ReleaseBranch;
@@ -1320,7 +1320,7 @@ CONFIG),
 
         $this->assertArrayHasKey(75, $dispatchedEvents);
         $event = $dispatchedEvents[75]->event;
-        $this->assertInstanceOf(ReleaseReleased::class, $event);
+        $this->assertInstanceOf(VersionReleased::class, $event);
         $this->assertObjectEquals(Version\Name::fromString((string) $releaseBranchName), $event->name);
         $this->assertTrue($event->released);
 

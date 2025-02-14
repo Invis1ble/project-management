@@ -6,6 +6,6 @@ namespace Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracke
 
 use Invis1ble\ProjectManagement\Shared\Domain\Event\TaskTracker\AbstractVersionEvent;
 
-final readonly class ReleaseReleased extends AbstractVersionEvent
+final readonly class VersionReleased extends AbstractVersionEvent
 {
 }

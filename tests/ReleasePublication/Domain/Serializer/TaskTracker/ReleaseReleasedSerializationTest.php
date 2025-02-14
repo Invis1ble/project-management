@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\ReleasePublication\Domain\Serializer\TaskTracker;
 
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\ReleaseReleased;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\VersionReleased;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\SerializationTestCase;
 
 /**
- * @extends SerializationTestCase<ReleaseReleased>
+ * @extends SerializationTestCase<VersionReleased>
  */
 class ReleaseReleasedSerializationTest extends SerializationTestCase
 {
-    protected function createObject(): ReleaseReleased
+    protected function createObject(): VersionReleased
     {
-        return new ReleaseReleased(
+        return new VersionReleased(
             id: Version\VersionId::fromString('1000'),
             name: Version\Name::fromString('v-1-0-0'),
             description: Version\Description::fromString('Version v-1-0-0'),

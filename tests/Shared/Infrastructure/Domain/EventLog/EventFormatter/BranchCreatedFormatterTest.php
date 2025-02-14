@@ -7,7 +7,6 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLo
 use GuzzleHttp\Psr7\Uri;
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Branch\BranchCreated;
-use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Commit;
@@ -19,7 +18,7 @@ use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventForma
  */
 class BranchCreatedFormatterTest extends EventFormatterTestCase
 {
-    protected function createEventFormatter(): EventFormatterInterface
+    protected function createEventFormatter(): BranchCreatedFormatter
     {
         return new BranchCreatedFormatter();
     }

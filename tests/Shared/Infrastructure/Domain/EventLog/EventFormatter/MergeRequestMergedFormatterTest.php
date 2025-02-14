@@ -7,7 +7,6 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLo
 use GuzzleHttp\Psr7\Uri;
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
-use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
@@ -18,7 +17,7 @@ use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventForma
  */
 class MergeRequestMergedFormatterTest extends EventFormatterTestCase
 {
-    protected function createEventFormatter(): EventFormatterInterface
+    protected function createEventFormatter(): MergeRequestMergedFormatter
     {
         return new MergeRequestMergedFormatter();
     }
