@@ -37,6 +37,6 @@ class PipelineAwaitingTickFormatterTest extends EventFormatterTestCase
 
     protected function createExpectedMessage(EventInterface $event): string
     {
-        return "Pipeline `$event->name` $event->guiUrl awaiting tick";
+        return "Pipeline $event->guiUrl awaiting tick";
     }
 }
