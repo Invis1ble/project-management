@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\ContinuousIntegration\Pipeline;
 
 use GuzzleHttp\Psr7\Uri;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineStuck;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\SerializationTestCase;
 
 /**
- * @extends SerializationTestCase<LatestPipelineAwaitingTick>
+ * @extends SerializationTestCase<PipelineStuck>
  */
-class LatestPipelineAwaitingTickSerializationTest extends SerializationTestCase
+class PipelineStuckSerializationTest extends SerializationTestCase
 {
-    protected function createObject(): LatestPipelineAwaitingTick
+    protected function createObject(): PipelineStuck
     {
-        return new LatestPipelineAwaitingTick(
+        return new PipelineStuck(
             projectId: Project\ProjectId::from(1),
             ref: Ref::fromString('1234567890abcdef1234567890abcdef12345678'),
             pipelineId: Pipeline\PipelineId::from(2),
-            status: Pipeline\Status::Created,
+            status: Pipeline\Status::Running,
             guiUrl: new Uri('http://127.0.0.1:3000/test-group/test-project/-/pipelines/2'),
             maxAwaitingTime: new \DateInterval('PT30M'),
         );

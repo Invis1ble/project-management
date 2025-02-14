@@ -6,10 +6,11 @@ namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\Even
 
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\AbstractJobEvent;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStuck;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter\AbstractFormatter;
 
 /**
- * @template T of AbstractJobEvent
+ * @template T of AbstractJobEvent|JobStuck
  *
  * @extends AbstractFormatter<T>
  */

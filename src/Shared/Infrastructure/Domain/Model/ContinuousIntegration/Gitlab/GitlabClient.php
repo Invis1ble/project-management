@@ -10,9 +10,9 @@ use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\Jo
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRun;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStuck;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStatusChanged;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStuck;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineAwaitingTick;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineStatusChanged;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineStuck;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineRetried;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestCreated;
@@ -92,7 +92,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
 
             if ($pipeline->createdAfter($createdAfter)) {
                 if (null === $previousStatus || !$pipeline->status->equals($previousStatus)) {
-                    $this->eventBus->dispatch(new LatestPipelineStatusChanged(
+                    $this->eventBus->dispatch(new PipelineStatusChanged(
                         projectId: $pipeline->projectId,
                         ref: $pipeline->ref,
                         pipelineId: $pipeline->id,
@@ -110,7 +110,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                 }
             }
 
-            $this->eventBus->dispatch(new LatestPipelineAwaitingTick(
+            $this->eventBus->dispatch(new PipelineAwaitingTick(
                 projectId: $pipeline->projectId,
                 ref: $pipeline->ref,
                 pipelineId: $pipeline->id,
@@ -122,12 +122,16 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             sleep($tickIntervalInSeconds);
         }
 
-        $this->eventBus->dispatch(new LatestPipelineStuck(
+        if (!isset($pipeline)) {
+            $pipeline = $this->getPipeline($ref);
+        }
+
+        $this->eventBus->dispatch(new PipelineStuck(
             projectId: $this->projectId,
             ref: $ref,
-            pipelineId: isset($pipeline) ? $pipeline->id : null,
-            status: isset($pipeline) ? $pipeline->status : null,
-            guiUrl: isset($pipeline) ? $pipeline->guiUrl : null,
+            pipelineId: $pipeline->id,
+            status: $pipeline->status,
+            guiUrl: $pipeline->guiUrl,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 
@@ -197,10 +201,14 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             sleep($tickIntervalInSeconds);
         }
 
+        if (!isset($job)) {
+            $job = $this->getJob($jobId);
+        }
+
         $this->eventBus->dispatch(new JobStuck(
             projectId: $this->projectId,
             jobId: $jobId,
-            guiUrl: isset($job) ? $job->guiUrl : null,
+            guiUrl: $job->guiUrl,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 

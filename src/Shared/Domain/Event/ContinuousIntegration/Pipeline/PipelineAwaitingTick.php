@@ -9,7 +9,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Projec
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Psr\Http\Message\UriInterface;
 
-final readonly class LatestPipelineAwaitingTick extends AbstractPipelineEvent
+final readonly class PipelineAwaitingTick extends AbstractPipelineEvent
 {
     public function __construct(
         Project\ProjectId $projectId,

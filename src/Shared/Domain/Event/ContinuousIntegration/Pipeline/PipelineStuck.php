@@ -11,13 +11,13 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Projec
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Psr\Http\Message\UriInterface;
 
-final readonly class LatestPipelineStuck extends RefAwareEvent
+final readonly class PipelineStuck extends RefAwareEvent
 {
     public function __construct(
         ProjectId $projectId,
         Ref $ref,
-        public ?PipelineId $pipelineId,
-        public ?Status $status,
+        public PipelineId $pipelineId,
+        public Status $status,
         public ?UriInterface $guiUrl,
         public \DateInterval $maxAwaitingTime,
     ) {
