@@ -6,8 +6,8 @@ namespace Invis1ble\ProjectManagement\Tests\ReleasePublication\Infrastructure\Do
 
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\TaskTracker\VersionReleased;
+use Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\EventLog\EventFormatter\TaskTracker\VersionReleasedFormatter;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
-use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter\SourceCodeRepository\Branch\BranchCreatedFormatter;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLog\EventFormatter\EventFormatterTestCase;
 
 /**
@@ -15,9 +15,9 @@ use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLog\Even
  */
 class VersionReleasedFormatterTest extends EventFormatterTestCase
 {
-    protected function createEventFormatter(): BranchCreatedFormatter
+    protected function createEventFormatter(): VersionReleasedFormatter
     {
-        return new BranchCreatedFormatter();
+        return new VersionReleasedFormatter();
     }
 
     protected function createEvent(): VersionReleased
