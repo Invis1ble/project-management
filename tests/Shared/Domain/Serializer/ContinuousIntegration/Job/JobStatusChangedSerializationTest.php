@@ -27,7 +27,7 @@ class JobStatusChangedSerializationTest extends SerializationTestCase
             name: Job\Name::fromString('deploy'),
             previousStatus: new Job\Status\StatusPreparing(),
             status: new Job\Status\StatusPending(),
-            guiUrl: new Uri('https://example.com/foo/bar/-/jobs/8'),
+            guiUrl: new Uri('https://example.com/foo/bar/-/jobs/4'),
             createdAt: new \DateTimeImmutable('-1 hour'),
             startedAt: new \DateTimeImmutable('-30 minutes'),
             finishedAt: new \DateTimeImmutable(),
@@ -44,7 +44,7 @@ class JobStatusChangedSerializationTest extends SerializationTestCase
             && $object1->name->equals($object2->name)
             && $object1->previousStatus->equals($object2->previousStatus)
             && $object1->status->equals($object2->status)
-            && $object1->guiUrl === $object2->guiUrl
+            && (string) $object1->guiUrl === (string) $object2->guiUrl
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning
             && $object1->createdAt == $object2->createdAt
             && $object1->startedAt == $object2->startedAt

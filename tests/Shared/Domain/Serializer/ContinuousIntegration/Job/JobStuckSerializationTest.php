@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\ContinuousIntegration\Job;
 
+use GuzzleHttp\Psr7\Uri;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStuck;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
@@ -19,6 +20,7 @@ class JobStuckSerializationTest extends SerializationTestCase
         return new JobStuck(
             projectId: Project\ProjectId::from(1),
             jobId: Job\JobId::from(3),
+            guiUrl: new Uri('https://example.com/foo/bar/-/jobs/3'),
             maxAwaitingTime: new \DateInterval('PT30M'),
         );
     }
@@ -26,6 +28,7 @@ class JobStuckSerializationTest extends SerializationTestCase
     protected function objectsEquals(object $object1, object $object2): bool
     {
         if ($object1->projectId->equals($object2->projectId)
+            && (string) $object1->guiUrl === (string) $object2->guiUrl
             && $object1->jobId->equals($object2->jobId)
         ) {
             return true;

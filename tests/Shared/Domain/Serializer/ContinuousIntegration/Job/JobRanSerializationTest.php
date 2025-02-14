@@ -24,7 +24,7 @@ class JobRanSerializationTest extends SerializationTestCase
             jobId: Job\JobId::from(3),
             name: Job\Name::fromString('deploy'),
             status: new Job\Status\StatusPending(),
-            guiUrl: new Uri('https://example.com/foo/bar/-/jobs/8'),
+            guiUrl: new Uri('https://example.com/foo/bar/-/jobs/3'),
             createdAt: new \DateTimeImmutable('-1 hour'),
             startedAt: new \DateTimeImmutable('-30 minutes'),
             finishedAt: new \DateTimeImmutable(),
@@ -38,7 +38,7 @@ class JobRanSerializationTest extends SerializationTestCase
             && $object1->jobId->equals($object2->jobId)
             && $object1->name->equals($object2->name)
             && $object1->status->equals($object2->status)
-            && $object1->guiUrl === $object2->guiUrl
+            && (string) $object1->guiUrl === (string) $object2->guiUrl
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning
             && $object1->createdAt == $object2->createdAt
             && $object1->startedAt == $object2->startedAt
