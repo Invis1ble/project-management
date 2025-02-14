@@ -9,7 +9,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface;
 /**
  * @template T
  *
- * @extends EventFormatterInterface<T>
+ * @implements EventFormatterInterface<T>
  */
 abstract readonly class AbstractFormatter implements EventFormatterInterface
 {
