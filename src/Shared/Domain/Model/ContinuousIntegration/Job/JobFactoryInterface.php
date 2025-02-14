@@ -14,6 +14,7 @@ interface JobFactoryInterface
         string $name,
         string $ref,
         string $status,
+        ?string $guiUrl,
         string $createdAt,
         ?string $startedAt,
         ?string $finishedAt,

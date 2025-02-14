@@ -7,12 +7,14 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job\Status\StatusFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\PipelineFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class JobFactory implements JobFactoryInterface
 {
     public function __construct(
         private StatusFactoryInterface $statusFactory,
         private PipelineFactoryInterface $pipelineFactory,
+        private UriFactoryInterface $uriFactory,
     ) {
     }
 
@@ -24,6 +26,7 @@ final readonly class JobFactory implements JobFactoryInterface
         string $name,
         string $ref,
         string $status,
+        ?string $guiUrl,
         string $createdAt,
         ?string $startedAt,
         ?string $finishedAt,
@@ -58,6 +61,7 @@ final readonly class JobFactory implements JobFactoryInterface
             name: Name::fromString($name),
             ref: Ref::fromString($ref),
             status: $this->statusFactory->createStatus(Status\Dictionary::from($status)),
+            guiUrl: $this->uriFactory->createUri($guiUrl),
             pipeline: $pipeline,
             createdAt: new \DateTimeImmutable($createdAt),
             startedAt: null === $startedAt ? null : new \DateTimeImmutable($startedAt),

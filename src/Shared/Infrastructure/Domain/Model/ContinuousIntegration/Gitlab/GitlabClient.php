@@ -161,6 +161,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                     name: $job->name,
                     previousStatus: $previousStatus,
                     status: $job->status,
+                    guiUrl: $job->guiUrl,
                     createdAt: $job->createdAt,
                     startedAt: $job->createdAt,
                     finishedAt: $job->createdAt,
@@ -181,6 +182,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                 jobId: $job->id,
                 name: $job->name,
                 status: $job->status,
+                guiUrl: $job->guiUrl,
                 createdAt: $job->createdAt,
                 startedAt: $job->startedAt,
                 finishedAt: $job->finishedAt,
@@ -257,6 +259,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             name: $data['name'],
             ref: $data['ref'],
             status: $data['status'],
+            guiUrl: $data['web_url'] ?? null,
             createdAt: $data['created_at'],
             startedAt: $data['started_at'],
             finishedAt: $data['finished_at'],
@@ -275,6 +278,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             jobId: $job->id,
             name: $job->name,
             status: $job->status,
+            guiUrl: $job->guiUrl,
             createdAt: $job->createdAt,
             startedAt: $job->startedAt,
             finishedAt: $job->finishedAt,
@@ -333,6 +337,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             name: $data['name'],
             ref: $data['ref'],
             status: $data['status'],
+            guiUrl: $data['web_url'] ?? null,
             createdAt: $data['created_at'],
             startedAt: $data['started_at'],
             finishedAt: $data['finished_at'],
@@ -351,6 +356,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             jobId: $job->id,
             name: $job->name,
             status: $job->status,
+            guiUrl: $job->guiUrl,
             createdAt: $job->createdAt,
             startedAt: $job->startedAt,
             finishedAt: $job->finishedAt,
@@ -880,6 +886,9 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         );
     }
 
+    /**
+     * @see https://docs.gitlab.com/ee/api/jobs.html#retry-a-job Retry a job
+     */
     private function getJob(Job\JobId $jobId): Job\Job
     {
         $request = $this->requestFactory->createRequest(
@@ -901,6 +910,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             name: $data['name'],
             ref: $data['ref'],
             status: $data['status'],
+            guiUrl: $data['web_url'] ?? null,
             createdAt: $data['created_at'],
             startedAt: $data['started_at'],
             finishedAt: $data['finished_at'],

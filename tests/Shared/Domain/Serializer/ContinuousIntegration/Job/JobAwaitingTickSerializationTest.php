@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\ContinuousIntegration\Job;
 
+use GuzzleHttp\Psr7\Uri;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
@@ -25,6 +26,7 @@ class JobAwaitingTickSerializationTest extends SerializationTestCase
             jobId: Job\JobId::from(4),
             name: Job\Name::fromString('deploy'),
             status: new Job\Status\StatusPending(),
+            guiUrl: new Uri('https://example.com/foo/bar/-/jobs/8'),
             createdAt: new \DateTimeImmutable('-1 hour'),
             startedAt: new \DateTimeImmutable('-30 minutes'),
             finishedAt: new \DateTimeImmutable(),
@@ -40,6 +42,7 @@ class JobAwaitingTickSerializationTest extends SerializationTestCase
             && $object1->jobId->equals($object2->jobId)
             && $object1->name->equals($object2->name)
             && $object1->status->equals($object2->status)
+            && $object1->guiUrl === $object2->guiUrl
             // phpcs:disable Symfony.ControlStructure.IdenticalComparison.Warning
             && $object1->createdAt == $object2->createdAt
             && $object1->startedAt == $object2->startedAt
