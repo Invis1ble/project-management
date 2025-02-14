@@ -38,6 +38,6 @@ class PipelineStatusChangedFormatterTest extends EventFormatterTestCase
 
     protected function createExpectedMessage(EventInterface $event): string
     {
-        return "Pipeline $event->guiUrl status changed from `$event->previousStatus` to `$event->status`";
+        return "Pipeline $event->guiUrl status changed from `{$event->previousStatus->value}` to `{$event->status->value}`";
     }
 }

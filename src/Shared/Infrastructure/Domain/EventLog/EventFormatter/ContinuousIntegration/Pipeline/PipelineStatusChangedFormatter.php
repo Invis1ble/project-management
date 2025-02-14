@@ -19,6 +19,6 @@ final readonly class PipelineStatusChangedFormatter extends AbstractPipelineEven
 
     public function format(EventInterface $event): string
     {
-        return "Pipeline {$this->pipelineKey($event)} status changed from `$event->previousStatus` to `$event->status`";
+        return "Pipeline {$this->pipelineKey($event)} status changed from `{$event->previousStatus->value}` to `{$event->status->value}`";
     }
 }
