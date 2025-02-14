@@ -6,7 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\Continu
 
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobAwaitingTick;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRun;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRetried;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStuck;
@@ -351,7 +351,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             pipelineGuiUrl: $data['pipeline']['web_url'] ?? null,
         );
 
-        $this->eventBus->dispatch(new JobRan(
+        $this->eventBus->dispatch(new JobRun(
             projectId: $this->projectId,
             ref: $job->ref,
             jobId: $job->id,

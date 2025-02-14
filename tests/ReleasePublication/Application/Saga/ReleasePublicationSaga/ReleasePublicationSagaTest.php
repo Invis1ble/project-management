@@ -42,7 +42,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusTag
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusVersionReleased;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Repository\ReleasePublicationRepositoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobAwaitingTick;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRun;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRetried;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
@@ -1159,7 +1159,7 @@ CONFIG),
 
         $this->assertArrayHasKey(55, $dispatchedEvents);
         $event = $dispatchedEvents[55]->event;
-        $this->assertInstanceOf(JobRan::class, $event);
+        $this->assertInstanceOf(JobRun::class, $event);
         $this->assertObjectEquals($backendProjectId, $event->projectId);
         $this->assertObjectEquals($deploymentJobId, $event->jobId);
         $this->assertObjectEquals($deploymentJobName, $event->name);

@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\ContinuousIntegration\Job;
 
 use GuzzleHttp\Psr7\Uri;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRun;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
 use Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\SerializationTestCase;
 
 /**
- * @extends SerializationTestCase<JobRan>
+ * @extends SerializationTestCase<JobRun>
  */
-class JobRanSerializationTest extends SerializationTestCase
+class JobRunSerializationTest extends SerializationTestCase
 {
-    protected function createObject(): JobRan
+    protected function createObject(): JobRun
     {
-        return new JobRan(
+        return new JobRun(
             projectId: Project\ProjectId::from(1),
             ref: Ref::fromString('1234567890abcdef1234567890abcdef12345678'),
             jobId: Job\JobId::from(3),
