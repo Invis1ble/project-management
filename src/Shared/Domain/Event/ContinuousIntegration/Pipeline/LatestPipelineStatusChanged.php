@@ -7,6 +7,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Psr\Http\Message\UriInterface;
 
 final readonly class LatestPipelineStatusChanged extends AbstractPipelineEvent
 {
@@ -16,13 +17,15 @@ final readonly class LatestPipelineStatusChanged extends AbstractPipelineEvent
         Pipeline\PipelineId $pipelineId,
         public ?Pipeline\Status $previousStatus,
         Pipeline\Status $status,
+        ?UriInterface $guiUrl,
         public \DateInterval $maxAwaitingTime,
     ) {
         parent::__construct(
-            $projectId,
-            $ref,
-            $pipelineId,
-            $status,
+            projectId: $projectId,
+            ref: $ref,
+            pipelineId: $pipelineId,
+            status: $status,
+            guiUrl: $guiUrl,
         );
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Domain\Serializer\ContinuousIntegration\Pipeline;
 
+use GuzzleHttp\Psr7\Uri;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
@@ -23,6 +24,7 @@ class LatestPipelineStatusChangedSerializationTest extends SerializationTestCase
             pipelineId: Pipeline\PipelineId::from(2),
             previousStatus: Pipeline\Status::Created,
             status: Pipeline\Status::WaitingForResource,
+            guiUrl: new Uri('http://127.0.0.1:3000/test-group/test-project/-/pipelines/2'),
             maxAwaitingTime: new \DateInterval('PT30M'),
         );
     }
@@ -34,6 +36,7 @@ class LatestPipelineStatusChangedSerializationTest extends SerializationTestCase
             && $object1->pipelineId->equals($object2->pipelineId)
             && $object1->previousStatus->equals($object2->previousStatus)
             && $object1->status->equals($object2->status)
+            && (string) $object1->guiUrl === (string) $object2->guiUrl
         ) {
             return true;
         }

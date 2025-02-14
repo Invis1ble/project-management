@@ -98,6 +98,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                         pipelineId: $pipeline->id,
                         previousStatus: $previousStatus,
                         status: $pipeline->status,
+                        guiUrl: $pipeline->guiUrl,
                         maxAwaitingTime: $maxAwaitingTime,
                     ));
 
@@ -114,6 +115,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                 ref: $pipeline->ref,
                 pipelineId: $pipeline->id,
                 status: $pipeline->status,
+                guiUrl: $pipeline->guiUrl,
                 maxAwaitingTime: $maxAwaitingTime,
             ));
 
@@ -123,6 +125,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         $this->eventBus->dispatch(new LatestPipelineStuck(
             projectId: $this->projectId,
             ref: $ref,
+            guiUrl: $pipeline->guiUrl,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 
@@ -202,6 +205,9 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         return $job ?? null;
     }
 
+    /**
+     * @see https://docs.gitlab.com/ee/api/pipelines.html#retry-jobs-in-a-pipeline Retry jobs in a pipeline
+     */
     public function retryPipeline(Pipeline\PipelineId $pipelineId): ?Pipeline\Pipeline
     {
         $request = $this->requestFactory->createRequest(
@@ -234,6 +240,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             ref: $pipeline->ref,
             pipelineId: $pipeline->id,
             status: $pipeline->status,
+            guiUrl: $pipeline->guiUrl,
         ));
 
         return $pipeline;
@@ -856,6 +863,9 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         );
     }
 
+    /**
+     * @see https://docs.gitlab.com/ee/api/pipelines.html#get-a-single-pipeline Get a single pipeline
+     */
     private function getPipeline(Ref $ref): Pipeline\Pipeline
     {
         $request = $this->requestFactory->createRequest(

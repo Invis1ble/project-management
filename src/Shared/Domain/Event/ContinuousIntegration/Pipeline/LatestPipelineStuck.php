@@ -7,14 +7,19 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\RefAwareEvent;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Psr\Http\Message\UriInterface;
 
 final readonly class LatestPipelineStuck extends RefAwareEvent
 {
     public function __construct(
         ProjectId $projectId,
         Ref $ref,
+        public ?UriInterface $guiUrl,
         public \DateInterval $maxAwaitingTime,
     ) {
-        parent::__construct($projectId, $ref);
+        parent::__construct(
+            projectId: $projectId,
+            ref: $ref,
+        );
     }
 }

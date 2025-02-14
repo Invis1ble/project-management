@@ -9,6 +9,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeli
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Status;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project\ProjectId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Psr\Http\Message\UriInterface;
 
 abstract readonly class AbstractPipelineEvent extends RefAwareEvent
 {
@@ -17,6 +18,7 @@ abstract readonly class AbstractPipelineEvent extends RefAwareEvent
         Ref $ref,
         public PipelineId $pipelineId,
         public Status $status,
+        public ?UriInterface $guiUrl,
     ) {
         parent::__construct($projectId, $ref);
     }
