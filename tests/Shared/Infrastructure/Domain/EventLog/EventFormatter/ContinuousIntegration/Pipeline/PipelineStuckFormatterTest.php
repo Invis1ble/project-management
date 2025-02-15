@@ -37,6 +37,6 @@ class PipelineStuckFormatterTest extends EventFormatterTestCase
 
     protected function createExpectedMessage(EventInterface $event): string
     {
-        return "Pipeline $event->guiUrl stuck";
+        return "Pipeline $event->guiUrl stuck in status {$event->status->value}";
     }
 }
