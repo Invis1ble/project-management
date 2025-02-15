@@ -206,9 +206,16 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         }
 
         $this->eventBus->dispatch(new JobStuck(
-            projectId: $this->projectId,
-            jobId: $jobId,
+            projectId: $job->pipeline->projectId,
+            ref: $job->ref,
+            pipelineId: $job->pipeline->id,
+            jobId: $job->id,
+            name: $job->name,
+            status: $job->status,
             guiUrl: $job->guiUrl,
+            createdAt: $job->createdAt,
+            startedAt: $job->startedAt,
+            finishedAt: $job->finishedAt,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 
