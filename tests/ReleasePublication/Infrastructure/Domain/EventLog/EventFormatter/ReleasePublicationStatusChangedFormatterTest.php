@@ -8,12 +8,13 @@ use GuzzleHttp\Psr7\Uri;
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\ReleasePublicationStatusChanged;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch as ReleaseBranchName;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusCreated;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusTasksWithoutMergeRequestTransitioned;
 use Invis1ble\ProjectManagement\ReleasePublication\Infrastructure\Domain\EventLog\EventFormatter\ReleasePublicationStatusChangedFormatter;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\MergeRequest;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Board\BoardId;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
@@ -32,7 +33,7 @@ class ReleasePublicationStatusChangedFormatterTest extends EventFormatterTestCas
 
     protected function createEvent(): ReleasePublicationStatusChanged
     {
-        $branchName = Branch\Name::fromString('v-1-0-0');
+        $branchName = ReleaseBranchName\Name::fromString('v-1-0-0');
 
         return new ReleasePublicationStatusChanged(
             id: ReleasePublicationId::fromBranchName($branchName),
@@ -62,7 +63,7 @@ class ReleasePublicationStatusChangedFormatterTest extends EventFormatterTestCas
                             title: MergeRequest\Title::fromString('Close PROJECT-1 Fix terrible bug'),
                             projectId: Project\ProjectId::from(4),
                             projectName: Project\Name::fromString('my-group/my-project'),
-                            sourceBranchName: Branch\Name::fromString('PROJECT-1'),
+                            sourceBranchName: $branchName,
                             targetBranchName: Branch\Name::fromString('master'),
                             status: MergeRequest\Status::Open,
                             guiUrl: new Uri('https://gitlab.example.com/my-group/my-project/-/merge_requests/2'),
@@ -77,7 +78,7 @@ class ReleasePublicationStatusChangedFormatterTest extends EventFormatterTestCas
                             title: MergeRequest\Title::fromString('Close PROJECT-1 Fix terrible bug'),
                             projectId: Project\ProjectId::from(4),
                             projectName: Project\Name::fromString('my-group/my-project'),
-                            sourceBranchName: Branch\Name::fromString('PROJECT-1'),
+                            sourceBranchName: $branchName,
                             targetBranchName: Branch\Name::fromString('master'),
                             status: MergeRequest\Status::Open,
                             guiUrl: new Uri('https://gitlab.example.com/my-group/my-project/-/merge_requests/2'),
