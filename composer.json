@@ -49,7 +49,7 @@
         "dama/doctrine-test-bundle": "^8.2",
         "escapestudios/symfony2-coding-standard": "^3.13",
         "friendsofphp/php-cs-fixer": "^3.57",
-        "phpunit/phpunit": "^9.6",
+        "phpunit/phpunit": "^11.5",
         "rector/rector": "^1.1",
         "symfony/phpunit-bridge": "^7.2",
         "symfony/stopwatch": "7.2.*",
