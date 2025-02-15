@@ -20,6 +20,6 @@ final readonly class MergeRequestMergedFormatter extends AbstractFormatter
 
     public function format(EventInterface $event): string
     {
-        return "MR $event->guiUrl merged ($event->sourceBranchName -> $event->targetBranchName | $event->title)";
+        return "MR $event->guiUrl merged (`$event->sourceBranchName` -> `$event->targetBranchName` | `$event->title`)";
     }
 }

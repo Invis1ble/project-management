@@ -26,7 +26,7 @@ class MergeRequestCreatedSerializationTest extends SerializationTestCase
             sourceBranchName: Branch\Name::fromString('TEST-1'),
             targetBranchName: Branch\Name::fromString('develop'),
             status: MergeRequest\Status::Open,
-            guiUrl: new Uri('https://gitlab.example.com/my-group/my-project/merge_requests/1'),
+            guiUrl: new Uri('https://gitlab.example.com/my-group/my-project/merge_requests/2'),
             details: new MergeRequest\Details\Details(
                 status: new MergeRequest\Details\Status\StatusChecking(),
             ),

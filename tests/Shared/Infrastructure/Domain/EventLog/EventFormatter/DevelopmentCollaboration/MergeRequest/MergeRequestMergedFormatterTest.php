@@ -42,6 +42,6 @@ class MergeRequestMergedFormatterTest extends EventFormatterTestCase
 
     protected function createExpectedMessage(EventInterface $event): string
     {
-        return "MR $event->guiUrl merged ($event->sourceBranchName -> $event->targetBranchName | $event->title)";
+        return "MR $event->guiUrl merged (`$event->sourceBranchName` -> `$event->targetBranchName` | `$event->title`)";
     }
 }
