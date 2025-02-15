@@ -19,6 +19,6 @@ final readonly class PipelineStuckFormatter extends AbstractPipelineEventFormatt
 
     public function format(EventInterface $event): string
     {
-        return "Pipeline {$this->pipelineKey($event)} stuck in status {$event->status->value}";
+        return "Pipeline {$this->pipelineKey($event)} stuck in status `{$event->status->value}`";
     }
 }
