@@ -43,6 +43,6 @@ class JobStuckFormatterTest extends EventFormatterTestCase
 
     protected function createExpectedMessage(EventInterface $event): string
     {
-        return "Job $event->guiUrl stuck in status `$event->status`";
+        return "Job `$event->name` $event->guiUrl stuck in status `$event->status`";
     }
 }
