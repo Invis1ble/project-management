@@ -7,8 +7,8 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLo
 use Invis1ble\Messenger\Event\EventInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\Tag\TagCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
-use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatter\SourceCodeRepository\Tag\TagCreatedFormatter;
 use Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\EventLog\EventFormatter\EventFormatterTestCase;
 
