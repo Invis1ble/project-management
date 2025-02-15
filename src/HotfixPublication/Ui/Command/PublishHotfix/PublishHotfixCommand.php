@@ -250,7 +250,7 @@ FORMAT;
                         $eventLog[] = $this->eventLogFormatter->format($event);
 
                         $progressBar->setMessage(
-                            message: join("\n    ", array_slice($eventLog, -5)) . "\n",
+                            message: join("\n    ", array_slice($eventLog, -30)) . "\n",
                             name: 'event_log_tail',
                         );
 
