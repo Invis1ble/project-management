@@ -48,6 +48,6 @@ class MergeRequestStatusChangedFormatterTest extends EventFormatterTestCase
 
     protected function createExpectedMessage(EventInterface $event): string
     {
-        return "MR $event->guiUrl status changed from `{$event->previousStatus->value}` to `{$event->status->value}` (`$event->sourceBranchName` -> `$event->targetBranchName` | `$event->title`)";
+        return "MR $event->guiUrl status changed from `{$event->previousDetails->status}` to `{$event->details->status}` (`$event->sourceBranchName` -> `$event->targetBranchName` | `$event->title`)";
     }
 }

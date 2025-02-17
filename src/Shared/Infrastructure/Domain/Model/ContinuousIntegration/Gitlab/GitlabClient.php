@@ -91,7 +91,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             $pipeline = $this->getPipeline($ref);
 
             if ($pipeline->createdAfter($createdAfter)) {
-                if (null === $previousStatus || !$pipeline->status->equals($previousStatus)) {
+                if (null !== $previousStatus && !$pipeline->status->equals($previousStatus)) {
                     $this->eventBus->dispatch(new PipelineStatusChanged(
                         projectId: $pipeline->projectId,
                         ref: $pipeline->ref,
@@ -101,8 +101,6 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                         guiUrl: $pipeline->guiUrl,
                         maxAwaitingTime: $maxAwaitingTime,
                     ));
-
-                    $previousStatus = $pipeline->status;
                 }
 
                 if ($pipeline->finished() || !$pipeline->inProgress()) {
@@ -120,6 +118,8 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             ));
 
             sleep($tickIntervalInSeconds);
+
+            $previousStatus = $pipeline->status;
         }
 
         if (!isset($pipeline)) {
@@ -161,7 +161,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         while (new \DateTimeImmutable() <= $untilTime) {
             $job = $this->getJob($jobId);
 
-            if (null === $previousStatus || !$job->status->equals($previousStatus)) {
+            if (null !== $previousStatus && !$job->status->equals($previousStatus)) {
                 $this->eventBus->dispatch(new JobStatusChanged(
                     projectId: $this->projectId,
                     ref: $job->ref,
@@ -176,8 +176,6 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                     finishedAt: $job->createdAt,
                     maxAwaitingTime: $maxAwaitingTime,
                 ));
-
-                $previousStatus = $job->status;
             }
 
             if ($job->finished() || !$job->inProgress()) {
@@ -199,6 +197,8 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             ));
 
             sleep($tickIntervalInSeconds);
+
+            $previousStatus = $job->status;
         }
 
         if (!isset($job)) {

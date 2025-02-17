@@ -214,7 +214,7 @@ services:
     
     Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatterStack:
         arguments:
-            $eventFormatters: !tagged_iterator invis1ble_project_management.event_log.event_formatters
+            $eventFormatters: !tagged_iterator invis1ble_project_management.event_log.event_formatter
 
 
 

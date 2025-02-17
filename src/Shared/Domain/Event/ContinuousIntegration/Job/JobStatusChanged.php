@@ -18,7 +18,7 @@ final readonly class JobStatusChanged extends AbstractJobEvent
         public Pipeline\PipelineId $pipelineId,
         Job\JobId $jobId,
         Job\Name $name,
-        public ?Job\Status\StatusInterface $previousStatus,
+        public Job\Status\StatusInterface $previousStatus,
         Job\Status\StatusInterface $status,
         ?UriInterface $guiUrl,
         \DateTimeImmutable $createdAt,

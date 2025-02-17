@@ -15,7 +15,7 @@ final readonly class PipelineStatusChanged extends AbstractPipelineEvent
         Project\ProjectId $projectId,
         Ref $ref,
         Pipeline\PipelineId $pipelineId,
-        public ?Pipeline\Status $previousStatus,
+        public Pipeline\Status $previousStatus,
         Pipeline\Status $status,
         ?UriInterface $guiUrl,
         public \DateInterval $maxAwaitingTime,
