@@ -9,7 +9,7 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
 
-abstract readonly class AbstractSseSendingEventHandler implements EventHandlerInterface
+abstract readonly class AbstractSsePublishingEventHandler implements EventHandlerInterface
 {
     public function __construct(
         private HubInterface $hub,

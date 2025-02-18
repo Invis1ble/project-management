@@ -49,7 +49,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
         Issue\StatusProviderInterface $issueStatusProvider,
         \DateInterval $pipelineMaxAwaitingTime,
         private readonly MessageFactoryInterface $tagMessageFactory,
-        private readonly HubInterface $hub,
+        private readonly HubInterface $mercureHub,
         private readonly EventNameReducerInterface $eventNameReducer,
         private readonly EventLog\EventFormatterStackInterface $eventLogFormatter,
     ) {
@@ -170,19 +170,9 @@ FORMAT;
 
         $progressBar->start();
 
-        if (false === $resume) {
-            $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
-                tagName: $tagName,
-                tagMessage: $tagMessage,
-                hotfixes: $hotfixes,
-            ));
-        } else {
-            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
-        }
-
         $topics = ['/api/events'];
 
-        $url = $this->hub->getPublicUrl();
+        $url = $this->mercureHub->getPublicUrl();
 
         if (null !== $topics) {
             // We cannot use http_build_query() because this method doesn't support generating multiple query parameters with the same name without the [] suffix
@@ -202,6 +192,16 @@ FORMAT;
         $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
 
         $result = Command::FAILURE;
+
+        if (false === $resume) {
+            $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
+                tagName: $tagName,
+                tagMessage: $tagMessage,
+                hotfixes: $hotfixes,
+            ));
+        } else {
+            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+        }
 
         while ($source) {
             foreach ($client->stream($source, 0.1) as $chunk) {

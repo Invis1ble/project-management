@@ -18,13 +18,10 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class PublicationAwareCommand extends Command
 {
-    protected SymfonyStyle $io;
-
     private const array NO_MERGE_REQUESTS_ACTION_IDS = [
         'ABORT' => 0,
         'RELOAD' => 1,

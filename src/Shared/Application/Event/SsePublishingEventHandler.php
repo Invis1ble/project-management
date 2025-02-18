@@ -9,7 +9,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final readonly class SseSendingEventHandler extends AbstractSseSendingEventHandler
+final readonly class SsePublishingEventHandler extends AbstractSsePublishingEventHandler
 {
     public function __construct(
         HubInterface $hub,
@@ -26,6 +26,7 @@ final readonly class SseSendingEventHandler extends AbstractSseSendingEventHandl
             data: [
                 'name' => $this->eventNameReducer->reduce($event),
                 'context' => $event,
+                'published_at' => new \DateTimeImmutable(),
             ],
         );
     }
