@@ -44,7 +44,7 @@ services:
     command: php bin/console messenger:consume async --sleep=0.1 --time-limit=600 --limit=100 --memory-limit=128M -vvv
     healthcheck:
       test: ["CMD-SHELL", "pgrep -f 'php bin/console messenger:consume async' || exit 1"]
-      interval: 10s
+      interval: 30s
       timeout: 5s
       retries: 3
     volumes:
@@ -71,7 +71,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-app}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app}"]
-      interval: 10s
       timeout: 5s
       retries: 5
       start_period: 60s
@@ -90,7 +89,7 @@ services:
       RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit disk_free_limit 2147483648
     healthcheck:
       test: rabbitmq-diagnostics -q ping
-      interval: 10s
+      interval: 30s
       timeout: 30s
       retries: 3
     volumes:
