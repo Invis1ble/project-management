@@ -17,7 +17,7 @@ abstract readonly class Action
     public function toArray(): array
     {
         return [
-            'name' => $this->name->value,
+            'action' => $this->name->value,
             'file_path' => (string) $this->filePath,
         ];
     }
