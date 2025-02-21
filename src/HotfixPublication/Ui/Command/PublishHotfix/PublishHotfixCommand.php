@@ -262,7 +262,9 @@ FORMAT;
 
         $this->io->newLine();
 
-        if (Command::FAILURE === $result) {
+        if (Command::SUCCESS === $result) {
+            $this->io->success('Publication done');
+        } else {
             $this->io->error('Unexpected error occurred');
         }
 
