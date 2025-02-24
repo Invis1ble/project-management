@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\HotfixPublication\Ui\Command;
+namespace Invis1ble\ProjectManagement\Shared\Ui\Command;
 
 use Invis1ble\Messenger\Event\EventInterface;
 

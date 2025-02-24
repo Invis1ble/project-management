@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Ui\Command;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\Command;
 
-use Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublicationProgressFactoryInterface;
-use Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublicationProgressInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationProgressFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationProgressInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface;
 use Symfony\Component\Console\Style\OutputStyle;
 

@@ -18,7 +18,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
-use Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublicationProgressFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationProgressFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
