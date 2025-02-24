@@ -37,6 +37,8 @@ services:
             tags: ['invis1ble_project_management.development_collaboration.merge_request_manager']
         Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterInterface:
             tags: ['invis1ble_project_management.event_log.event_formatter']
+        Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\StepResolverInterface:
+            tags: ['invis1ble_project_management.publication_progress.step_resolver']
 
 
 
@@ -215,6 +217,10 @@ services:
     Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatterStack:
         arguments:
             $eventFormatters: !tagged_iterator invis1ble_project_management.event_log.event_formatter
+    
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress\StepResolver:
+        arguments:
+            $stepResolvers: !tagged_iterator invis1ble_project_management.publication_progress.step_resolver
 
 
 
@@ -261,4 +267,5 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\TransitionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Transition\TransitionFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Event\EventNameReducer'
     Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatterStack'
-    Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationProgressFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\Command\PublicationProgressFactory'
+    Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\StepResolverInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress\StepResolver'
+    Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress\PublicationProgressFactory'

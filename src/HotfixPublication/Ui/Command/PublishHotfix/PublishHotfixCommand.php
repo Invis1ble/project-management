@@ -18,12 +18,14 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationProgressFactoryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary as PublicationStatusDictionary;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationAwareCommand;
+use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressFactoryInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\StepResolverInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -50,6 +52,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
         private readonly MessageFactoryInterface $tagMessageFactory,
         private readonly HubInterface $mercureHub,
         private readonly EventNameReducerInterface $eventNameReducer,
+        private readonly StepResolverInterface $publicationProgressStepResolver,
         private readonly PublicationProgressFactoryInterface $publicationProgressFactory,
     ) {
         $this->statusReadyForPublish = $issueStatusProvider->readyForPublish();
@@ -152,6 +155,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
 
         $publicationProgress = $this->publicationProgressFactory->create(
             io: $this->io,
+            finalStep: $this->publicationProgressStepResolver->resolve(PublicationStatusDictionary::Done),
             dateTimeFormat: 'd.m.Y H:i:sP',
         );
 
@@ -197,7 +201,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
                 }
 
                 if (new \DateTimeImmutable() > $untilTime) {
-                    $publicationProgress->setStatus('stuck in ' . $status);
+                    $publicationProgress->setStatus("stuck in {$status}");
 
                     break 2;
                 }
@@ -216,8 +220,11 @@ final class PublishHotfixCommand extends PublicationAwareCommand
                         /** @var HotfixPublication $publication */
                         $publication = $this->serializer->denormalize($data['context'], HotfixPublication::class);
 
-                        $publicationProgress->setStatus((string) $publication->status());
-                        $publicationProgress->advance();
+                        $status = (string) $publication->status();
+                        $publicationProgress->setStatus($status);
+                        $publicationProgress->setProgress(
+                            $this->publicationProgressStepResolver->resolve(PublicationStatusDictionary::from($status)),
+                        );
 
                         if ($publication->published()) {
                             $publicationProgress->finish();

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\Command;
+namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationProgressInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\Step;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Style\OutputStyle;
 
@@ -24,6 +25,7 @@ final class PublicationProgress implements PublicationProgressInterface
     public function __construct(
         OutputStyle $io,
         private readonly EventFormatterStackInterface $eventFormatter,
+        Step $finalStep,
         private readonly int $eventLogTailSize = 30,
         private readonly ?string $dateTimeFormat = self::DEFAULT_DATETIME_FORMAT,
     ) {
@@ -38,7 +40,7 @@ FORMAT;
 
         ProgressBar::setFormatDefinition('custom', $format);
 
-        $this->progressBar = $io->createProgressBar(15);
+        $this->progressBar = $io->createProgressBar($finalStep->value);
     }
 
     public function start(string $status = 'inited'): void
@@ -59,9 +61,9 @@ FORMAT;
         $this->progressBar->start();
     }
 
-    public function advance(int $step = 1): void
+    public function setProgress(Step $step): void
     {
-        $this->progressBar->advance($step);
+        $this->progressBar->setProgress($step->value);
     }
 
     public function finish(): void
