@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress;
 
 use Invis1ble\Messenger\Event\EventInterface;
-use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressInterface;
 use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\Step;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Style\OutputStyle;

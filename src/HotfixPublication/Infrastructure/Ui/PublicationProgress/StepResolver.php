@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Ui\PublicationProgress;
 
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary;
-use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\StepResolverInterface;
 use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\Step;
+use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\StepResolverInterface;
 
 final readonly class StepResolver implements StepResolverInterface
 {

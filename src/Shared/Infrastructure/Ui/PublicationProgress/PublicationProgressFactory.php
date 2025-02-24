@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress;
 
+use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface;
 use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface;
 use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\Step;
 use Symfony\Component\Console\Style\OutputStyle;
 
