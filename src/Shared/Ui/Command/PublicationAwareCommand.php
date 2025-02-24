@@ -212,11 +212,6 @@ abstract class PublicationAwareCommand extends Command
         throw new \RuntimeException($message);
     }
 
-    protected function time(): string
-    {
-        return date('d.m.Y H:i:sP');
-    }
-
     private function issueMergeRequests(Issue\Issue $issue): MergeRequest\MergeRequestList
     {
         $this->phase("Fetching Merge Requests for $issue...");

@@ -1,0 +1,96 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Ui\Command;
+
+use Invis1ble\Messenger\Event\EventInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublicationProgressInterface;
+use Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Style\OutputStyle;
+
+final class PublicationProgress implements PublicationProgressInterface
+{
+    public const string DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i:s';
+
+    private readonly ProgressBar $progressBar;
+
+    /**
+     * @var string[]
+     */
+    private array $eventLog = [];
+
+    public function __construct(
+        OutputStyle $io,
+        private readonly EventFormatterStackInterface $eventFormatter,
+        private readonly int $eventLogTailSize = 30,
+        private readonly ?string $dateTimeFormat = self::DEFAULT_DATETIME_FORMAT,
+    ) {
+        $format = <<<FORMAT
+
+ <fg=blue>[%time%] Publication status: %status%</>
+
+ %current%/%max% [%bar%] %percent:3s%%  |  %elapsed:6s%/%estimated:-6s%  |  %memory:6s%
+
+    <fg=gray>%event_log_tail%</>
+FORMAT;
+
+        ProgressBar::setFormatDefinition('custom', $format);
+
+        $this->progressBar = $io->createProgressBar(15);
+    }
+
+    public function start(string $status = 'inited'): void
+    {
+        $this->progressBar->setFormat('custom');
+        $this->progressBar->maxSecondsBetweenRedraws(0.1);
+
+        $this->setStatus(
+            status: $status,
+            display: false,
+        );
+
+        $this->progressBar->setMessage(
+            message: "\n",
+            name: 'event_log_tail',
+        );
+
+        $this->progressBar->start();
+    }
+
+    public function advance(int $step = 1): void
+    {
+        $this->progressBar->advance($step);
+    }
+
+    public function finish(): void
+    {
+        $this->progressBar->finish();
+    }
+
+    public function setStatus(string $status, bool $display = true): void
+    {
+        $this->progressBar->setMessage(
+            (new \DateTimeImmutable())->format($this->dateTimeFormat),
+            'time',
+        );
+        $this->progressBar->setMessage($status, 'status');
+
+        if ($display) {
+            $this->progressBar->display();
+        }
+    }
+
+    public function addEvent(EventInterface $event): void
+    {
+        $this->eventLog[] = $this->eventFormatter->format($event);
+
+        $this->progressBar->setMessage(
+            message: join("\n    ", array_slice($this->eventLog, -$this->eventLogTailSize)) . "\n",
+            name: 'event_log_tail',
+        );
+
+        $this->progressBar->display();
+    }
+}

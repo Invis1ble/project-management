@@ -261,3 +261,4 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Transition\TransitionFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\TaskTracker\Transition\TransitionFactory'
     Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Event\EventNameReducer'
     Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatterStack'
+    Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublicationProgressFactoryInterface: '@Invis1ble\ProjectManagement\HotfixPublication\Infrastructure\Ui\Command\PublicationProgressFactory'

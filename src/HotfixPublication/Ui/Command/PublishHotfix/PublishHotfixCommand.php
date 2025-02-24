@@ -18,15 +18,14 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublicationProgressFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface;
-use Invis1ble\ProjectManagement\Shared\Domain\EventLog;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationAwareCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,7 +50,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
         private readonly MessageFactoryInterface $tagMessageFactory,
         private readonly HubInterface $mercureHub,
         private readonly EventNameReducerInterface $eventNameReducer,
-        private readonly EventLog\EventFormatterStackInterface $eventLogFormatter,
+        private readonly PublicationProgressFactoryInterface $publicationProgressFactory,
     ) {
         $this->statusReadyForPublish = $issueStatusProvider->readyForPublish();
 
@@ -145,30 +144,18 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             $this->abort();
         }
 
-        $status = 'inited';
+        if (isset($publication)) {
+            $status = (string) $publication->status();
+        } else {
+            $status = 'inited';
+        }
 
-        $format = <<<FORMAT
+        $publicationProgress = $this->publicationProgressFactory->create(
+            io: $this->io,
+            dateTimeFormat: 'd.m.Y H:i:sP',
+        );
 
- <fg=blue>[%time%] Publication status: %status%</>
-
- %current%/%max% [%bar%] %percent:3s%%  |  %elapsed:6s%/%estimated:-6s%  |  %memory:6s%
-
-    <fg=gray>%event_log_tail%</>
-FORMAT;
-
-        ProgressBar::setFormatDefinition('custom', $format);
-
-        $progressBar = $this->io->createProgressBar(15);
-        $progressBar->setFormat('custom');
-        $progressBar->maxSecondsBetweenRedraws(0.1);
-
-        $progressBar->setMessage($this->time(), 'time');
-        $progressBar->setMessage($status, 'status');
-        $progressBar->setMessage('', 'event_log_tail');
-
-        $eventLog = [];
-
-        $progressBar->start();
+        $publicationProgress->start(status: $status);
 
         $topics = ['/api/events'];
 
@@ -193,14 +180,14 @@ FORMAT;
 
         $result = Command::FAILURE;
 
-        if (false === $resume) {
+        if (isset($publicationId)) {
+            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+        } else {
             $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
                 tagName: $tagName,
                 tagMessage: $tagMessage,
                 hotfixes: $hotfixes,
             ));
-        } else {
-            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
         }
 
         while ($source) {
@@ -210,10 +197,7 @@ FORMAT;
                 }
 
                 if (new \DateTimeImmutable() > $untilTime) {
-                    $progressBar->setMessage($this->time(), 'time');
-                    $progressBar->setMessage('stuck in ' . $status, 'status');
-
-                    $progressBar->display();
+                    $publicationProgress->setStatus('stuck in ' . $status);
 
                     break 2;
                 }
@@ -231,15 +215,12 @@ FORMAT;
 
                         /** @var HotfixPublication $publication */
                         $publication = $this->serializer->denormalize($data['context'], HotfixPublication::class);
-                        $status = (string) $publication->status();
 
-                        $progressBar->setMessage($this->time(), 'time');
-                        $progressBar->setMessage($status, 'status');
-
-                        $progressBar->advance();
+                        $publicationProgress->setStatus((string) $publication->status());
+                        $publicationProgress->advance();
 
                         if ($publication->published()) {
-                            $progressBar->finish();
+                            $publicationProgress->finish();
 
                             $result = Command::SUCCESS;
 
@@ -247,14 +228,7 @@ FORMAT;
                         }
                     } else {
                         $event = $this->serializer->denormalize($data['context'], $eventName);
-                        $eventLog[] = $this->eventLogFormatter->format($event);
-
-                        $progressBar->setMessage(
-                            message: join("\n    ", array_slice($eventLog, -30)) . "\n",
-                            name: 'event_log_tail',
-                        );
-
-                        $progressBar->display();
+                        $publicationProgress->addEvent($event);
                     }
                 }
             }
