@@ -22,16 +22,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class PublicationAwareCommand extends Command
 {
-    private const array NO_MERGE_REQUESTS_ACTION_IDS = [
+    protected const array NO_MERGE_REQUESTS_ACTIONS = [
+        'Abort publication' => self::NO_MERGE_REQUESTS_ACTION_IDS['ABORT'],
+        'Load merge requests for the task again' => self::NO_MERGE_REQUESTS_ACTION_IDS['RELOAD'],
+        'Continue without merge requests' => self::NO_MERGE_REQUESTS_ACTION_IDS['CONTINUE'],
+    ];
+
+    protected const array NO_MERGE_REQUESTS_ACTION_IDS = [
         'ABORT' => 0,
         'RELOAD' => 1,
         'CONTINUE' => 2,
-    ];
-
-    private const array NO_MERGE_REQUESTS_ACTIONS = [
-        'Abort release preparation' => self::NO_MERGE_REQUESTS_ACTION_IDS['ABORT'],
-        'Load merge requests for the task again' => self::NO_MERGE_REQUESTS_ACTION_IDS['RELOAD'],
-        'Continue without merge requests' => self::NO_MERGE_REQUESTS_ACTION_IDS['CONTINUE'],
     ];
 
     private array $userChoices = [

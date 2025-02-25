@@ -29,6 +29,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[AsCommand(name: 'pm:release:prepare', description: 'Prepares a new release')]
 final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
 {
+    protected const array NO_MERGE_REQUESTS_ACTIONS = [
+        'Abort release preparation' => self::NO_MERGE_REQUESTS_ACTION_IDS['ABORT'],
+        'Load merge requests for the task again' => self::NO_MERGE_REQUESTS_ACTION_IDS['RELOAD'],
+        'Continue without merge requests' => self::NO_MERGE_REQUESTS_ACTION_IDS['CONTINUE'],
+    ];
+
     private readonly Issue\Status $statusReadyToMerge;
 
     private readonly Issue\Status $statusReleaseCandidate;
