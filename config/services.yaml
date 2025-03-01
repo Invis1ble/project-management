@@ -222,6 +222,10 @@ services:
         arguments:
             $stepResolvers: !tagged_iterator invis1ble_project_management.publication_progress.step_resolver
 
+    Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\Command\ShowingProgressCommandDispatcher:
+        arguments:
+            $dateTimeFormat: 'd.m.Y H:i:sP'
+
 
 
 
@@ -269,3 +273,4 @@ services:
     Invis1ble\ProjectManagement\Shared\Domain\EventLog\EventFormatterStackInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\EventLog\EventFormatterStack'
     Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\StepResolverInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress\StepResolver'
     Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressFactoryInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\PublicationProgress\PublicationProgressFactory'
+    Invis1ble\ProjectManagement\Shared\Ui\Command\ShowingProgressCommandDispatcherInterface: '@Invis1ble\ProjectManagement\Shared\Infrastructure\Ui\Command\ShowingProgressCommandDispatcher'

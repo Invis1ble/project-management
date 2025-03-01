@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Ui\Command;
 
-use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\Messenger\Query\QueryInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
@@ -18,7 +17,6 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class PublicationAwareCommand extends Command
 {
@@ -40,10 +38,8 @@ abstract class PublicationAwareCommand extends Command
 
     public function __construct(
         protected readonly QueryBusInterface $queryBus,
-        protected readonly CommandBusInterface $commandBus,
-        protected readonly SerializerInterface $serializer,
-        protected readonly Issue\StatusProviderInterface $issueStatusProvider,
-        protected readonly Issue\GuiUrlFactoryInterface $issueGuiUrlFactory,
+        private readonly Issue\GuiUrlFactoryInterface $issueGuiUrlFactory,
+        protected readonly ShowingProgressCommandDispatcherInterface $showingProgressCommandDispatcher,
         protected readonly \DateInterval $pipelineMaxAwaitingTime,
     ) {
         parent::__construct();
@@ -151,46 +147,7 @@ abstract class PublicationAwareCommand extends Command
         return Tag\VersionName::fromString($tagName);
     }
 
-    protected function showProgressLog(QueryInterface $query, callable $inFinalState): int
-    {
-        $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
-        $tickInterval = 10;
-        $previousStatus = null;
-        $statusChanged = false;
-
-        while (new \DateTimeImmutable() <= $untilTime) {
-            $publication = $this->getPublication($query);
-            $status = $publication->status();
-            $this->displayProgress($this->serializer->serialize($status, 'json'));
-
-            if (null === $previousStatus || ($statusChanged = !$status->equals($previousStatus))) {
-                $previousStatus = $status;
-            }
-
-            if ($inFinalState($publication)) {
-                return Command::SUCCESS;
-            }
-
-            sleep($tickInterval);
-
-            if ($statusChanged) {
-                $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
-            }
-        }
-
-        if (null === $previousStatus || !$statusChanged) {
-            $this->abort('Publication stuck');
-        }
-
-        return Command::SUCCESS;
-    }
-
     abstract protected function getPublication(QueryInterface $query): ReleasePublicationInterface|HotfixPublicationInterface;
-
-    protected function displayProgress(string $message): void
-    {
-        $this->io->writeln('[' . date('Y-m-d\TH:i:s.uP') . "] $message");
-    }
 
     protected function caption(string $text): void
     {

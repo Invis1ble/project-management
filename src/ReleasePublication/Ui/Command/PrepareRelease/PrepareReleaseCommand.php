@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\PrepareRelease;
 
-use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\CreateReleasePublication\CreateReleasePublicationCommand;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\ProceedToNextStatus\ProceedToNextStatusCommand;
@@ -12,19 +11,21 @@ use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\Get
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestReleasePublication\GetLatestReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReleasePublication\GetReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetTasksInActiveSprint\GetTasksInActiveSprintQuery;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\AbstractReleasePublicationEvent;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationInterface;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\Dictionary as PublicationStatusDictionary;
 use Invis1ble\ProjectManagement\ReleasePublication\Ui\Command\ReleasePublicationAwareCommand;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch\Name as BasicBranchName;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\GuiUrlFactoryInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Version;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\ShowingProgressCommandDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:release:prepare', description: 'Prepares a new release')]
 final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
@@ -41,21 +42,18 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
 
     public function __construct(
         QueryBusInterface $queryBus,
-        CommandBusInterface $commandBus,
         GuiUrlFactoryInterface $issueGuiUrlFactory,
-        SerializerInterface $serializer,
-        \DateInterval $pipelineMaxAwaitingTime,
         Issue\StatusProviderInterface $statusProvider,
+        ShowingProgressCommandDispatcherInterface $showingProgressCommandDispatcher,
+        \DateInterval $pipelineMaxAwaitingTime,
     ) {
         $this->statusReadyToMerge = $statusProvider->readyToMerge();
         $this->statusReleaseCandidate = $statusProvider->releaseCandidate();
 
         parent::__construct(
             queryBus: $queryBus,
-            commandBus: $commandBus,
-            serializer: $serializer,
-            issueStatusProvider: $statusProvider,
             issueGuiUrlFactory: $issueGuiUrlFactory,
+            showingProgressCommandDispatcher: $showingProgressCommandDispatcher,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }
@@ -139,19 +137,38 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
             $this->abort();
         }
 
-        if (false === $resume) {
-            $this->commandBus->dispatch(new CreateReleasePublicationCommand(
-                branchName: $newReleaseBranchName,
-                tasks: $tasks,
-            ));
+        if (isset($publication)) {
+            $status = (string) $publication->status();
         } else {
-            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+            $status = 'inited';
         }
 
-        return $this->showProgressLog(
-            query: new GetReleasePublicationQuery($publicationId),
-            inFinalState: fn (ReleasePublicationInterface $publication): bool => $publication->prepared(),
+        if (false === $resume) {
+            $command = new CreateReleasePublicationCommand(
+                branchName: $newReleaseBranchName,
+                tasks: $tasks,
+            );
+        } else {
+            $command = new ProceedToNextStatusCommand($publicationId);
+        }
+
+        $result = $this->showingProgressCommandDispatcher->dispatch(
+            io: $this->io,
+            command: $command,
+            initialStatus: $status,
+            finalStatus: PublicationStatusDictionary::ReleaseCandidateCreated,
+            publicationClass: ReleasePublication::class,
+            publicationEventClass: AbstractReleasePublicationEvent::class,
+            publicationStatusDictionaryClass: PublicationStatusDictionary::class,
         );
+
+        if (Command::SUCCESS === $result) {
+            $this->io->success('Release prepared');
+        } else {
+            $this->io->error('Unexpected error occurred');
+        }
+
+        return $result;
     }
 
     private function latestReleaseBranchName(): Branch\Name

@@ -24,13 +24,17 @@ return (new Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
-        'multiline_comment_opening_closing' => true, // @PhpCsFixer default
         'comment_to_phpdoc' => [
             'ignored_tags' => [],
         ], // @PhpCsFixer:risky default
         'concat_space' => [
             'spacing' => 'one',
         ], // overrides @Symfony defaults
+        'multiline_comment_opening_closing' => true, // @PhpCsFixer default
+        'no_superfluous_phpdoc_tags' => [
+            'allow_hidden_params' => true,
+            'remove_inheritdoc' => false,  // overrides @Symfony defaults
+        ],
         'single_line_throw' => false, // overrides @Symfony defaults
         'trailing_comma_in_multiline' => [
             'after_heredoc' => true,

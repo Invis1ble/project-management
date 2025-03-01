@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublishHotfix;
 
-use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\Messenger\Query\QueryInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
@@ -19,23 +18,16 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary as PublicationStatusDictionary;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\EventNameReducerInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationAwareCommand;
-use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\PublicationProgressFactoryInterface;
-use Invis1ble\ProjectManagement\Shared\Ui\PublicationProgress\StepResolverInterface;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\ShowingProgressCommandDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpClient\Chunk\ServerSentEvent;
-use Symfony\Component\HttpClient\EventSourceHttpClient;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:hotfix:publish', description: 'Publish hotfixes')]
 final class PublishHotfixCommand extends PublicationAwareCommand
@@ -44,25 +36,18 @@ final class PublishHotfixCommand extends PublicationAwareCommand
 
     public function __construct(
         QueryBusInterface $queryBus,
-        CommandBusInterface $commandBus,
         Issue\GuiUrlFactoryInterface $issueGuiUrlFactory,
-        SerializerInterface $serializer,
         Issue\StatusProviderInterface $issueStatusProvider,
-        \DateInterval $pipelineMaxAwaitingTime,
+        ShowingProgressCommandDispatcherInterface $showingProgressCommandDispatcher,
         private readonly MessageFactoryInterface $tagMessageFactory,
-        private readonly HubInterface $mercureHub,
-        private readonly EventNameReducerInterface $eventNameReducer,
-        private readonly StepResolverInterface $publicationProgressStepResolver,
-        private readonly PublicationProgressFactoryInterface $publicationProgressFactory,
+        \DateInterval $pipelineMaxAwaitingTime,
     ) {
         $this->statusReadyForPublish = $issueStatusProvider->readyForPublish();
 
         parent::__construct(
             queryBus: $queryBus,
-            commandBus: $commandBus,
-            serializer: $serializer,
-            issueStatusProvider: $issueStatusProvider,
             issueGuiUrlFactory: $issueGuiUrlFactory,
+            showingProgressCommandDispatcher: $showingProgressCommandDispatcher,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }
@@ -153,95 +138,25 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             $status = 'inited';
         }
 
-        $publicationProgress = $this->publicationProgressFactory->create(
-            io: $this->io,
-            finalStep: $this->publicationProgressStepResolver->resolve(PublicationStatusDictionary::Done),
-            dateTimeFormat: 'd.m.Y H:i:sP',
-        );
-
-        $publicationProgress->start(status: $status);
-
-        $topics = ['/api/events'];
-
-        $url = $this->mercureHub->getPublicUrl();
-
-        if (null !== $topics) {
-            // We cannot use http_build_query() because this method doesn't support generating multiple query parameters with the same name without the [] suffix
-            $separator = '?';
-            foreach ((array) $topics as $topic) {
-                $url .= $separator . 'topic=' . rawurlencode($topic);
-                if ('?' === $separator) {
-                    $separator = '&';
-                }
-            }
-        }
-
-        $client = HttpClient::create();
-        $client = new EventSourceHttpClient($client, 10);
-        $source = $client->connect($url);
-
-        $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
-
-        $result = Command::FAILURE;
-
         if (isset($publicationId)) {
-            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+            $command = new ProceedToNextStatusCommand($publicationId);
         } else {
-            $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
+            $command = new CreateHotfixPublicationCommand(
                 tagName: $tagName,
                 tagMessage: $tagMessage,
                 hotfixes: $hotfixes,
-            ));
+            );
         }
 
-        while ($source) {
-            foreach ($client->stream($source, 0.1) as $chunk) {
-                if ($chunk->isTimeout()) {
-                    continue;
-                }
-
-                if (new \DateTimeImmutable() > $untilTime) {
-                    $publicationProgress->setStatus("stuck in {$status}");
-
-                    break 2;
-                }
-
-                if ($chunk->isLast()) {
-                    break 2;
-                }
-
-                if ($chunk instanceof ServerSentEvent) {
-                    $data = $chunk->getArrayData();
-                    $eventName = $this->eventNameReducer->expand($data['name']);
-
-                    if (is_subclass_of($eventName, AbstractHotfixPublicationEvent::class)) {
-                        $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
-
-                        /** @var HotfixPublication $publication */
-                        $publication = $this->serializer->denormalize($data['context'], HotfixPublication::class);
-
-                        $status = (string) $publication->status();
-                        $publicationProgress->setStatus($status);
-                        $publicationProgress->setProgress(
-                            $this->publicationProgressStepResolver->resolve(PublicationStatusDictionary::from($status)),
-                        );
-
-                        if ($publication->published()) {
-                            $publicationProgress->finish();
-
-                            $result = Command::SUCCESS;
-
-                            break 2;
-                        }
-                    } else {
-                        $event = $this->serializer->denormalize($data['context'], $eventName);
-                        $publicationProgress->addEvent($event);
-                    }
-                }
-            }
-        }
-
-        $this->io->newLine();
+        $result = $this->showingProgressCommandDispatcher->dispatch(
+            io: $this->io,
+            command: $command,
+            initialStatus: $status,
+            finalStatus: PublicationStatusDictionary::Done,
+            publicationClass: HotfixPublication::class,
+            publicationEventClass: AbstractHotfixPublicationEvent::class,
+            publicationStatusDictionaryClass: PublicationStatusDictionary::class,
+        );
 
         if (Command::SUCCESS === $result) {
             $this->io->success('Publication done');
