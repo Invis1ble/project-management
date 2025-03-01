@@ -31,7 +31,7 @@ return RectorConfig::configure()
     ])
     ->withPhpSets()
     ->withSets([
-        SymfonySetList::SYMFONY_64,
+        SymfonySetList::SYMFONY_71,
         SymfonySetList::SYMFONY_CODE_QUALITY,
         SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
 
