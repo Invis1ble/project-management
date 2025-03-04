@@ -34,6 +34,11 @@ readonly class VersionName extends Name
         return new self((string) $ref);
     }
 
+    public function versionCompare(self $name): int
+    {
+        return version_compare($this->value, $name->value);
+    }
+
     public function bumpVersion(): self
     {
         $i = $this->i + 1;
