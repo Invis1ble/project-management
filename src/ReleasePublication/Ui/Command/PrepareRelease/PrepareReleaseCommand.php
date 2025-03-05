@@ -11,7 +11,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\Get
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestReleasePublication\GetLatestReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReleasePublication\GetReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetTasksInActiveSprint\GetTasksInActiveSprintQuery;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\AbstractReleasePublicationEvent;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\AbstractReleasePublicationStatusSetEvent;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
@@ -158,7 +158,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
             initialStatus: $status,
             finalStatus: PublicationStatusDictionary::ReleaseCandidateCreated,
             publicationClass: ReleasePublication::class,
-            publicationEventClass: AbstractReleasePublicationEvent::class,
+            publicationStatusSetEventClass: AbstractReleasePublicationStatusSetEvent::class,
             publicationStatusDictionaryClass: PublicationStatusDictionary::class,
         );
 

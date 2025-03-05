@@ -11,7 +11,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\Pr
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixesInActiveSprint\GetHotfixesInActiveSprintQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixPublication\GetHotfixPublicationQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublication\GetLatestHotfixPublicationQuery;
-use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\AbstractHotfixPublicationEvent;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\AbstractHotfixPublicationStatusSetEvent;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
@@ -154,7 +154,7 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             initialStatus: $status,
             finalStatus: PublicationStatusDictionary::Done,
             publicationClass: HotfixPublication::class,
-            publicationEventClass: AbstractHotfixPublicationEvent::class,
+            publicationStatusSetEventClass: AbstractHotfixPublicationStatusSetEvent::class,
             publicationStatusDictionaryClass: PublicationStatusDictionary::class,
         );
 

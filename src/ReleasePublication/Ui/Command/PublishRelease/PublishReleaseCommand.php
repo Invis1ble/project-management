@@ -10,7 +10,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Command\P
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestRelease\GetLatestReleaseQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetLatestReleasePublication\GetLatestReleasePublicationQuery;
 use Invis1ble\ProjectManagement\ReleasePublication\Application\UseCase\Query\GetReleasePublication\GetReleasePublicationQuery;
-use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\AbstractReleasePublicationEvent;
+use Invis1ble\ProjectManagement\ReleasePublication\Domain\Event\AbstractReleasePublicationStatusSetEvent;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublication;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\ReleasePublicationId;
 use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\SourceCodeRepository\Branch;
@@ -113,7 +113,7 @@ final class PublishReleaseCommand extends ReleasePublicationAwareCommand
             initialStatus: $status,
             finalStatus: PublicationStatusDictionary::Done,
             publicationClass: ReleasePublication::class,
-            publicationEventClass: AbstractReleasePublicationEvent::class,
+            publicationStatusSetEventClass: AbstractReleasePublicationStatusSetEvent::class,
             publicationStatusDictionaryClass: PublicationStatusDictionary::class,
         );
 

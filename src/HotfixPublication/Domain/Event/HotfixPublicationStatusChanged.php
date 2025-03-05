@@ -9,7 +9,7 @@ use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\StatusInte
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
-final readonly class HotfixPublicationStatusChanged extends AbstractHotfixPublicationEvent
+final readonly class HotfixPublicationStatusChanged extends AbstractHotfixPublicationStatusSetEvent
 {
     public function __construct(
         HotfixPublicationId $id,

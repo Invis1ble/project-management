@@ -17,7 +17,7 @@ interface ShowingProgressCommandDispatcherInterface
      * @phpstan-param TStatus              $finalStatus
      *
      * @param class-string<T>              $publicationClass
-     * @param class-string<EventInterface> $publicationEventClass
+     * @param class-string<EventInterface> $publicationStatusSetEventClass
      * @param class-string<TStatus>        $publicationStatusDictionaryClass
      */
     public function dispatch(
@@ -26,7 +26,7 @@ interface ShowingProgressCommandDispatcherInterface
         string $initialStatus,
         \BackedEnum $finalStatus,
         string $publicationClass,
-        string $publicationEventClass,
+        string $publicationStatusSetEventClass,
         string $publicationStatusDictionaryClass,
     ): int;
 

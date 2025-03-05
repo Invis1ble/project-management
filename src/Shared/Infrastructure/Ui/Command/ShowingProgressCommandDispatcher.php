@@ -42,7 +42,7 @@ final class ShowingProgressCommandDispatcher implements ShowingProgressCommandDi
         string $initialStatus,
         \BackedEnum $finalStatus,
         string $publicationClass,
-        string $publicationEventClass,
+        string $publicationStatusSetEventClass,
         string $publicationStatusDictionaryClass,
     ): int {
         $status = $initialStatus;
@@ -97,9 +97,9 @@ final class ShowingProgressCommandDispatcher implements ShowingProgressCommandDi
 
                 if ($chunk instanceof ServerSentEvent) {
                     $data = $chunk->getArrayData();
-                    $eventName = $this->eventNameReducer->expand($data['name']);
+                    $eventClass = $this->eventNameReducer->expand($data['name']);
 
-                    if (is_subclass_of($eventName, $publicationEventClass)) {
+                    if (is_subclass_of($eventClass, $publicationStatusSetEventClass)) {
                         $untilTime = (new \DateTimeImmutable())->add($this->pipelineMaxAwaitingTime);
 
                         /** @var HotfixPublication $publication */
@@ -119,7 +119,7 @@ final class ShowingProgressCommandDispatcher implements ShowingProgressCommandDi
                             break 2;
                         }
                     } else {
-                        $event = $this->serializer->denormalize($data['context'], $eventName);
+                        $event = $this->serializer->denormalize($data['context'], $eventClass);
                         $publicationProgress->addEvent($event);
                     }
                 }
