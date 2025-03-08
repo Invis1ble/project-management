@@ -25,7 +25,9 @@ final class PublicationProgress implements PublicationProgressInterface
     public function __construct(
         OutputStyle $io,
         private readonly EventFormatterStackInterface $eventFormatter,
+        ?Step $initialStep,
         Step $finalStep,
+        string $initialStatus = 'inited',
         private readonly int $eventLogTailSize = 30,
         private readonly ?string $dateTimeFormat = self::DEFAULT_DATETIME_FORMAT,
     ) {
@@ -41,23 +43,26 @@ FORMAT;
         ProgressBar::setFormatDefinition('custom', $format);
 
         $this->progressBar = $io->createProgressBar($finalStep->value);
-    }
-
-    public function start(string $status = 'inited'): void
-    {
         $this->progressBar->setFormat('custom');
         $this->progressBar->maxSecondsBetweenRedraws(0.1);
 
         $this->setStatus(
-            status: $status,
+            status: $initialStatus,
             display: false,
         );
+
+        if (null !== $initialStep) {
+            $this->setProgress($initialStep);
+        }
 
         $this->progressBar->setMessage(
             message: "\n",
             name: 'event_log_tail',
         );
+    }
 
+    public function start(): void
+    {
         $this->progressBar->start();
     }
 

@@ -90,8 +90,12 @@ final readonly class StepResolver implements StepResolverInterface
         return $status instanceof Dictionary;
     }
 
-    public function resolve(\BackedEnum $status): Step
+    public function resolve(?\BackedEnum $status): Step
     {
+        if (null === $status) {
+            return new Step(0);
+        }
+
         if (isset(self::STEPS[$status->value])) {
             return new Step(self::STEPS[$status->value]);
         }

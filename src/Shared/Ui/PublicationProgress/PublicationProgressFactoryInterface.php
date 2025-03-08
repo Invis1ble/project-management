@@ -10,7 +10,9 @@ interface PublicationProgressFactoryInterface
 {
     public function create(
         OutputStyle $io,
+        ?Step $initialStep,
         Step $finalStep,
+        string $initialStatus = 'inited',
         int $eventLogTailSize = 30,
         ?string $dateTimeFormat = null,
     ): PublicationProgressInterface;

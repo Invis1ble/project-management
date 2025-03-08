@@ -94,7 +94,7 @@ final class PublishReleaseCommand extends ReleasePublicationAwareCommand
         if (isset($publication)) {
             $status = (string) $publication->status();
         } else {
-            $status = PublicationStatusDictionary::ReleaseCandidateCreated->value;
+            $status = 'inited';
         }
 
         if (isset($publicationId)) {

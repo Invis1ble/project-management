@@ -8,7 +8,7 @@ use Invis1ble\Messenger\Event\EventInterface;
 
 interface PublicationProgressInterface
 {
-    public function start(string $status = 'inited'): void;
+    public function start(): void;
 
     public function setProgress(Step $step): void;
 

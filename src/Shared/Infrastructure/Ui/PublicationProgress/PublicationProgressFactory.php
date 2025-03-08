@@ -18,14 +18,18 @@ final readonly class PublicationProgressFactory implements PublicationProgressFa
 
     public function create(
         OutputStyle $io,
+        ?Step $initialStep,
         Step $finalStep,
+        string $initialStatus = 'inited',
         int $eventLogTailSize = 30,
         ?string $dateTimeFormat = null,
     ): PublicationProgressInterface {
         return new PublicationProgress(
             io: $io,
             eventFormatter: $this->eventFormatter,
+            initialStep: $initialStep,
             finalStep: $finalStep,
+            initialStatus: $initialStatus,
             eventLogTailSize: $eventLogTailSize,
             dateTimeFormat: $dateTimeFormat ?? PublicationProgress::DEFAULT_DATETIME_FORMAT,
         );

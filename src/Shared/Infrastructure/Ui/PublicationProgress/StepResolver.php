@@ -47,8 +47,12 @@ final readonly class StepResolver implements StepResolverInterface
         return false;
     }
 
-    public function resolve(\BackedEnum $status): Step
+    public function resolve(?\BackedEnum $status): Step
     {
+        if (null === $status) {
+            return new Step(0);
+        }
+
         foreach ($this->resolvers as $resolver) {
             if ($resolver->supports($status)) {
                 return $resolver->resolve($status);

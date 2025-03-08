@@ -49,11 +49,13 @@ final class ShowingProgressCommandDispatcher implements ShowingProgressCommandDi
 
         $publicationProgress = $this->publicationProgressFactory->create(
             io: $io,
+            initialStep: $this->publicationProgressStepResolver->resolve($publicationStatusDictionaryClass::tryFrom($initialStatus)),
             finalStep: $this->publicationProgressStepResolver->resolve($finalStatus),
+            initialStatus: $initialStatus,
             dateTimeFormat: $this->dateTimeFormat,
         );
 
-        $publicationProgress->start(status: $status);
+        $publicationProgress->start();
 
         $topics = ['/api/events'];
 

@@ -11,5 +11,5 @@ interface StepResolverInterface
     /**
      * @throws \InvalidArgumentException
      */
-    public function resolve(\BackedEnum $status): Step;
+    public function resolve(?\BackedEnum $status): Step;
 }
