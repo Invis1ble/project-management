@@ -113,7 +113,7 @@ final class ShowingProgressCommandDispatcher implements ShowingProgressCommandDi
                             $this->publicationProgressStepResolver->resolve($publicationStatusDictionaryClass::from($status)),
                         );
 
-                        if ($publication->published()) {
+                        if ($finalStatus->value === $status) {
                             $publicationProgress->finish();
 
                             $result = SymfonyCommand::SUCCESS;
