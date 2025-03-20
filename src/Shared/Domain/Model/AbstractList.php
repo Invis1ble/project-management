@@ -88,7 +88,7 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
 
     public function concat(self $other): static
     {
-        if ($other::class !== $this::class) {
+        if ($other::class !== static::class) {
             throw new \InvalidArgumentException(sprintf('Incompatible object type: %s', $other::class));
         }
 
