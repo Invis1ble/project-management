@@ -71,9 +71,9 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
 
             $tasks = $this->tasksToRelease();
             $tasks = $this->enrichIssuesWithMergeRequests(
-                issues: $tasks,
+                issues: $tasks->onlyInStatus($this->statusReadyToMerge),
                 targetBranchName: BasicBranchName::fromString('develop'),
-            );
+            )->concat($tasks->onlyInStatus($this->statusReleaseCandidate));
 
             $this->caption("Latest release branch name: $latestReleaseBranchName");
 
@@ -221,7 +221,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         $this->caption('Tasks to merge');
         $this->listIssues($tasksToMerge);
 
-        return $tasksToMerge;
+        return $tasks;
     }
 
     private function listTasksToRelease(Issue\IssueList $tasks): void
@@ -229,7 +229,7 @@ final class PrepareReleaseCommand extends ReleasePublicationAwareCommand
         $releaseCandidateTasks = $tasks->onlyInStatus($this->statusReleaseCandidate);
         $readyToMergeTasks = $tasks->onlyInStatus($this->statusReadyToMerge);
 
-        if (!$readyToMergeTasks->empty()) {
+        if (!$releaseCandidateTasks->empty()) {
             $this->caption("$this->statusReleaseCandidate tasks");
             $this->listIssues($releaseCandidateTasks);
         }
