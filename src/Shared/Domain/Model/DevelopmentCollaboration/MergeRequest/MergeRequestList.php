@@ -43,14 +43,6 @@ final readonly class MergeRequestList extends AbstractList
         );
     }
 
-    public function concat(self $list): self
-    {
-        return new self(
-            ...$this->elements,
-            ...$list->elements,
-        );
-    }
-
     public function onlyShouldBeCopiedWithNewTargetBranch(
         ProjectResolver $projectResolver,
         SourceCodeRepositoryInterface $frontendSourceCodeRepository,

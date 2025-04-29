@@ -44,6 +44,8 @@ abstract readonly class AbstractStatus implements StatusInterface
         $reflection = new \ReflectionMethod($publication, 'raiseDomainEvent');
         $reflection->invoke($publication, new HotfixPublicationStatusChanged(
             id: $publication->id(),
+            tagName: $publication->tagName(),
+            tagMessage: $publication->tagMessage(),
             status: $publication->status(),
             previousStatus: $previousStatus,
             hotfixes: $publication->hotfixes(),

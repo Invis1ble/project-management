@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Ui\Command;
 
-use Symfony\Component\Console\Command\Command as BasicCommand;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-abstract class Command extends BasicCommand
+abstract class Command extends SymfonyCommand
 {
     protected SymfonyStyle $io;
 

@@ -15,9 +15,7 @@ abstract class AbstractStringableValueObjectNormalizer extends AbstractValueObje
         ?string $format = null,
         array $context = [],
     ): object {
-        [$type, $value] = explode(':', (string) $data, 2);
-
-        return $this->createValueObject($value, $type);
+        return $this->createValueObject($data, $type);
     }
 
     public function normalize(
@@ -25,9 +23,7 @@ abstract class AbstractStringableValueObjectNormalizer extends AbstractValueObje
         ?string $format = null,
         array $context = [],
     ): string {
-        $type = $object::class;
-
-        return "$type:{$this->stringify($object)}";
+        return $this->stringify($object);
     }
 
     protected function getDenormalizationFactoryMethod(): string

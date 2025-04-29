@@ -21,6 +21,14 @@ final readonly class ReleasePublicationTagSet extends AbstractReleasePublication
         IssueList $tasks,
         \DateTimeImmutable $createdAt,
     ) {
-        parent::__construct($id, $branchName, $tagName, $tagMessage, $status, $tasks, $createdAt);
+        parent::__construct(
+            id: $id,
+            branchName: $branchName,
+            tagName: $tagName,
+            tagMessage: $tagMessage,
+            status: $status,
+            tasks: $tasks,
+            createdAt: $createdAt,
+        );
     }
 }

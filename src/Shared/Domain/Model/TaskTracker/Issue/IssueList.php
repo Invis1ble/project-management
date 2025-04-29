@@ -15,7 +15,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 final readonly class IssueList extends AbstractList
 {
     /**
-     * @var \SplObjectStorage<Key>
+     * @var \SplObjectStorage<Key, Issue>
      */
     private \SplObjectStorage $storage;
 

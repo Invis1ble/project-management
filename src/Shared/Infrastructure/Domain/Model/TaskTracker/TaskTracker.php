@@ -39,7 +39,7 @@ readonly class TaskTracker implements TaskTrackerInterface
     }
 
     /**
-     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post Transition API
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post Transition Issue
      */
     public function transitionTo(
         Issue\Key $key,
@@ -244,6 +244,9 @@ readonly class TaskTracker implements TaskTrackerInterface
         );
     }
 
+    /**
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-get Get transitions
+     */
     public function issueTransitions(Issue\Key $key): Transition\TransitionList
     {
         $request = $this->requestFactory->createRequest(

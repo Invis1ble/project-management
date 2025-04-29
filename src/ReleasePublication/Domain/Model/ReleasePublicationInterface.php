@@ -63,7 +63,7 @@ interface ReleasePublicationInterface extends AggregateRootInterface
 
     public function status(): StatusInterface;
 
-    public function createdAt(): \DateTimeImmutable;
-
     public function tasks(): IssueList;
+
+    public function createdAt(): \DateTimeImmutable;
 }

@@ -6,14 +6,14 @@ namespace Invis1ble\ProjectManagement\Shared\Infrastructure\Domain\Model\Continu
 
 use Invis1ble\Messenger\Event\EventBusInterface;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobAwaitingTick;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRan;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRetried;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobRun;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStatusChanged;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Job\JobStuck;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineAwaitingTick;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStatusChanged;
-use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\LatestPipelineStuck;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineRetried;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineStatusChanged;
+use Invis1ble\ProjectManagement\Shared\Domain\Event\ContinuousIntegration\Pipeline\PipelineStuck;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestAwaitingTick;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestCreated;
 use Invis1ble\ProjectManagement\Shared\Domain\Event\DevelopmentCollaboration\MergeRequest\MergeRequestMerged;
@@ -91,17 +91,16 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             $pipeline = $this->getPipeline($ref);
 
             if ($pipeline->createdAfter($createdAfter)) {
-                if (null === $previousStatus || !$pipeline->status->equals($previousStatus)) {
-                    $this->eventBus->dispatch(new LatestPipelineStatusChanged(
+                if (null !== $previousStatus && !$pipeline->status->equals($previousStatus)) {
+                    $this->eventBus->dispatch(new PipelineStatusChanged(
                         projectId: $pipeline->projectId,
                         ref: $pipeline->ref,
                         pipelineId: $pipeline->id,
                         previousStatus: $previousStatus,
                         status: $pipeline->status,
+                        guiUrl: $pipeline->guiUrl,
                         maxAwaitingTime: $maxAwaitingTime,
                     ));
-
-                    $previousStatus = $pipeline->status;
                 }
 
                 if ($pipeline->finished() || !$pipeline->inProgress()) {
@@ -109,20 +108,30 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                 }
             }
 
-            $this->eventBus->dispatch(new LatestPipelineAwaitingTick(
+            $this->eventBus->dispatch(new PipelineAwaitingTick(
                 projectId: $pipeline->projectId,
                 ref: $pipeline->ref,
                 pipelineId: $pipeline->id,
                 status: $pipeline->status,
+                guiUrl: $pipeline->guiUrl,
                 maxAwaitingTime: $maxAwaitingTime,
             ));
 
             sleep($tickIntervalInSeconds);
+
+            $previousStatus = $pipeline->status;
         }
 
-        $this->eventBus->dispatch(new LatestPipelineStuck(
+        if (!isset($pipeline)) {
+            $pipeline = $this->getPipeline($ref);
+        }
+
+        $this->eventBus->dispatch(new PipelineStuck(
             projectId: $this->projectId,
             ref: $ref,
+            pipelineId: $pipeline->id,
+            status: $pipeline->status,
+            guiUrl: $pipeline->guiUrl,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 
@@ -152,7 +161,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         while (new \DateTimeImmutable() <= $untilTime) {
             $job = $this->getJob($jobId);
 
-            if (null === $previousStatus || !$job->status->equals($previousStatus)) {
+            if (null !== $previousStatus && !$job->status->equals($previousStatus)) {
                 $this->eventBus->dispatch(new JobStatusChanged(
                     projectId: $this->projectId,
                     ref: $job->ref,
@@ -161,13 +170,12 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                     name: $job->name,
                     previousStatus: $previousStatus,
                     status: $job->status,
+                    guiUrl: $job->guiUrl,
                     createdAt: $job->createdAt,
                     startedAt: $job->createdAt,
                     finishedAt: $job->createdAt,
                     maxAwaitingTime: $maxAwaitingTime,
                 ));
-
-                $previousStatus = $job->status;
             }
 
             if ($job->finished() || !$job->inProgress()) {
@@ -181,6 +189,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
                 jobId: $job->id,
                 name: $job->name,
                 status: $job->status,
+                guiUrl: $job->guiUrl,
                 createdAt: $job->createdAt,
                 startedAt: $job->startedAt,
                 finishedAt: $job->finishedAt,
@@ -188,17 +197,34 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             ));
 
             sleep($tickIntervalInSeconds);
+
+            $previousStatus = $job->status;
+        }
+
+        if (!isset($job)) {
+            $job = $this->getJob($jobId);
         }
 
         $this->eventBus->dispatch(new JobStuck(
-            projectId: $this->projectId,
-            jobId: $jobId,
+            projectId: $job->pipeline->projectId,
+            ref: $job->ref,
+            pipelineId: $job->pipeline->id,
+            jobId: $job->id,
+            name: $job->name,
+            status: $job->status,
+            guiUrl: $job->guiUrl,
+            createdAt: $job->createdAt,
+            startedAt: $job->startedAt,
+            finishedAt: $job->finishedAt,
             maxAwaitingTime: $maxAwaitingTime,
         ));
 
         return $job ?? null;
     }
 
+    /**
+     * @see https://docs.gitlab.com/ee/api/pipelines.html#retry-jobs-in-a-pipeline Retry jobs in a pipeline
+     */
     public function retryPipeline(Pipeline\PipelineId $pipelineId): ?Pipeline\Pipeline
     {
         $request = $this->requestFactory->createRequest(
@@ -231,6 +257,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             ref: $pipeline->ref,
             pipelineId: $pipeline->id,
             status: $pipeline->status,
+            guiUrl: $pipeline->guiUrl,
         ));
 
         return $pipeline;
@@ -257,6 +284,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             name: $data['name'],
             ref: $data['ref'],
             status: $data['status'],
+            guiUrl: $data['web_url'] ?? null,
             createdAt: $data['created_at'],
             startedAt: $data['started_at'],
             finishedAt: $data['finished_at'],
@@ -275,6 +303,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             jobId: $job->id,
             name: $job->name,
             status: $job->status,
+            guiUrl: $job->guiUrl,
             createdAt: $job->createdAt,
             startedAt: $job->startedAt,
             finishedAt: $job->finishedAt,
@@ -333,6 +362,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             name: $data['name'],
             ref: $data['ref'],
             status: $data['status'],
+            guiUrl: $data['web_url'] ?? null,
             createdAt: $data['created_at'],
             startedAt: $data['started_at'],
             finishedAt: $data['finished_at'],
@@ -345,12 +375,13 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             pipelineGuiUrl: $data['pipeline']['web_url'] ?? null,
         );
 
-        $this->eventBus->dispatch(new JobRan(
+        $this->eventBus->dispatch(new JobRun(
             projectId: $this->projectId,
             ref: $job->ref,
             jobId: $job->id,
             name: $job->name,
             status: $job->status,
+            guiUrl: $job->guiUrl,
             createdAt: $job->createdAt,
             startedAt: $job->startedAt,
             finishedAt: $job->finishedAt,
@@ -459,7 +490,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         $data = [
             'branch' => (string) $branchName,
             'commit_message' => (string) $message,
-            'actions' => iterator_to_array($actions->map(fn (NewCommit\Action\AbstractAction $action): array => $action->toArray())),
+            'actions' => iterator_to_array($actions->map(fn (NewCommit\Action\Action $action): array => $action->toArray())),
         ];
 
         $request = $this->requestFactory->createRequest(
@@ -850,6 +881,9 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         );
     }
 
+    /**
+     * @see https://docs.gitlab.com/ee/api/pipelines.html#get-a-single-pipeline Get a single pipeline
+     */
     private function getPipeline(Ref $ref): Pipeline\Pipeline
     {
         $request = $this->requestFactory->createRequest(
@@ -881,6 +915,9 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
         );
     }
 
+    /**
+     * @see https://docs.gitlab.com/ee/api/jobs.html#retry-a-job Retry a job
+     */
     private function getJob(Job\JobId $jobId): Job\Job
     {
         $request = $this->requestFactory->createRequest(
@@ -902,6 +939,7 @@ final readonly class GitlabClient implements SourceCodeRepositoryInterface, Cont
             name: $data['name'],
             ref: $data['ref'],
             status: $data['status'],
+            guiUrl: $data['web_url'] ?? null,
             createdAt: $data['created_at'],
             startedAt: $data['started_at'],
             finishedAt: $data['finished_at'],

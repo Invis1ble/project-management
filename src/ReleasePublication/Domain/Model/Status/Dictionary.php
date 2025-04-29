@@ -12,10 +12,6 @@ enum Dictionary: string
 
     case MergeRequestsIntoDevelopmentBranchMerged = 'merge_requests_into_development_branch_merged';
 
-    case BackendReleaseBranchCreated = 'backend_release_branch_created';
-
-    case FrontendApplicationBranchSetToRelease = 'frontend_application_branch_set_to_release';
-
     case FrontendReleaseBranchCreated = 'frontend_release_branch_created';
 
     case FrontendReleaseBranchPipelineCreated = 'frontend_release_branch_pipeline_created';
@@ -42,6 +38,18 @@ enum Dictionary: string
 
     case FrontendReleaseBranchPipelineStuck = 'frontend_release_branch_pipeline_stuck';
 
+    case BackendReleaseBranchCreated = 'backend_release_branch_created';
+
+    case FrontendApplicationBranchSetToRelease = 'frontend_application_branch_set_to_release';
+
+    case ReleaseCandidateRenamed = 'release_candidate_renamed';
+
+    case ReleaseCandidateCreated = 'release_candidate_created';
+
+    case FrontendMergeRequestIntoProductionReleaseBranchCreated = 'frontend_merge_request_into_production_release_branch_created';
+
+    case FrontendMergeRequestIntoProductionReleaseBranchMerged = 'frontend_merge_request_into_production_release_branch_merged';
+
     case FrontendProductionReleaseBranchPipelineCreated = 'frontend_production_release_branch_pipeline_created';
 
     case FrontendProductionReleaseBranchPipelineWaitingForResource = 'frontend_production_release_branch_pipeline_waiting_for_resource';
@@ -65,14 +73,6 @@ enum Dictionary: string
     case FrontendProductionReleaseBranchPipelineScheduled = 'frontend_production_release_branch_pipeline_scheduled';
 
     case FrontendProductionReleaseBranchPipelineStuck = 'frontend_production_release_branch_pipeline_stuck';
-
-    case ReleaseCandidateRenamed = 'release_candidate_renamed';
-
-    case ReleaseCandidateCreated = 'release_candidate_created';
-
-    case FrontendMergeRequestIntoProductionReleaseBranchCreated = 'frontend_merge_request_into_production_release_branch_created';
-
-    case FrontendMergeRequestIntoProductionReleaseBranchMerged = 'frontend_merge_request_into_production_release_branch_merged';
 
     case BackendMergeRequestIntoProductionReleaseBranchCreated = 'backend_merge_request_into_production_release_branch_created';
 
