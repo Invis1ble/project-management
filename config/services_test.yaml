@@ -1,0 +1,6 @@
+services:
+    invis1ble_project_management.serializer.test_normalizer.high_priority:
+        namespace: Invis1ble\ProjectManagement\Tests\
+        resource: '../tests/*/Infrastructure/**/*Normalizer.php'
+        tags:
+            - { name: serializer.normalizer, priority: 990 }

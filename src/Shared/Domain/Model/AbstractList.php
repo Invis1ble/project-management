@@ -86,6 +86,18 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
         return $initial;
     }
 
+    public function concat(self $other): static
+    {
+        if ($other::class !== static::class) {
+            throw new \InvalidArgumentException(sprintf('Incompatible object type: %s', $other::class));
+        }
+
+        return new static(
+            ...$this->elements(),
+            ...$other->elements(),
+        );
+    }
+
     /**
      * @template R
      *
@@ -136,5 +148,5 @@ abstract readonly class AbstractList implements \IteratorAggregate, \Countable
      * @param T $element1
      * @param T $element2
      */
-    abstract protected function elementsEquals($element1, $element2): bool;
+    abstract protected function elementsEquals(mixed $element1, mixed $element2): bool;
 }

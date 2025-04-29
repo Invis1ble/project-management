@@ -53,6 +53,8 @@ class HotfixPublication extends AbstractAggregateRoot implements HotfixPublicati
 
         $publication->raiseDomainEvent(new HotfixPublicationCreated(
             id: $publication->id(),
+            tagName: $tagName,
+            tagMessage: $tagMessage,
             status: $publication->status(),
             hotfixes: $hotfixes,
             createdAt: $publication->createdAt(),

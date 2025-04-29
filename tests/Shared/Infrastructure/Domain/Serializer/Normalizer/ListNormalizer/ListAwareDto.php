@@ -7,8 +7,7 @@ namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Seriali
 final readonly class ListAwareDto
 {
     public function __construct(
-        public AbstractTestList $abstract,
-        public TestList $concrete,
+        public TestList $list,
     ) {
     }
 }

@@ -39,7 +39,7 @@ readonly class TaskTracker implements TaskTrackerInterface
     }
 
     /**
-     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post Transition API
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post Transition Issue
      */
     public function transitionTo(
         Issue\Key $key,
@@ -93,7 +93,7 @@ readonly class TaskTracker implements TaskTrackerInterface
 
         $versions = json_decode($content, true)['values'];
 
-        $heap = new class() extends \SplMaxHeap {
+        $heap = new class extends \SplMaxHeap {
             /**
              * @param array $value1
              * @param array $value2
@@ -244,6 +244,9 @@ readonly class TaskTracker implements TaskTrackerInterface
         );
     }
 
+    /**
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-get Get transitions
+     */
     public function issueTransitions(Issue\Key $key): Transition\TransitionList
     {
         $request = $this->requestFactory->createRequest(

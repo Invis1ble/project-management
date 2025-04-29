@@ -8,6 +8,7 @@ use Invis1ble\ProjectManagement\Shared\Domain\Event\SourceCodeRepository\RefAwar
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Job;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Project;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Psr\Http\Message\UriInterface;
 
 abstract readonly class AbstractJobEvent extends RefAwareEvent
 {
@@ -17,6 +18,7 @@ abstract readonly class AbstractJobEvent extends RefAwareEvent
         public Job\JobId $jobId,
         public Job\Name $name,
         public Job\Status\StatusInterface $status,
+        public ?UriInterface $guiUrl,
         public \DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $startedAt,
         public ?\DateTimeImmutable $finishedAt,

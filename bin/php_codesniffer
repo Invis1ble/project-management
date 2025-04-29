@@ -2,4 +2,6 @@
 
 vendor/bin/phpcs \
     -p \
-    --report=code,gitblame
+    --report=code,gitblame \
+    --parallel="$(nproc)" \
+    --no-cache

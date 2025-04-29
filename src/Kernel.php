@@ -7,6 +7,7 @@ namespace Invis1ble\ProjectManagement;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundle;
 use EugenGanshorn\Bundle\GuzzleBundleRetryPlugin\GuzzleBundleRetryPlugin;
 use Invis1ble\ProjectManagement\Shared\Infrastructure\DependencyInjection\AdjustMessageHandlersPass;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,7 +19,13 @@ class Kernel extends BaseKernel
 
     public function registerBundles(): iterable
     {
-        $contents = require $this->getBundlesPath();
+        if (!is_file($bundlesPath = $this->getBundlesPath())) {
+            yield new FrameworkBundle();
+
+            return;
+        }
+
+        $contents = require $bundlesPath;
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
                 if (EightPointsGuzzleBundle::class === $class) {

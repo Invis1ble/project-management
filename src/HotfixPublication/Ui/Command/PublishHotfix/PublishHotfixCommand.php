@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\HotfixPublication\Ui\Command\PublishHotfix;
 
-use Invis1ble\Messenger\Command\CommandBusInterface;
 use Invis1ble\Messenger\Query\QueryBusInterface;
 use Invis1ble\Messenger\Query\QueryInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\CreateHotfixPublication\CreateHotfixPublicationCommand;
@@ -12,21 +11,23 @@ use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Command\Pr
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixesInActiveSprint\GetHotfixesInActiveSprintQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetHotfixPublication\GetHotfixPublicationQuery;
 use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublication\GetLatestHotfixPublicationQuery;
-use Invis1ble\ProjectManagement\HotfixPublication\Application\UseCase\Query\GetLatestHotfixPublicationByTag\GetLatestHotfixPublicationByTagQuery;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Event\AbstractHotfixPublicationStatusSetEvent;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Exception\HotfixPublicationNotFoundException;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublication;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationId;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\HotfixPublicationInterface;
 use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\SourceCodeRepository\Tag\MessageFactoryInterface;
+use Invis1ble\ProjectManagement\HotfixPublication\Domain\Model\Status\Dictionary as PublicationStatusDictionary;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Branch;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue;
 use Invis1ble\ProjectManagement\Shared\Ui\Command\PublicationAwareCommand;
+use Invis1ble\ProjectManagement\Shared\Ui\Command\ShowingProgressCommandDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsCommand(name: 'pm:hotfix:publish', description: 'Publish hotfixes')]
 final class PublishHotfixCommand extends PublicationAwareCommand
@@ -35,21 +36,18 @@ final class PublishHotfixCommand extends PublicationAwareCommand
 
     public function __construct(
         QueryBusInterface $queryBus,
-        CommandBusInterface $commandBus,
         Issue\GuiUrlFactoryInterface $issueGuiUrlFactory,
-        SerializerInterface $serializer,
         Issue\StatusProviderInterface $issueStatusProvider,
-        \DateInterval $pipelineMaxAwaitingTime,
+        ShowingProgressCommandDispatcherInterface $showingProgressCommandDispatcher,
         private readonly MessageFactoryInterface $tagMessageFactory,
+        \DateInterval $pipelineMaxAwaitingTime,
     ) {
         $this->statusReadyForPublish = $issueStatusProvider->readyForPublish();
 
         parent::__construct(
             queryBus: $queryBus,
-            commandBus: $commandBus,
-            serializer: $serializer,
-            issueStatusProvider: $issueStatusProvider,
             issueGuiUrlFactory: $issueGuiUrlFactory,
+            showingProgressCommandDispatcher: $showingProgressCommandDispatcher,
             pipelineMaxAwaitingTime: $pipelineMaxAwaitingTime,
         );
     }
@@ -128,29 +126,45 @@ final class PublishHotfixCommand extends PublicationAwareCommand
             return Command::SUCCESS;
         }
 
-        $confirmed = $this->io->confirm('OK', !empty($keys));
+        $confirmed = $this->io->confirm('OK', !empty($keys) || is_string($resume));
 
         if (!$confirmed) {
             $this->abort();
         }
 
-        if (false === $resume) {
-            $this->commandBus->dispatch(new CreateHotfixPublicationCommand(
+        if (isset($publication)) {
+            $status = (string) $publication->status();
+        } else {
+            $status = 'inited';
+        }
+
+        if (isset($publicationId)) {
+            $command = new ProceedToNextStatusCommand($publicationId);
+        } else {
+            $command = new CreateHotfixPublicationCommand(
                 tagName: $tagName,
                 tagMessage: $tagMessage,
                 hotfixes: $hotfixes,
-            ));
-
-            $publication = $this->getPublication(new GetLatestHotfixPublicationByTagQuery($tagName));
-            $publicationId = $publication->id();
-        } else {
-            $this->commandBus->dispatch(new ProceedToNextStatusCommand($publicationId));
+            );
         }
 
-        return $this->showProgressLog(
-            query: new GetHotfixPublicationQuery($publicationId),
-            inFinalState: fn (HotfixPublicationInterface $publication): bool => $publication->published(),
+        $result = $this->showingProgressCommandDispatcher->dispatch(
+            io: $this->io,
+            command: $command,
+            initialStatus: $status,
+            finalStatus: PublicationStatusDictionary::Done,
+            publicationClass: HotfixPublication::class,
+            publicationStatusSetEventClass: AbstractHotfixPublicationStatusSetEvent::class,
+            publicationStatusDictionaryClass: PublicationStatusDictionary::class,
         );
+
+        if (Command::SUCCESS === $result) {
+            $this->io->success('Publication done');
+        } else {
+            $this->io->error('Unexpected error occurred');
+        }
+
+        return $result;
     }
 
     protected function getPublication(QueryInterface $query): HotfixPublicationInterface

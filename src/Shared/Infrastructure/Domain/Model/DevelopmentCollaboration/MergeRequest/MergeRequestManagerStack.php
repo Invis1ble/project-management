@@ -20,6 +20,9 @@ final readonly class MergeRequestManagerStack implements MergeRequestManagerInte
      */
     private iterable $mergeRequestManagers;
 
+    /**
+     * @param iterable<MergeRequestManagerInterface> $mergeRequestManagers
+     */
     public function __construct(iterable $mergeRequestManagers)
     {
         $managers = [];

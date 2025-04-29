@@ -7,13 +7,13 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\N
 use Invis1ble\ProjectManagement\Shared\Domain\Model\AbstractList;
 
 /**
- * @extends AbstractList<AbstractAction>
+ * @extends AbstractList<Action>
  */
 final readonly class ActionList extends AbstractList
 {
     private iterable $elements;
 
-    public function __construct(AbstractAction ...$actions)
+    public function __construct(Action ...$actions)
     {
         if (0 === iterator_count($actions)) {
             throw new \InvalidArgumentException('Actions must have at least one action');

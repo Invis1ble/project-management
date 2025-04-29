@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Shared\Domain\Model;
 
-use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 
 abstract readonly class AbstractUuid implements IdInterface
 {
-    public function __construct(private AbstractUid $uuid)
+    public function __construct(private Uuid $uuid)
     {
     }
 

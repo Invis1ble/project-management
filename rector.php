@@ -15,6 +15,7 @@ return RectorConfig::configure()
         __DIR__ . '/config',
         __DIR__ . '/public',
         __DIR__ . '/src',
+        __DIR__ . '/tests',
     ])
     ->withSkip([
         __DIR__ . '/public/index.php',
@@ -31,7 +32,7 @@ return RectorConfig::configure()
     ])
     ->withPhpSets()
     ->withSets([
-        SymfonySetList::SYMFONY_64,
+        SymfonySetList::SYMFONY_71,
         SymfonySetList::SYMFONY_CODE_QUALITY,
         SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Invis1ble\ProjectManagement\Tests\Shared\Infrastructure\Domain\Serializer\Normalizer\IdNormalizer;
 
-use Invis1ble\ProjectManagement\Tests\Shared\Domain\SerializerAwareTestCase;
+use Invis1ble\ProjectManagement\Tests\Shared\SerializerAwareTestCase;
 
 class IdNormalizerTest extends SerializerAwareTestCase
 {
@@ -12,16 +12,13 @@ class IdNormalizerTest extends SerializerAwareTestCase
     {
         $serializer = static::getSerializer();
 
-        $id1 = new TestId(1);
-        $id2 = new TestId(2);
-
-        $dto = new IdAwareDto($id1, $id2);
+        $id = new TestId(42);
+        $dto = new IdAwareDto($id);
 
         $normalized = $serializer->normalize($dto);
         $denormalized = $serializer->denormalize($normalized, IdAwareDto::class);
 
         $this->assertInstanceOf(IdAwareDto::class, $denormalized);
-        $this->assertObjectEquals($id1, $denormalized->abstract);
-        $this->assertObjectEquals($id2, $denormalized->concrete);
+        $this->assertObjectEquals($id, $denormalized->id);
     }
 }

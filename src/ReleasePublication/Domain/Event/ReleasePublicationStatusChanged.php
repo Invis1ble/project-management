@@ -10,7 +10,7 @@ use Invis1ble\ProjectManagement\ReleasePublication\Domain\Model\Status\StatusInt
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Tag;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\TaskTracker\Issue\IssueList;
 
-final readonly class ReleasePublicationStatusChanged extends AbstractReleasePublicationEvent
+final readonly class ReleasePublicationStatusChanged extends AbstractReleasePublicationStatusSetEvent
 {
     public function __construct(
         ReleasePublicationId $id,

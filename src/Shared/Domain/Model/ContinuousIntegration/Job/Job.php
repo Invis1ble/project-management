@@ -6,6 +6,7 @@ namespace Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\
 
 use Invis1ble\ProjectManagement\Shared\Domain\Model\ContinuousIntegration\Pipeline\Pipeline;
 use Invis1ble\ProjectManagement\Shared\Domain\Model\SourceCodeRepository\Ref;
+use Psr\Http\Message\UriInterface;
 
 final readonly class Job
 {
@@ -14,6 +15,7 @@ final readonly class Job
         public Name $name,
         public Ref $ref,
         public Status\StatusInterface $status,
+        public ?UriInterface $guiUrl,
         public ?Pipeline $pipeline,
         public \DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $startedAt,

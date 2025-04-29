@@ -15,13 +15,13 @@ use Invis1ble\ProjectManagement\Shared\Domain\Model\DevelopmentCollaboration\Mer
 final readonly class IssueList extends AbstractList
 {
     /**
-     * @var \SplObjectStorage<Key>
+     * @var \SplObjectStorage<Key, Issue>
      */
     private \SplObjectStorage $storage;
 
     public function __construct(Issue ...$issues)
     {
-        $this->storage = new class() extends \SplObjectStorage {
+        $this->storage = new class extends \SplObjectStorage {
             public function getHash(object $object): string
             {
                 if (!$object instanceof Key) {

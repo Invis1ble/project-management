@@ -34,11 +34,6 @@ readonly class VersionName extends Name
         return new self((string) $ref);
     }
 
-    public function versionNewerThan(self $name): bool
-    {
-        return 1 === $this->versionCompare($name);
-    }
-
     public function versionCompare(self $name): int
     {
         return version_compare($this->value, $name->value);
