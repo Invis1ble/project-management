@@ -25,7 +25,7 @@ final class PublicationProgress implements PublicationProgressInterface
     public function __construct(
         OutputStyle $io,
         private readonly EventFormatterStackInterface $eventFormatter,
-        ?Step $initialStep,
+        private readonly ?Step $initialStep,
         Step $finalStep,
         string $initialStatus = 'inited',
         private readonly int $eventLogTailSize = 30,
@@ -51,10 +51,6 @@ FORMAT;
             display: false,
         );
 
-        if (null !== $initialStep) {
-            $this->setProgress($initialStep);
-        }
-
         $this->progressBar->setMessage(
             message: "\n",
             name: 'event_log_tail',
@@ -63,7 +59,9 @@ FORMAT;
 
     public function start(): void
     {
-        $this->progressBar->start();
+        $this->progressBar->start(
+            startAt: $this->initialStep?->value ?? 0,
+        );
     }
 
     public function setProgress(Step $step): void
